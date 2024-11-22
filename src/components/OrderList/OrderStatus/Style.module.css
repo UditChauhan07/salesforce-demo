@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap');
+
+.BoxBlack{
+    width: 210px;
+height: 210px;
+flex-shrink: 0;
+background-color: #5B5B5B;
+position: relative;
+border-radius: 6px;
+background: #5B5B5B;
+
+}
+
+.ProtuctInnerBox1 span{
+    margin: 0 0 0 15px;
+    color: #000;
+font-family: "Montserrat";
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: normal;
+letter-spacing: 1.4px;
+text-decoration-line: underline;
+
+}
+
+.Boxwhite{
+    width: 210px;
+height: 210px;
+flex-shrink: 0;
+background-color: #ffffff;
+margin: 0 0 0 0;
+position: absolute;
+right: 20px;
+top: 20px;
+text-align: center;
+display: flex;
+align-items: center;
+border-radius: 6px;
+background: #FFF;
+justify-content: center;
+box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+
+
+}
+
+.Boxwhite h1{
+    color: #000;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 104px;
+font-style: normal;
+font-weight: 900;
+line-height: normal;
+letter-spacing: 1.12px;
+line-height: 30px;
+margin: 0;
+}
+
+.Boxwhite h1 span{
+    color: #000;
+font-family: Montserrat;
+font-size: 27px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+letter-spacing: 1.5px;
+}
+
+.ProtuctInnerBoxInner h3{
+    color: #000;
+font-family: "Montserrat";
+font-size: 18px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+letter-spacing: 1.8px;
+}
+
+.span3{
+    color: #000;
+font-family: "Montserrat";
+font-size: 18px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: 1.8px;
+}
+
+.span1{
+    color: #9C9C9C;
+font-family: "Montserrat";
+font-size: 13px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: 1.3px;
+}
+
+.span2{
+    color: #212121;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 13px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+letter-spacing: 1.12px;
+}
+
+.mainControl{
+    display: flex;
+    gap: 20px;
+    padding: 0 0 0 20px;
+}
+
+.mainTop{
+    border-radius: 10px;
+    /* border: 1px solid #000; */
+    /* width: 70%; */
+    margin: auto;
+ padding: 20px;
+}
+
+.ProtuctInnerBoxInner p{
+    display: flex;
+    gap: 10px;
+    
+}
+
+.mainTop h2{
+    color: #000;
+    text-align: center;
+    font-family: "Montserrat";
+    font-size: 22px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 2.2px; 
+    padding-bottom: 50PX;
+    /* border: 1px solid; */
+}
+
+.ShippedBar{
+    display: flex;
+    justify-content: space-between;
+    margin:45px 0 0 0 ;
+    padding:30px 0 0 0 ;
+    border-top: 1px dashed #000 ;
+}
+
+.BtnGroup{
+    display: flex;
+    gap: 20px;
+}
+
+.BtnGroup button{
+    border: 1px solid #000;
+background: rgba(64, 58, 53, 0.00);
+color: #000;
+text-align: center;
+font-family: "Montserrat";
+font-size: 16px;
+font-style: normal;
+font-weight: 600;
+line-height: 33px; /* 206.25% */
+letter-spacing: 1.6px;
+text-transform: uppercase;
+padding: 0 10px;
+
+}
+
+
+.ShippedBar h3{
+    color: #9C9C9C;
+font-family: "Montserrat";
+font-size: 13px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+letter-spacing: 1.3px;
+}
+
+.ShippedBar h3 span{
+    color: #212121;
+font-family: Arial;
+font-size: 13px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+letter-spacing: 1.12px;
+}
+
+
+@media(max-width:1199px)
+{
+    .BoxBlack, .Boxwhite{
+        width: 150px;
+    height: 150px;
+    }
+
+    .Boxwhite h1{        
+    font-size: 54px;
+}
+}

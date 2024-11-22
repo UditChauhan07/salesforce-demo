@@ -1,0 +1,234 @@
+.orderListHolder {
+  height: 50vh;
+  overflow: scroll;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  position: relative;
+}
+/* .openListHolder{
+  animation: openList 10s;
+}
+@keyframes openList {
+  0% {
+    height: 0;
+  }
+  100% {
+    height: 100%;
+  }
+} */
+
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(10px, 0);
+  }
+  66% {
+    transform: translate(-10px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+/* .cardEnterRight {
+  animation: cardEnterRight 0.5s;
+}
+
+@keyframes cardEnterRight {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.cardEnterLeft {
+  animation: cardEnterLeft 0.5s;
+}
+
+@keyframes cardEnterLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+} */
+.scrollEffect {
+  /* opacity: 0;
+  -moz-transition: all 500ms linear;
+  -webkit-transition: all 500ms linear;
+  -o-transition: all 500ms linear; */
+  transition: all 500s linear;
+  /* -moz-transform: translate3d(-100px, 0px, 0px);
+  -webkit-transform: translate3d(-100px, 0px, 0px);
+  -o-transform: translate(-100px, 0px);
+  -ms-transform: translate(-100px, 0px); */
+  /* transform: translate3d(-100px, 0px, 0px); */
+}
+.reasonTitle {
+  color: #000;
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  margin-top: 25px;
+}
+.selOrder {
+  border: 1px dashed #3c74b4 !important;
+}
+.searchBox {
+  float: right;
+  /* border-radius: 50px; */
+  border-bottom: 1px solid #ccc;
+  font-size: 12px;
+  width: 200px;
+  text-align: right;
+}
+.searchBox::placeholder {
+  font-size: 12px;
+}
+.productErrorQtyHolder::placeholder {
+  font-size: 12px;
+}
+tr th {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+.btnHolder {
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  padding: 0px 10px;
+  line-height: 33px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  border: 1px solid #fff;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  float: right;
+}
+table tr td {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 14px;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: 1.4px;
+}
+.imgHolder {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 115px);
+  gap: 10px;
+}
+.imgHolder img {
+  width: 100px;
+  height: auto;
+}
+.productErrorQtyHolder {
+  width: 100px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.productErrorQtyHolder:focus {
+  outline: none;
+}
+.errorCardHolder {
+  border-bottom: 1px solid #ccc;
+  transition: box-shadow 0.3s;
+}
+input[type="radio"] {
+  accent-color: #3c74b4;
+}
+.errorCardHolder:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  background-color: #f7f7f7 !important;
+}
+.productErrorQtyHolder::placeholder {
+  font: 0.1em;
+}
+.productImageHolder img {
+  width: 50px;
+  height: 100%;
+  margin: auto 5px;
+  cursor: pointer;
+}
+
+.searchBox:focus {
+  outline: none;
+}
+.inputHolder {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.totalProductPrice {
+  text-align: end;
+}
+.Margitotal {
+  margin: 0 0 15px;
+  cursor: pointer;
+}
+.detailsTitleHolder {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.detailsDescHolder {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 14px;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  word-wrap: break-word;
+}
+
+@media (max-width: 1440.98px) {
+  tr th {
+    font-size: 13px;
+  }
+  .totalProductPrice {
+    width: 200px;
+  }
+}
+@media (max-width: 1300.98px) {
+  .reasonTitle {
+    font-size: 18px;
+  }
+}
+@media (max-width: 1160.98px) {
+  .totalProductPrice {
+    width: 100%;
+  }
+  .orderListHolder {
+    width: 100%;
+  }
+}

@@ -1,0 +1,490 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
+
+.TicketWidth{
+  display: grid;
+  gap: 20px;
+}
+
+.TicketWidth button{
+  width: 100%;
+}
+
+.inputDraw input {
+  color: white;
+  padding: 0 2px;
+  outline: none;
+  border-bottom: 1px solid #fff;
+  border-top: 0px solid #fff;
+  border-left: 0px solid #fff;
+  border-right: 0px solid #fff;
+  background-color: transparent;
+}
+.btn {
+  padding: 0.5rem 2rem;
+  border: 1px solid #000;
+  background: #000;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+}
+.btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+.BtnStyle {
+  border: 1px solid #fff;
+  padding: 0 6px;
+}
+
+ul.dropdown-menu.show {
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.blacklLabel {
+  background-color: #08090a;
+  text-align: center;
+
+  padding: 10px 0;
+  /* height: 50px; */
+}
+
+.blacklLabel ul {
+  gap: 10%;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.blacklLabel ul li {
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; /* 266.667% */
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+.modalContent{
+  font-family: "Montserrat";
+  font-size: 14px;
+  line-height: 18px;
+}
+.OrderSvg {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.head_topp {
+  /* width: 80%; */
+  height: 50px;
+  background-color: black;
+}
+.OrderSvg h2 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.ginput_container input {
+  padding-left: 30px;
+  background-image: url("./Images/FindIcon.svg");
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: 10px 1rem;
+}
+
+.inorderflex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #000;
+  padding: 0px 0px 20px 0px;
+  margin: 27px 0 0 0;
+}
+
+.inorderflex h2 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.inorderflex button {
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.8px;
+  border-radius: 0px 8px 8px 0px;
+  background: #000;
+  height: 42px;
+  padding: 0px 13px;
+  border: none;
+}
+
+.InputControll {
+  height: 42px;
+  /* background-color: aqua; */
+}
+
+.InputControll input {
+  height: 42px;
+  border-radius: 8px 0px 0px 8px;
+  border: 1px solid #9c9c9c;
+  background: #fff;
+  padding: 0 15px;
+  outline: none;
+}
+
+.InputControll input::placeholder {
+  padding: 0 0 10px 0;
+}
+
+.poNumber {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 36px;
+  border-radius: 8px 8px 0px 0px;
+  border: 1px solid #d5d9d9;
+  background: #f8f8f8;
+  gap: 10px;
+    width: 100%;
+}
+
+.poNumber .PoOrderLast h3 {
+  text-align: end;
+}
+
+.poNumber h3 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.6px;
+}
+
+.poNumber p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.productDetail .Prod1 {
+  display: flex;
+  gap: 15px;
+}
+
+.BoxBlack {
+  width: 107px;
+  height: 108px;
+  flex-shrink: 0;
+  background-color: #5b5b5b;
+  position: relative;
+  border-radius: 6px;
+  background: #5b5b5b;
+}
+
+.ProtuctInnerBox1 span {
+  margin: 0 0 0 15px;
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  text-decoration-line: underline;
+}
+
+.Boxwhite {
+  width: 107px;
+  height: 108px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  margin: 0 0 0 0;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.Boxwhite h1 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 37px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  line-height: 22px;
+  margin: 0;
+}
+
+.Boxwhite h1 span {
+  color: #000;
+  font-family: Montserrat;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.5px;
+}
+
+.ProtuctInnerBox1 ul li,
+.noProductLabel {
+  margin-top: 4%;
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 1.6px;
+  list-style: disc;
+}
+
+.productDetail {
+  margin: 20px 0;
+  display: flex;
+ /* flex-wrap: wrap; */
+  justify-content: space-between;
+  padding: 0 36px 0 46px;
+}
+
+.totalProductPrice h3,
+.totalProductPrice p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.totalProductPrice {
+  text-align: end;
+}
+
+.Margitotal {
+  margin: 30px 0;
+}
+
+.totalProductPrice p {
+  font-size: 20px;
+}
+
+.totalProductPrice button {
+  color: #000;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  padding: 0px 10px;
+  line-height: 33px;
+  /* 206.25% */
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  border: 1px solid #000;
+  background: rgba(64, 58, 53, 0);
+}
+
+.StatusOrder {
+  /* display: flex; */
+  justify-content: space-between;
+  padding: 20px 36px;
+  border-top: 1px solid #d5d9d9;
+  align-items: center;
+  display: grid;
+  gap: 20px;
+}
+
+.Status1 {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.Status1 h2,
+.Status1 h3,
+.Status1 h4 {
+  color: #000;
+  text-align: center;
+  font-family: Montserrat-500;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  background: #e2e2e2;
+cursor: pointer;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  padding: 10px 10px;
+  margin: 0;
+}
+
+/* .Status1 h3 {
+    background: #CBF9D5;
+}
+
+.Status1 h4 {
+    background: #FFD3AB;
+} */
+
+.Status2 h6 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  margin: 0;
+}
+
+.Status2 h6 span {
+  font-weight: 400;
+}
+
+.orderStatement {
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #fff;
+  margin: 20px 0;
+}
+
+.OrderMainPr {
+  width: 75%;
+  margin: auto;
+}
+
+.OrderMainFull {
+  width: 100%;
+  margin: auto;
+}
+.tool {
+  cursor: pointer;
+}
+.buullet {
+  list-style: disc;
+}
+.selection {
+  background-color: #08090a;
+  color: white;
+  outline: none;
+  border: none;
+}
+.selection option {
+  background-color: white;
+  color: #000;
+}
+
+.modalContrlWidth {
+  width: 80%;
+  margin: auto;
+  /* height: 500px; */
+}
+
+.ProtuctInnerBoxInner .Span2 {
+  color: #212121;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+  @media (max-width: 1199px) {
+  .OrderMainPr {
+    width: 85%;
+    margin: auto;
+  }
+  .modalContrlWidth {
+    width: 100%;
+    margin: auto;
+    /* height: 500px; */
+  }
+}
+
+@media (max-width: 767px) {
+  .Status2 {
+    margin-top: 20px;
+  }
+
+  .StatusOrder {
+    display: block;
+  }
+
+  .Status1 {
+    display: grid;
+    gap: 20px;
+    align-items: center;
+    justify-content: start;
+  }
+
+  .productDetail {
+    display: block;
+  }
+  .poNumber {
+    display: block;
+  }
+  .poNumb1 {
+    margin: 20px 0;
+  }
+  .poNumber .PoOrderLast h3 {
+    text-align: start;
+  }
+}
+@media (max-width: 1160.98px) {
+  .poNumber{
+    text-align: right;
+    padding: 15px 20px;
+  }
+  .poNumber h3{
+    font-size: 14px;
+  }
+  .poNumber p{
+    font-size: 18px;
+  }
+  .warp{
+    padding: 0 10px!important;
+    flex-wrap: wrap;
+  }
+}

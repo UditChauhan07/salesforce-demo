@@ -1,0 +1,280 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
+
+.BrandTopShow {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 40px 0;
+}
+.BrandTopShow p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.BackToMyRetailer {
+  color: #fff;
+  text-align: center;
+  font-family: Montserrat;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; /* 266.667% */
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  background-color: #000;
+  
+
+}
+
+.BrandTopShow p span {
+  /* color: #000; */
+  /* text-align: right; */
+  font-family: "Montserrat";
+  /* font-size: 20px; */
+  /* font-style: normal; */
+  font-weight: 600;
+  /* line-height: normal; */
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.BrandLeft h2 {
+  color: #fff;
+  font-family: "Montserrat";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  text-transform: uppercase;
+  background: #000;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  padding: 0 0px 0 17px;
+  gap: 10px;
+  margin:0 0 10px 0;
+}
+
+.HeaderAccor {
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin: 20px 0 0 0 !important;
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.AccoMain button {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  /* border-bottom: 2px solid #F2F2F2; */
+  padding: 0 0 14px 0;
+  margin: 30px 0 10px 0;
+}
+
+.AcciIten button {
+color: #000;
+}
+
+.AcciIten button:not(.collapsed){
+  color: #000;
+}
+
+
+
+.AcciIten {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 2px solid #f2f2f2;
+  border-radius: 0 !important;
+  padding-bottom: 10px;
+}
+
+.bodyAccor {
+  padding: 30px 0 0 0;
+}
+
+.title {
+  color: #000;
+  font-family: Arial;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 1.12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
+.TotalSide {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 0 0;
+}
+
+.TotalSide h4 {
+  color: #000;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.TotalSide Button {
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  background-color: #000;
+  /* height: 40px; */
+  padding: 6px 10px;
+}
+.title input {
+  margin: 0 15px 0 0;
+  min-width: 15px;
+  min-height: 15px;
+}
+.title input[type="check"],
+.title input[type="check"]:checked {
+  width: 19px;
+  height: 19px;
+}
+
+.title input[type="radio"],
+.title input[type="radio"]:checked {
+  width: 15px;
+  height: 15px;
+  top: 30%;
+}
+
+.title input[type="radio"] {
+  padding: 0;
+  border: 5px solid #000000;
+  margin-right: 16px;
+}
+
+.title input[type="radio"]:checked {
+  border: 8px solid #003b5f;
+}
+
+.title.borderRad {
+  border-radius: 20px 20px 0px 0px;
+}
+.active {
+  color: #000;
+}
+.title .active {
+  color: #000 !important;
+}
+
+.title input[type="radio"]:checked:after,
+.title input[type="radio"]:not(:checked):before {
+  width: 15px;
+  height: 15px;
+  border-radius: 15px;
+  background-color: #fff;
+  content: "";
+  display: inline-block;
+  visibility: visible;
+}
+
+.title input[type="radio"]:checked:after {
+  border: 4px solid #000;
+  transition: 0.5s;
+}
+.title input[type="radio"]:not(:checked):before {
+  border: 2px solid #8c8c8c;
+  transition: 0.5s;
+}
+
+.lastFill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0 0 0;
+}
+
+.lastFill h5 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.lastFill button {
+  color: #fff;
+  text-align: center;
+  font-family: Arial;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  background-color: #000;
+  padding: 4px;
+}
+
+
+/* .AccorBorder{
+  height: 600px;
+} */
+
+@media (max-width: 1200px) {
+  .BrandLeft h2 {
+    font-size: 9px;
+    height: 30px;
+    padding: 0 0px 0 8px;
+    gap: 7px;
+  }
+  .BrandTopShow h4{
+    font-size: 15px;
+  }
+  .BrandTopShow p {
+    font-size: 15px;
+}
+}
+
+@media(max-width:991px){
+  .TotalSide h4 {
+        font-size: 15px;
+}
+.TotalSide Button {
+  font-size: 15px;
+}
+}
+
+
+@media(max-width:767px){
+  .BrandTopShow {
+    display: block;
+     }
+
+     .BrandTopShow h4{
+      justify-content: start;
+      margin-bottom: 20px;
+     }
+}

@@ -1,0 +1,351 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
+
+.FullQuearyDetailH2 {
+  display: flex;
+  align-items: center;
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  margin: 40px 0;
+}
+.LinkHolder{
+  color: #000;
+  text-decoration: underline!important;
+}
+.FullQuearyDetailH2 svg {
+  margin: 0 10px 0 0;
+}
+
+.DownloadLink {
+  transition: text-decoration 0.2s !important; 
+}
+
+.DownloadLink:hover {
+  text-decoration: underline !important;  
+  cursor: pointer !important;
+}
+
+.FullQuearyDetailH2 span {
+  font-size: 22px;
+  letter-spacing: 2.2px;
+}
+
+.FullQuearyDetailH4 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin-bottom: 40px;
+}
+
+.FullQuearyDetailH4 span {
+  font-weight: 700;
+}
+
+.LeftMainTopBox p {
+  display: flex;
+  color: #000;
+  font-family: Arial;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.LeftMainTopBox p span {
+  font-weight: 700;
+}
+
+.LeftMainTopBox p svg {
+  width: 24px;
+  height: 22px;
+  margin: 0 10px 0 0;
+}
+
+.LeftMainTopBox {
+  border-radius: 8px;
+  border: 1px solid #ffd6b4;
+  background: linear-gradient(90deg, #ffead7 0%, #fffcfa 100%);
+  padding: 0 35px;
+  height: 77px;
+  display: flex;
+  align-items: center;
+}
+
+.LeftMainDiv h6 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 111.111% */
+  letter-spacing: 1.12px;
+  margin: 32px 0;
+}
+
+.ActivityProfile h6 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 125% */
+  letter-spacing: 1.12px;
+  width: 58px;
+  height: 58px;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.ActivityContentImform {
+  width: 90%;
+  margin: auto;
+}
+
+.SendFlex {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.SendButtonChat svg path {
+  color: #000;
+  fill: #000;
+}
+.SendButtonChat {
+  display: flex;
+  align-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid #000;
+  border-radius: 100%;
+  justify-content: center;
+}
+
+.SendButtonChat svg {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ActivityProfile {
+  margin: 0 10px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 58px;
+  height: 58px;
+  background-color: #cef6ff;
+  border-radius: 100%;
+}
+
+.ActiDark {
+  background-color: #a6a6a6;
+}
+
+.ActivityBox {
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.ActivityContentImform h2 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 125% */
+  letter-spacing: 1.12px;
+  margin: 0 0 10px 0;
+}
+
+.ActivityContentImform p {
+  color: #787878;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 142.857% */
+  letter-spacing: 1.12px;
+  word-break: break-word;
+}
+
+.ActivityDate p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px; /* 112.5% */
+  letter-spacing: 1.12px;
+  width: 193px;
+}
+
+.Para2 {
+  border-bottom: 1px solid #d5d9d9;
+  padding-bottom: 23px;
+  width: 100%;
+}
+
+.RightMainDiv h3 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 125% */
+  letter-spacing: 1.12px;
+}
+
+.RightMainDiv p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 142.857% */
+  letter-spacing: 1.12px;
+  margin: 0 0 30px 0;
+}
+
+.ControlPriority p {
+  display: flex;
+  gap: 15px;
+}
+
+.RightControlStatus p {
+  color: #6f3400;
+  text-align: center;
+  font-family: Arial;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 166.667% */
+  letter-spacing: 1.12px;
+  text-transform: uppercase;
+  background-color: #ffead7;
+  display: inline-block;
+  padding: 5px 25px;
+}
+
+.ActivityContentImform textarea {
+  border: 1px solid #000;
+  background: #fff;
+  outline: none;
+  width: 100%;
+  padding: 10px 0 0 20px;
+  height: 79px;
+}
+
+.CommentBox {
+  margin: 30px 0 0 0;
+}
+
+.HeightGiven {
+  height: 400px;
+  overflow: auto;
+  padding: 15px 0;
+  background-color: #ffff;
+  overflow-y: auto;
+}
+
+
+.ActivityContentImform textarea::-moz-placeholder {
+  color: #000;
+}
+.UserDescWrapper {
+  white-space: normal; /* Allows text to wrap and break onto the next line when needed */
+  word-wrap: break-word; /* Ensures long words break correctly and don't overflow the container */
+  word-break: break-all; /* Breaks words that are too long to fit */
+  overflow-wrap: break-word; /* Same as word-wrap, adds a fallback */
+  hyphens: auto; /* Hyphenates the content when necessary */
+}
+
+.UserDescContent {
+  white-space: normal; /* Ensures wrapping of the description */
+  overflow-wrap: break-word; /* Handles word breaking to avoid overflow */
+  word-break: break-word; /* Ensures breaking at natural break points */
+}
+
+.ShowFullDesc {
+  max-height: none; /* Removes any restrictions on height if showing full description */
+}
+
+.UserDescWrapper {
+  max-width: 100%; /* Ensure the description wrapper doesn't exceed container's width */
+  display: block;
+  margin-top: 10px; /* Ensures that the description takes up a new line when needed */
+}
+.descriptionMarginTop {
+  margin-top: 10px;  /* Adjust the value as per your requirement */
+}
+
+
+
+.LeftMainDiv {
+  border-right: 1px dashed #000;
+  padding: 0 36px 0 0;
+  width: 98%;
+}
+
+@media (max-width: 1024.98px) {
+  .ActivityDate p {
+    line-height: 23px;
+    width: 127px;
+    font-size: 13px;
+  }
+  .ActivityContentImform h2 {
+    font-size: 14px;
+  }
+
+  .ActivityContentImform p {
+    font-size: 13px;
+  }
+
+  .ActivityProfile h6 {
+    font-size: 13px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .ActivityProfile {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .ActivityDate p {
+    line-height: 23px;
+    width: 127px;
+  }
+
+  .FlexReverse {
+    flex-direction: column-reverse;
+  }
+
+  .RightMainDiv {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+  }
+
+  .LeftMainDiv {
+    border-right: 0px dashed #000;
+    padding: 0 0px 0 0;
+    width: 100%;
+  }
+}

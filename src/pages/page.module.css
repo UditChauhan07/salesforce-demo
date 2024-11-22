@@ -1,0 +1,273 @@
+/* .LabelBorder{
+  border: 1px solid #F8F8F8;
+background: #FFF;
+} */
+/* ........................... */
+.tableBoundary {
+  border: 1px dashed #000;
+
+  /* overflow: auto; */
+}
+.stickyFirstColumnHeading {
+  position: sticky;
+  left: 0%;
+  top: 0%;
+  z-index: 5;
+}
+.stickyMonth {
+  position: sticky;
+  top: 0%;
+  z-index: 2;
+}
+.stickyFirstColumn {
+  position: sticky;
+  left: 0%;
+  z-index: 2;
+}
+.spinnerOverlay {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  right: 0%;
+  bottom: 0%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: #fff;
+}
+
+.month {
+  background-color: #eeeeee !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; /* 177.778% */
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+}
+.TOPName {
+  color: #000;
+  font-family: Montserrat-400;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+
+  line-height: 22px; /* 150% */
+  letter-spacing: 1.6px;
+
+  padding-top: 17px;
+  margin-left: -30px;
+}
+.td {
+  color: #000;
+  font-family: Montserrat-400;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  /* line-height: 24px;  */
+  line-height: 22px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+
+/* Styles for the download confirmation modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.modalContent {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 28%;
+  max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  overflow: hidden;
+  height: 150px;
+}
+
+.modalActions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.confirmButton {
+  background-color: #080808; /* Green background for the confirm button */
+  color: #fff;
+  border: none;
+  padding: 6px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.confirmButton:hover {
+  background-color: #080808; /* Darker green on hover */
+}
+
+.downloadButton {
+  background-color: #000;
+  color: white;
+  padding: 3px 10px 3px 10px;
+  font-family: Montserrat-400;
+  font-size: 13px;
+  margin-top: 12px;
+  max-width: 105px;
+}
+.cancelButton {
+  border: 2px solid black;
+  background-color: #ececec; /* Red background for the cancel button */
+  color: #080808;
+  border: none;
+  padding: 6px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.cancelButton:hover {
+  background-color: #faf8f8; /* Darker red on hover */
+  border: 2px solid rgb(7, 7, 7);
+}
+/* ......................... */
+
+.widthGivenBrandDetailPage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  grid-template-columns: 24% 24% 24% 24%;
+  gap: 15px;
+  margin: auto;
+  /* display: flex; */
+}
+.upArrow {
+  margin-left: 25px;
+  width: 25px;
+  height: 25px;
+  border-bottom: 10px solid #fff;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+}
+.HoverArrow svg {
+  transition: 0.5s;
+  width: 20px;
+  height: 20px;
+}
+
+.HoverArrow:hover svg {
+  /* margin-left: 10px; */
+  transition: 0.5s;
+}
+
+/* animation */
+.ImgHover img {
+  width: 100%;
+  height: 300px;
+}
+.ImgHover1 {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: 0.75s;
+  cursor: pointer;
+}
+.ImgHover1::before {
+  position: absolute;
+  top: 0;
+  left: -75%;
+  z-index: 2;
+  display: block;
+  content: "";
+  width: 50%;
+  height: 100%;
+  background: -webkit-linear-gradient(
+    left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(240, 240, 240, 0.3) 100%
+  );
+  transform: skewX(-25deg);
+}
+.ImgHover1::before {
+  -webkit-animation: shine 0.75s;
+  animation: shine 0.75s;
+}
+@-webkit-keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+
+.AcoorWidrth td {
+  padding: 0;
+  margin: 0 0 2px 0;
+}
+
+.AcoorWidrth label {
+  border-bottom: 1px solid #f8f8f8;
+  background: #f8fafb;
+  margin: 0 0 3px 0;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+}
+
+.FilterNoneClass {
+  background-color: #000;
+}
+
+@media (max-width: 991.98px) {
+  .widthGivenBrandDetailPage {
+    grid-template-columns: repeat(3, auto);
+  }
+
+  .AcoorWidrth label {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768.98px) {
+  .widthGivenBrandDetailPage {
+    grid-template-columns: repeat(2, auto);
+  }
+
+  .FilterNoneClass {
+    /* display: none; */
+  }
+}
+
+@media (max-width: 600.98px) {
+  .widthGivenBrandDetailPage {
+    grid-template-columns: repeat(1, auto);
+  }
+}

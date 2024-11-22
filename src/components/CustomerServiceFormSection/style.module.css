@@ -1,0 +1,107 @@
+.container {
+  width: 60%;
+  margin: 2rem auto;
+}
+.containerTitle {
+  color: #000;
+  font-family: Montserrat;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.2px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+.formContainer {
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #f8fafb;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+}
+.labelHolder {
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #fff;
+  width: 100%;
+  /* min-height: 70px; */
+  display: flex;
+  color: #9c9c9c;
+  padding: 0.5rem 1rem;
+  font-family: Montserrat;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.6px;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+  gap: 4px;
+}
+
+.labelHolder select,
+.labelHolder textarea,
+.labelHolder input {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  outline: none;
+}
+.btn{
+  padding: 0.5rem 2rem;
+border: 1px solid #000;
+background: #FFF;
+text-align: center;
+text-transform: uppercase;
+cursor: pointer;
+text-decoration: none;
+color: #000;
+}
+.btn:hover{
+  background: #000;
+  color: #fff;
+}
+.dFlex{
+  display: flex;
+  margin: 20px 0;
+  gap: 20px;
+  justify-content: end;
+}
+
+.labelHolder textarea::placeholder{
+  color: #000;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+letter-spacing: 1.12px;
+}
+.labelHolder input::placeholder{
+  color: #000;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+letter-spacing: 1.12px;
+}
+
+@media (max-width: 769px) {
+  .container {
+    width: 80%;
+  }
+}
+@media (max-width: 500px) {
+  .container {
+    width: 95%;
+  }
+}

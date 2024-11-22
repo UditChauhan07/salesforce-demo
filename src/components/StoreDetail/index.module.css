@@ -1,0 +1,251 @@
+.accountHolder {
+  background: #f8f8f8;
+  width: 100%;
+  min-height: 200px;
+  border: 1px solid #d3d3d3;
+  padding: 3rem 2rem 2rem;
+}
+.accountHolder .accountTitleHolder {
+  width: 30%;
+}
+
+.dFlex {
+  display: flex;
+  flex-wrap: wrap;
+}
+.brandContainer{
+  position: absolute;
+  width: 100%;
+}
+.dGrid {
+  display: grid;
+  place-content: center;
+  grid-template-columns: repeat(auto-fill, 30%);
+  gap: 1rem;
+}
+.accountHolder p {
+  margin-bottom: 0;
+}
+.accountHolder .accountLabel {
+  font-family: Montserrat-500;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 19.5px;
+  letter-spacing: 0.1em;
+  text-align: left;
+}
+.detailTitleSubHolder {
+  font-family: Montserrat-400;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 18.94px;
+  letter-spacing: 0.1em;
+  text-align: left;
+}
+.accountHolder .accountNameHolder {
+  font-family: Montserrat-700;
+  font-size: 22px;
+  font-weight: bolder;
+  line-height: 26.82px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.accountHolder .webLinkHolder{
+  position: relative;
+  z-index: 111;
+}
+.accountHolder .webLinkHolder,.detailsContainer .addressLabelHolder {
+  font-family: Arial;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 1.1200000047683716px;
+  text-align: left;
+}
+.accountHolder .addressHoilder {
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e1e1e1;
+  height: fit-content;
+}
+.accountHolder .addressHoilder .labelHolder {
+  font-family: Montserrat-400;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 14.63px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  color: #404040;
+}
+.accountHolder .addressHoilder .addCard {
+  font-family: Arial;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 18.03px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  margin-top: 5px;
+}
+.accountHolder .totalRevenueLinkHolder {
+  font-family: Montserrat-400;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 19.5px;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+.accountHolder .totalRevenueHolder {
+  font-family: Montserrat-700;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 26.82px;
+  letter-spacing: 0.1em;
+  text-align: right;
+  color: #00a82d;
+}
+.accountHolder .infoHolder {
+  width: 25%;
+  border-right: 1px solid #d9d9d9;
+}
+.accountHolder .BrandInfoHolder {
+  width: 75%;
+  padding: 10px 10px 10px 20px;
+  position: relative;
+}
+.accountHolder .accountDetailerLabel {
+  padding: 1rem;
+  border-radius: 10px;
+  background-color: #000;
+  color: #fff;
+  font-family: Arial;
+  font-size: 16px;
+  font-weight: 200;
+  line-height: 18px;
+  letter-spacing: 1.2000000476837158px;
+  height: 50px;
+  margin: auto 0;
+}
+.accountHolder .infoHolder .webLinkHolder {
+  font-weight: bold;
+}
+
+/* details css */
+.detailsContainer {
+  margin: 2rem;
+}
+.detailsContainer .accountNumberHolder {
+  border-right: 1px solid #ccc;
+  width: 15%;
+}
+.detailsContainer .detailTitleHolder {
+  font-family: Montserrat-400;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 21.94px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.detailsContainer .buttonHolder {
+  font-family: Montserrat-400;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 17.07px;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 3px;
+  border-radius: 4px;
+}
+.detailsContainer .activeHolder {
+  background-color: #1abd51;
+  color: #fff;
+}
+.detailsContainer .closeHolder {
+  background-color: #000;
+  color: #fff;
+}
+.detailsContainer .accountNumber {
+  font-family: Montserrat-700;
+  font-size: 30px;
+  font-weight: bolder;
+  line-height: 36.57px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  margin: 0;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+.detailsContainer .accountNumberTinyText {
+  font-family: Arial;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18.03px;
+  letter-spacing: 1.1200000047683716px;
+  text-align: left;
+}
+.detailsContainer .detailBox{
+  display: flex;
+}
+.detailsContainer .detailBox .labelHolder {
+  font-family: Montserrat-400;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 19.5px;
+  letter-spacing: 0.1em;
+  text-align: left;
+  width: 100%;
+}
+.detailsContainer .detailBox .valueHolder {
+  width: 100%;
+  font-family: Arial;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18.03px;
+  letter-spacing: 1.1200000047683716px;
+  text-align: left;
+}
+.detailsContainer .mapContainer{
+  border-right: 1px solid #ccc;
+}
+.detailsContainer .mapHolder{
+  width: 97%;
+  height: 200px;
+  border-radius: 8px;
+  border: 1px solid #EAEAEA;
+}
+.detailsContainer .subTitleHolder{
+  font-family: Montserrat;
+font-size: 16px;
+font-weight: 600;
+line-height: 19.5px;
+letter-spacing: 0.1em;
+text-align: left;
+}
+
+@media (max-width: 1530px) {
+  .detailsContainer .accountNumberHolder{
+    width: 20%;
+  }
+}
+  @media (max-width: 1200px) {
+  .accountHolder .infoHolder {
+    flex-direction: column;
+  }
+  .accountHolder .infoHolder .webLinkHolder {
+    margin-top: 20px !important;
+  }
+  .accountHolder .infoHolder .accountDetailerLabel {
+    padding: 10px;
+    height: auto;
+  }
+  .dGrid{
+    grid-template-columns: repeat(auto-fill, 47%);
+    margin-left: 10px;
+  }
+  .detailsContainer .accountNumberHolder{
+    width: 25%;
+  }
+}

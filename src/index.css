@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Montserrat";
+  }
+}
+
+@layer utilities {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    @apply appearance-none;
+  }
+}
+
+@layer components {
+  .filter-container {
+    @apply w-full h-[50px] bg-[#000] text-white flex justify-center items-center uppercase text-[12px] font-[500] tracking-[1.2px];
+    font-family: "Montserrat-500";
+    gap: 20px;
+
+    @media (max-width: 768.98px) {
+      display: none;
+    }
+    @media (max-width: 1350.98px) {
+      font-size: 9px;
+      gap: 10px;
+    }
+    @media (max-width: 1279.98px) {
+      /* font-size: 8px; */
+      gap: 7px;
+    }
+    @media (max-width: 1160.98px) {
+      height: auto;
+      min-height: 50px;
+    }
+  }
+}
+

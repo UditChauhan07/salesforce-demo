@@ -1,0 +1,120 @@
+.reasonTitle {
+  color: #000;
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  margin-top: 25px;
+}
+.subTitle {
+  color: #000;
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+}
+.attachContainer{
+    border: 1px dashed #3c74b4 !important;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+.dFlex {
+  display: flex;
+  justify-content: space-between;
+}
+.attachLabel {
+  background: #f5f5f5;
+  border-radius: 8px;
+  width: 100%;
+}
+.attachLabel div {
+  padding: 15px;
+}
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(10px, 0);
+  }
+  66% {
+    transform: translate(-10px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+.imgHolder{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 100px);
+    gap: 5px;
+}
+.imgHolder img{
+    width: 100px;
+    height: auto;
+}
+.attachLabelDiv {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  text-align: center;
+  padding: 40px 10px;
+  display: flex;
+  justify-content: center;
+}
+.attachHolder {
+  width: 49%;
+  border: 1px dashed #ccc;
+  padding: 10px;
+}
+.descholder {
+  width: 49%;
+  height: 100%;
+  border: 1px dashed #ccc;
+  padding: 10px;
+}
+.textAreaPut{
+    width: 100%;
+    min-height: 150px;
+    height: 75%;
+    border-bottom: 1px solid #ccc;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background: #F4F4F4;
+}
+.textAreaPut:focus{
+    outline: none;
+}
+.btnHolder{
+    color: #fff;
+    text-align: center;
+    font-family: "Montserrat";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    padding: 0px 10px;
+    line-height: 33px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    border: 1px solid #000;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: right;
+    max-width: 150px;
+    margin: 10px auto;
+  }

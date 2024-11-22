@@ -1,0 +1,150 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap'); */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1021;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  min-width: 309px;
+  max-height: 80vh !important;
+  /* overflow: auto; */
+  text-align: center;
+  /* transition: 250ms ease-in; */
+  transition: height 5s ease;
+  position: relative;
+  overflow-y: auto;
+}
+.modalTitle{
+  font-family: "Montserrat";
+  position: absolute;
+  top: -5px;
+  background: #000;
+  color: #fff;
+  padding: 2px 15px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  font-size: 20px;
+  /* text-decoration: underline; */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.modalClose {
+  margin-top: 20px;
+  /* margin-top: 10px; */
+  padding: 8px 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ModMain {
+  display: flex;
+  /* justify-content: space-between; */
+  justify-content: center;
+}
+
+.modal p {
+  color: #000;
+  text-align: center;
+  font-family: "Arial-400";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.ModMain button {
+  color: #fff;
+  font-family: "Montserrat-600";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.4px;
+}
+
+.ModalControl h2 {
+  color: #000;
+  font-family: "Montserrat-500";
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.2px;
+}
+
+.ModalContent {
+  color: #000;
+  text-align: center;
+  font-family: Arial-400;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 23px;
+  letter-spacing: 1.12px;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  padding-top: 25px;
+  padding-bottom: 8px;
+}
+.ModalHeader {
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.2px;
+  text-align: center !important;
+  /* padding-top: 31px; */
+}
+.ModalFooter {
+  display: flex;
+  padding-bottom: 41px;
+  padding-top: 28px;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+}
+.modalButton {
+  color: #fff;
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  width: 100px;
+  height: 30px;
+  background-color: black;
+  text-transform: uppercase;
+}
+.modalButtonCancel {
+  color: black;
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  width: 100px;
+  height: 30px;
+  background-color: white;
+  text-transform: uppercase;
+  border: 1px solid black;
+}

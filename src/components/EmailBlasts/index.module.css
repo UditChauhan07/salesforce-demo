@@ -1,0 +1,134 @@
+.titleHolder {
+  border-bottom: 1px dashed #000;
+  padding: 0px 0px 20px 0px;
+  margin: 27px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.titleHolder h2 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin: 0;
+}
+.titleHolder h2 p{
+  margin: 0;
+}
+.settingButton {
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.8px;
+  border-radius: 8px;
+  background: #000;
+  height: 42px;
+  min-width: 150px;
+  padding: 0 10px;
+  height: 30px;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+}
+.searchBox {
+  float: right;
+  /* border-radius: 50px; */
+  border-bottom: 1px solid #ccc;
+  font-size: 12px;
+  width: 150px;
+  text-align: right;
+  margin-left: 10px;
+}
+.checkAllHolder {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-content: center;
+  border-radius: 5px;
+  margin: 0 15px 0 0;
+}
+.checkAllHolder:hover {
+  background-color: #e5e5e5;
+}
+.unChecked{
+ opacity: 0.4;
+ transition: 'all 250ms ease-out'
+}
+.unChecked:hover{
+  opacity: 1;
+  transition: 'all 750ms ease-out'
+}
+.checked{
+}
+.checkAllHolder input {
+  width: 18px;
+  height: 18px;
+}
+.searchBox::placeholder {
+  font-size: 12px;
+}
+.searchBox:focus {
+  outline: none;
+}
+.table th {
+  background-color: #f8f8f8 !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  /* line-height: 32px; */
+  line-height: 23px;
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+  vertical-align: middle;
+  padding: 0.5rem 0.5rem;
+  color: var(
+    --bs-table-color-state,
+    var(--bs-table-color-type, var(--bs-table-color))
+  );
+  background-color: var(--bs-table-bg);
+  border-bottom-width: var(--bs-border-width);
+  box-shadow: inset 0 0 0 9999px
+    var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+.tableRow td {
+  color: #000;
+  font-family: Montserrat-400;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  /* line-height: 24px; */
+  line-height: 22px;
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+  padding: 0.5rem 0.5rem;
+  color: var(
+    --bs-table-color-state,
+    var(--bs-table-color-type, var(--bs-table-color))
+  );
+  background-color: var(--bs-table-bg);
+  border-bottom-width: var(--bs-border-width);
+  box-shadow: inset 0 0 0 9999px
+    var(--bs-table-bg-state, var(--bs-table-bg-type, var(--bs-table-accent-bg)));
+}
+@media (max-width: 1999.98px) {
+  .titleHolder h2 {
+    font-size: 20px;
+  }
+  .titleHolder h2 p{
+    margin-left: 10px;
+  }
+  .settingButton1{
+    font-size: 15px;
+    width: 260px!important;
+  }
+}

@@ -1,0 +1,185 @@
+.tableBoundary {
+  border: 1px dashed #000;
+  /* overflow: auto; */
+}
+
+.th {
+  background-color: #f8f8f8 !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 23px; /* 177.778% */
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+}
+.breakHolder{
+  width: 2px;
+  height: 100%;
+  background: #fff;
+  margin: auto;
+}
+.month {
+  background-color: #eeeeee !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; /* 177.778% */
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+}
+.stickyMonth {
+  position: sticky;
+  top: 0%;
+  z-index: 2;
+}
+.td {
+  color: #000;
+  font-family: Montserrat-400;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  /* line-height: 24px;  */
+  line-height: 22px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.stickyFirstColumn {
+  position: sticky;
+  left: 0%;
+  z-index: 2;
+}
+.stickyFirstColumnHeading {
+  position: sticky;
+  left: 0%;
+  top: 0%;
+  z-index: 5;
+}
+.stickySecondColumn {
+  position: sticky;
+  left: 170px;
+  z-index: 2;
+  max-width: 170px !important;
+}
+.stickySecondColumnHeading {
+  position: sticky;
+  left: 170px;
+  top: 0%;
+  z-index: 5;
+}
+
+.stickyThirdColumn {
+  position: sticky;
+  left: 320px;
+  z-index: 2;
+}
+.stickyThirdColumnHeading {
+  position: sticky;
+  left: 320px;
+  top: 0%;
+  z-index: 5;
+  min-width: 130px !important;
+}
+
+.stickyLastColumn {
+  position: sticky;
+  right: 0%;
+  z-index: 2;
+}
+.stickyLastColumnHeading {
+  position: sticky;
+  right: 0%;
+  top: 0%;
+  z-index: 5;
+}
+.stickySecondLastColumn {
+  position: sticky;
+  right: 125px;
+  z-index: 2;
+}
+.inorderflex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #000;
+  padding: 0px 0px 20px 0px;
+  margin: 27px 0 0 0;
+}
+.inorderflex h2 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.inorderflex button {
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.8px;
+  border-radius: 0px 8px 8px 0px;
+  background: #000;
+  height: 42px;
+  padding: 0px 13px;
+  border: none;
+}
+.stickyThirdLastColumn{
+    position: sticky;
+    right: 260px;
+    z-index: 2;
+}
+.stickySecondLastColumnHeading {
+  position: sticky;
+  right: 125px;
+  top: 0%;
+  z-index: 5;
+  min-width: 150px !important;
+}
+.stickyThirdLastColumnHeading {
+  position: sticky;
+  right: 260px;
+  top: 0%;
+  z-index: 5;
+  min-width: 150px !important;
+}
+.stickyLastRow {
+  position: sticky;
+  bottom: 0%;
+}
+.lastRow {
+  background-color: #f8f8f8 !important;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 24px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.lastRowMonth {
+  background-color: #eeeeee !important;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 24px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+
+/* #salesReportTable tbody tr:nth-last-child(1) {
+    position: sticky;
+    bottom: 0%;
+    z-index: 6;
+  } */

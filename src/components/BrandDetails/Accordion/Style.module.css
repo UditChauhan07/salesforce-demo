@@ -1,0 +1,194 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
+
+.OverFloweClass{
+  min-width:850px;
+
+}
+.ControlTR{
+  border: 1px solid #F8F8F8;
+  background: #FFF;
+}
+input[type=radio]:checked{
+  accent-color: #000;
+}
+.ControlStyle img{
+  width: 50px;
+  margin: auto;
+  height: 75px;
+  object-fit: contain;
+}
+
+.ButtonControl button{
+border: 1px solid #000 !important;
+}
+.customPriceInput{
+  max-width: 100px;
+    border: 1px solid rgb(204, 204, 204);
+    border-radius: 5px;
+    padding: 1px 5px;
+}
+.customPriceInput:focus {
+  outline: none;
+}
+.PriceInput{
+  padding: 0px 10px ;
+}
+.ButtonControl input{
+  width: 20px !important;
+}
+
+.title {
+  border: 1px solid #f8f8f8;
+  background: #f8fafb;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 0 0 20px;
+  justify-content: space-between;
+}
+
+.title h3 {
+  color: #1d1d1d;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.projectsee input {
+  width: 42px;
+  height: 26px;
+  text-align: center;
+}
+
+.projectsee button {
+  height: 26px;
+  border: 0.5px solid #000;
+  background: #f8fafb;
+  width: 22px;
+  color: #000;
+  /* font-family: Lato; */
+  font-size: 14px;
+
+  font-weight: 400;
+}
+
+.projectsee img {
+  border: 1px solid #6c6c6c;
+}
+
+.projectsee td {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  border-bottom: none;
+}
+
+/* .projectsee tr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+} */
+
+.accordion {
+  border-radius: 5px;
+  background: #fff;
+  padding: 0 10px;
+}
+
+/* .accordion tr{
+display: flex;
+justify-content:space-around;
+align-items: center;
+} */
+
+.accordion th {
+  border-bottom: none;
+}
+
+.TotalSide {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 0 0;
+}
+
+.TotalSide h4 {
+  color: #000;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+.TotalSide Button {
+  font-size: 18px;
+  color: #fff;
+  text-align: center;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  background-color: #000;
+  /* height: 40px; */
+  padding: 6px 10px;
+}
+
+.arrow {
+  margin-right: 8px; /* Adjust spacing as needed */
+}
+
+.arrowUp {
+  transform: rotate(-90deg);
+  transition: transform 0.3s ease; /* Add smooth transition effect */
+}
+
+.arrowDown {
+  transform: rotate(0deg);
+  transition: transform 0.3s ease; /* Add smooth transition effect */
+}
+.warning {
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.2px;
+}
+.warningContent {
+  color: #000;
+  text-align: center;
+  font-family: Arial;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+.modalButton {
+  color: #fff;
+  font-family: Montserrat-600;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  background-color: #000;
+  width: 100px;
+  height: 30px;
+}
+/* ............ */
+

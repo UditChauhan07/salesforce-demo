@@ -1,0 +1,13 @@
+/* ProductPage.css */
+
+.product-page-container {
+    position: relative;
+    top: 20px;
+   
+    padding-top: 500px;
+    max-width: 75%; /* Set a max width */
+    margin: 0 auto;   /* Center the container */
+    padding: 20px;    /* Optional padding for breathing space */
+
+  }
+  

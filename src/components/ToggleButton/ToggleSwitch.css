@@ -1,0 +1,47 @@
+/* ToggleSwitch.css */
+
+.toggle-switch {
+    width: 60px;
+    height: 30px;
+    background-color: #888; /* Grey when OFF */
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .switch {
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+  }
+  
+  .switch-on {
+    background-color: #4caf50; /* Green when ON */
+  }
+  
+  .switch-off {
+    background-color: #888; /* Grey when OFF */
+  }
+  
+  .toggle {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    position: absolute;
+  }
+  
+  .toggle-on {
+    transform: translateX(30px); /* Move toggle to the right */
+  }
+  
+  .toggle-off {
+    transform: translateX(0px); /* Move toggle to the left */
+  }
+  

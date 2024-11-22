@@ -1,0 +1,319 @@
+.tableBoundary {
+  border: 1px dashed #000;
+}
+
+.th {
+  background-color: #f8f8f8 !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  /* line-height: 32px;  */
+  line-height: 23px;
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+  vertical-align: middle;
+}
+.month {
+  background-color: #eeeeee !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 23px;
+  vertical-align: middle;
+  /* line-height: 32px;  */
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+}
+.stickyMonth {
+  position: sticky;
+  top: 0%;
+  z-index: 2;
+}
+.stickyBottom {
+  position: sticky;
+  bottom: 0%;
+  z-index: 2;
+}
+.td {
+  color: #000;
+  font-family: Montserrat-400;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  /* line-height: 24px;  */
+  line-height: 22px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.stickyFirstColumn {
+  position: sticky;
+  left: 0%;
+  z-index: 2;
+  background: #fff;
+}
+.stickyFirstColumnHeading {
+  position: sticky;
+  left: 0%;
+  top: 0%;
+  z-index: 5;
+}
+.stickySecondColumn {
+  position: sticky;
+  left: 15%;
+  z-index: 2;
+  max-width: 150px !important;
+}
+.stickySecondColumnHeading {
+  position: sticky;
+  left: 15%;
+  top: 0%;
+  z-index: 5;
+}
+
+.stickyThirdColumn {
+  position: sticky;
+  left: 28%;
+  z-index: 2;
+}
+.stickyThirdColumnHeading {
+  position: sticky;
+  left: 28%;
+  top: 0%;
+  z-index: 5;
+  min-width: 130px !important;
+}
+.stickyThirdColumn1 {
+  position: sticky;
+  left: 28%;
+  z-index: 2;
+}
+.dGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+.dFlex {
+  display: flex;
+  flex-wrap: wrap;
+}
+.cardMd {
+  width: 75%;
+  margin: auto;
+}
+.cardSd {
+  width: 20%;
+  margin: auto;
+}
+.cardBr {
+  border-left: 1px dashed #000;
+}
+.stickyLastColumn {
+  position: sticky;
+  right: 0%;
+  z-index: 2;
+  background: #fff;
+}
+.stickyLastColumnHeading {
+  position: sticky;
+  right: 0%;
+  top: 0%;
+  z-index: 5;
+}
+.stickySecondLastColumn {
+  position: sticky;
+  right: 100px;
+  z-index: 2;
+  background: #fff;
+}
+.stickySecondLastColumnHeading {
+  position: sticky;
+  right: 100px;
+  top: 0%;
+  z-index: 5;
+  min-width: 150px !important;
+}
+
+.stickyThirdColumnHeading1 {
+  position: sticky;
+  left: 28%;
+  top: 0%;
+  z-index: 5;
+  min-width: 130px !important;
+}
+
+.stickyLastRow {
+  position: sticky;
+  bottom: 0%;
+}
+.lastRow {
+  background-color: #f8f8f8 !important;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 24px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.lastRowMonth {
+  background-color: #eeeeee !important;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 24px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+
+/* #salesReportTable tbody tr:nth-last-child(1) {
+  position: sticky;
+  bottom: 0%;
+  z-index: 6;
+} */
+.inorderflex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed #000;
+  padding: 0px 0px 20px 0px;
+  margin: 27px 0 0 0;
+}
+.inorderflex h2 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin: 0;
+}
+.subTitileHolder {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.mapHolder{
+  position: relative;
+}
+.mapHolder .mapContainer{
+  width: 100%;
+  height: 350px;
+  padding-bottom: 30px;
+}
+.mapHolder .extHolder{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  background: #ccc;
+  color: #fff;
+  display: grid;
+  place-content: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  cursor: pointer;
+}
+.cardHolder {
+  /* background: #ecfbff; */
+  width: 100%;
+  min-height: 97px;
+  border: 2px solid rgb(238, 238, 238);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 2%;
+  margin: 5px 0;
+}
+.cardHolder:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.cardHolder .badge {
+  width: 75px;
+  height: 50px;
+  /* border: 2px solid #C7C7C7; */
+  border-radius: 10px;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  font-family: Arial;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+.cardHolder .textHolder {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 22px;
+  /* letter-spacing: .5px; */
+  text-transform: uppercase;
+  text-align: right !important;
+}
+.cardHolder .countHolder {
+  color: #000;
+  text-align: right;
+  font-family: Arial;
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 22px;
+  letter-spacing: 0.12px;
+  text-transform: uppercase;
+}
+@media (max-width: 1440.98px) {
+  .cardHolder .textHolder {
+    margin: 0;
+  }
+}
+@media (max-width: 1350.98px) {
+  .dFlex{
+    flex-direction: column;
+  }
+  .cardMd,.cardSd{
+    width: 100%;
+  }
+  .cardBr{
+    width: 0;
+  }
+  .cardHolder .countHolder{
+    font-size: 35px;
+  }
+  .cardHolder .textHolder {
+    margin-bottom: 0.5rem;
+  }
+  .cardSd{
+    display: flex;
+    border-bottom: 1px dashed #000;
+    border-top: 1px dashed #000;
+  }
+  .cardSd .inorderflex{
+    border-right: 1px dashed #000;
+    border-bottom: 0;
+    margin-right: 25px;
+    padding: 5px 10px;
+  }
+  .cardSd .cardHolder:nth-child(2){
+    margin: auto;
+  }
+  .cardSd .cardHolder:nth-child(3){
+    margin: auto;
+  }
+}

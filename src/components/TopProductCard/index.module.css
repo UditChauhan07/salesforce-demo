@@ -1,0 +1,306 @@
+.dGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 19%);
+  justify-content: space-between;
+  gap: 2.5rem 0.5rem;
+  transition: all 0.25s;
+  margin: 3rem auto;
+  overflow-x: hidden;
+}
+.cardElement {
+  border: 1px solid #e1e1e1;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 25px 10px;
+  border-radius: 10px;
+  position: relative;
+  transition: box-shadow 0.3s;
+}
+.cardElement:hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+  /* transform: translateY(-2px); */
+}
+.BrandInRadio {
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #f8fafb;
+  padding: 27px;
+  /* max-height: 340px;
+  overflow: auto; */
+}
+.BrandName {
+  height: 60px;
+  border: 0.5px solid #d5d9d9;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 0 18px;
+}
+
+.BrandName label {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 22px; /* 228.571% */
+  letter-spacing: 1.4px;
+  display: flex;
+  /* gap: 10px; */
+  text-align: left;
+  align-items: center;
+  /* padding: 0 18px; */
+}
+.BrandName input[type="radio"],
+.title input[type="radio"]:checked {
+  width: 25px;
+  height: 25px;
+  top: 30%;
+}
+
+.BrandName input[type="radio"] {
+  padding: 0;
+  border: 5px solid #000000;
+  margin-right: 16px;
+}
+
+.BrandName input[type="radio"]:checked {
+  border: 8px solid #003b5f;
+}
+
+.BrandName.borderRad {
+  border-radius: 20px 20px 0px 0px;
+}
+.active {
+  color: #000;
+}
+.BrandName .active {
+  color: #000 !important;
+}
+
+.BrandName input[type="radio"]:checked:after,
+.BrandName input[type="radio"]:not(:checked):before {
+  width: 25px;
+  height: 25px;
+  border-radius: 15px;
+  background-color: #fff;
+  content: "";
+  display: inline-block;
+  visibility: visible;
+}
+
+.BrandName input[type="radio"]:checked:after {
+  border: 8px solid #000;
+  transition: 0.5s;
+}
+.BrandName input[type="radio"]:not(:checked):before {
+  border: 1px solid #8c8c8c;
+  transition: 0.5s;
+}
+.ModalResponsive {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 20px;
+}
+.salesHolder {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 25px;
+  padding: 2px;
+  width: 44px;
+  height: 40px;
+  z-index: 1;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.salesIcon {
+  animation: rotate 4s linear infinite;
+}
+.imgHolder {
+  width: 175px;
+  height: 175px;
+  object-fit: contain;
+  cursor: pointer;
+}
+.brandHolder {
+  margin-top: 1rem;
+  font-family: Montserrat-500;
+  font-size: 22px;
+  line-height: 25px;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+}
+.titleHolder {
+  font-family: Arial;
+  font-size: 16px;
+  line-height: 20px;
+  text-transform: capitalize;
+  color: #6a6a6a;
+  cursor: pointer;
+  text-align: center;
+}
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.salesIcon {
+  animation: rotate 4s linear infinite;
+}
+.priceHolder {
+  font-family: Montserrat-500;
+  font-size: 24px;
+  /* line-height: 15px; */
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.priceCrossed {
+  color: #ccc;
+  /* line-height: 15px; */
+  text-decoration: line-through;
+  font-size: 14px;
+  margin: 0;
+}
+.priceHolder a {
+  color: #000;
+  text-decoration: none;
+}
+
+.btn {
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  font-family: Montserrat-600;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  height: 30px;
+  letter-spacing: 1.4px;
+  line-height: normal;
+  width: 100px;
+}
+.preOrderBadge {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  color: #ccc;
+  font-size: 9px;
+  padding: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.preOrderBadge:hover {
+  background: #ccc;
+  color: #fff;
+}
+.btnHolder {
+  background-color: #000;
+  color: #fff;
+  font-family: Montserrat-600;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: normal;
+  height: 40px;
+  width: 150px;
+  margin: auto;
+  display: grid;
+  place-content: center;
+}
+
+.modalButton {
+  color: #fff;
+  font-family: Montserrat-600;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.4px;
+  background-color: #000;
+  width: 100px;
+  height: 30px;
+}
+/* animation */
+.ImgHover img {
+  width: 100%;
+  height: 300px;
+}
+.ImgHover1 {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: 0.75s;
+  cursor: pointer;
+}
+.ImgHover1::before {
+  position: absolute;
+  top: 0;
+  left: -75%;
+  z-index: 2;
+  display: block;
+  content: "";
+  width: 50%;
+  height: 100%;
+  background: -webkit-linear-gradient(
+    left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(240, 240, 240, 0.3) 100%
+  );
+  transform: skewX(-25deg);
+}
+.ImgHover1::before {
+  -webkit-animation: shine 0.75s;
+  animation: shine 0.75s;
+}
+@-webkit-keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+@media (max-width: 1199px) {
+  .dGrid {
+    grid-template-columns: repeat(auto-fill, 24%);
+  }
+}
+@media (max-width: 900px) {
+  .ModalResponsive {
+    grid-template-columns: repeat(2, auto);
+  }
+  .dGrid {
+    grid-template-columns: repeat(auto-fill, 30%);
+  }
+}
+
+@media (max-width: 650px) {
+  .ModalResponsive {
+    grid-template-columns: repeat(1, auto);
+    height: 250px;
+    overflow: auto;
+  }
+}

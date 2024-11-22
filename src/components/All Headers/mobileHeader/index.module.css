@@ -1,0 +1,244 @@
+.dropdown-toggle::after {
+  content: none;
+}
+
+.text {
+  text-align: center;
+  font-family: Montserrat-500;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.language input {
+  width: 58px;
+
+}
+
+.language input::placeholder {
+  color: #000;
+}
+
+
+.language {
+  color: #000;
+  text-align: center;
+  font-family: Arial-400;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px;
+  /* 266.667% */
+  letter-spacing: 1.12px;
+  align-items: center;
+}
+
+.myRetailer {
+  color: #fff;
+  text-align: center;
+  font-family: Arial-400;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32px;
+  /* 320% */
+  letter-spacing: 1.12px;
+  background-color: #000;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.mobileHeader {
+  display: none !important;
+}
+
+.ControlMobNav {
+  background-color: #000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+}
+
+.MoblabelLine {
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0px 0 0;
+}
+
+.MoblabelLine svg {
+  width: 11px;
+  height: 10px;
+
+}
+
+.AfterRemove::after {
+  content: unset !important;
+}
+
+.flexMain1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+}
+
+.flexMain3 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.flexMain2 {
+  display: flex;
+  gap: 5px;
+}
+
+.myRetailerPaddingBorder {
+
+  border-left: 1px solid #D9D9D9;
+  border-right: 1px solid #D9D9D9;
+  padding: 4px 21px 4px 21px;
+}
+
+.flexMain3 P {}
+
+@media screen and (max-width: 767.98px) and (min-width: 200px) {
+  .mobileHeader {
+    display: block !important;
+  }
+}
+
+
+/* ankush code start */
+.country {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.line {
+  border-right: 1px solid #252323 !important;
+  height: 16px !important;
+}
+
+.welcomeAdmin {
+  background-color: #0c0c0c;
+  color: #ffffff;
+  padding: 10px;
+}
+
+.welcomeText {
+  text-align: center;
+  
+}
+.welcomeAdmin p{
+  color: #ffffff;
+  font-family: Arial-400;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 1.12px;
+  
+}
+.welcomeAdmin span{
+  color: rgb(255, 255, 255);
+  text-align: center;
+    font-family: Arial-500;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 1.12px;
+   
+ }
+
+.offcanvasMain {
+  width: 70vw !important;
+  background-color: rgb(216, 216, 216) !important;
+}
+
+.offcanvasBody ul {
+  margin-top: -1rem;
+  padding-left: 0rem;
+
+}
+
+.offcanvasBody li {
+  padding-top: 0rem;
+  border-bottom: 1px solid #ffffff9c;
+}
+
+.offcanvasBody li:hover {
+  background-color: #dddddd !important;
+  color: #ffffff !important;
+
+}
+
+.accordion {
+  width: 95%;
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.panel {
+  border-bottom: 1px solid #ffffff9c;
+  margin-left: 15px;
+}
+
+.panel :hover {
+  background-color: #dddddd  !important;
+}
+
+.panelHeader {
+  text-align: center;
+  /* margin-left: 15px; */
+  font-family: Montserrat-500;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+
+  padding: 10px;
+  cursor: pointer;
+  background-color: none;
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.panelContent ul {
+  padding-left: 1rem;
+margin-bottom: 0rem;
+}
+.panelContent2 ul {
+  padding-left: 1rem;
+  padding-bottom: 2rem;
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.arrowUp {
+  transform: rotate(90deg);
+}
+
+
+/* @media (min-width: 768px) {
+ 
+} */
+/* ankush code end */
+
+/* Accordion.module.css */

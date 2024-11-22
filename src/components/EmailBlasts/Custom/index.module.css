@@ -1,0 +1,98 @@
+.dFlex {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+.gap10 {
+  flex-wrap: wrap;
+  gap: 25px !important;
+}
+
+.templateHolder {
+  position: relative;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 10px;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  background-color: #fff; /* Default background color */
+  display: grid;
+  place-content: center;
+}
+
+.gap10 .templateHolder img {
+  display: block;
+  border-radius: 8px;
+  width: 200px;
+  height: 60px;
+  object-fit: contain;
+}
+.templateHolder img {
+  display: block;
+  border-radius: 8px;
+  width: 150px;
+  height: 200px;
+  object-fit: contain;
+}
+.btn {
+  padding: 0.5rem 2rem;
+  border: 1px solid #000;
+  background: #000;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+}
+.modalContent {
+  font-family: "Montserrat";
+  font-size: 14px;
+  line-height: 18px;
+}
+.maxHeightNinty{
+  max-height: 90vh !important;
+}
+.templateHolder:hover {
+  box-shadow: 0 0 10px rgba(13, 41, 71, 0.5);
+  transform: scale(1.05);
+}
+.templateHolder .labelHolder{
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+.templateHolder .previewIcon {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  transform: translate(50px, -50px);
+  opacity: 0;
+  font-size: 2rem;
+  color: #fff;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  background-color: #ccc;
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-content: center;
+  border-radius: 45px;
+}
+
+.templateHolder:hover .previewIcon {
+  opacity: 1;
+}
+
+.hiddenRadio {
+  display: none;
+}
+
+.selected {
+  border-color: #000; /* Black border for selected templates */
+  transform: scale(1.1);
+}
+
+.selected img {
+  opacity: 0.8;
+}

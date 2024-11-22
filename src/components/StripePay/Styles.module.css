@@ -1,0 +1,47 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .inputField {
+    width: 100%; /* Full width for card number */
+    margin: 0.5rem 0;
+  }
+  
+  .flexRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Add some space between the two fields */
+  }
+  .flexRow div{
+    margin: 0.5rem 0;
+  }
+  .halfWidth {
+    width: 50%; /* Expiry and CVC elements will take 50% width each */
+  }
+  
+  .btnHolder {
+    margin-top: 20px;
+  }
+  
+  .btn {
+    text-align: center;
+    color: #fff;
+    width: 100%;
+    font-family: "Montserrat";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 32px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background-color: #000;
+    margin: 0 0 28px 0;
+  }
+  
+  .btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  

@@ -1,0 +1,297 @@
+import AppLayout from "../components/AppLayout";
+import { useEffect, useState } from "react";
+import { GetAuthData, getProductDetails } from "../lib/store";
+import Loading from "../components/Loading";
+import ModalPage from "../components/Modal UI";
+import ProductDetailCard from "../components/ProductDetailCard";
+import { CloseButton } from "../lib/svg";
+import { useCart } from "../context/CartContext";
+import Select from "react-select";
+import axios from "axios";
+import { originAPi } from "../lib/store";
+
+const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true }) => {
+    const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
+    const [product, setProduct] = useState({ isLoaded: false, data: [], discount: {} });
+    const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(isPopUp);
+    const [isModalNoRepOpen, setIsModalNoRepOpen] = useState(false);
+    const [dealAccountList, setAccountList] = useState([]);
+    const [selectAccount, setSelectAccount] = useState();
+    const [replaceCartProduct, setReplaceCartProduct] = useState({});
+    const [accountDetails, setAccountDetails] = useState();
+    const [manufacturerId, setManufacturerId] = useState();
+    const [clickedProduct, setClickedProduct] = useState(null);
+
+    const fetchAccountDetails = async () => {
+        const data = await GetAuthData();
+        const { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
+
+        try {
+            const res = await axios.post(`${originAPi}/beauty/v3/23n38hhduu`, { salesRepId, accessToken });
+            setAccountDetails(res.data.accountDetails);
+        } catch (error) {
+            console.error("Error fetching account details:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchAccountDetails();
+    }, []);
+
+    useEffect(() => {
+        if (productId) {
+            setIsModalOpen(isPopUp);
+            setProduct({ isLoaded: false, data: [], discount: {} });
+
+            GetAuthData()
+                .then((user) => {
+                    const rawData = { productId, key: user?.x_access_token };
+                    getProductDetails({ rawData })
+                        .then((productRes) => {
+                            const manufacturer = productRes.data?.ManufacturerId__c;
+                            setManufacturerId(manufacturer);
+                            setClickedProduct(productRes.data);
+                            setProduct({
+                                isLoaded: true,
+                                data: productRes.data,
+                                discount: accountDetails[manufacturer] || {},
+                            });
+                        })
+                        .catch((err) => console.error("Error fetching product details:", err));
+                })
+                .catch((err) => console.error("Error fetching auth data:", err));
+        }
+    }, [productId, isPopUp, accountDetails]);
+
+    if (!productId) return null;
+
+    const onQuantityChange = (element, quantity) => {
+        const listPrice = Number(element?.usdRetail__c?.replace("$", "").replace(",", ""));
+        const selectProductDealWith = product?.discount || {};
+        const listOfAccounts = Object.keys(selectProductDealWith);
+        let addProductToAccount = null;
+
+        if (listOfAccounts.length) {
+            if (listOfAccounts.length === 1) {
+                addProductToAccount = listOfAccounts[0];
+            } else if (selectAccount?.value) {
+                addProductToAccount = selectAccount.value;
+            } else {
+                const accounts = listOfAccounts.map((actId) => ({
+                    value: actId,
+                    label: selectProductDealWith[actId]?.Name,
+                }));
+                setReplaceCartProduct({ product: element, quantity });
+                setAccountList(accounts);
+                return;
+            }
+
+            if (addProductToAccount) {
+                const accountDetails = selectProductDealWith[addProductToAccount];
+                const account = {
+                    name: accountDetails?.Name,
+                    id: addProductToAccount,
+                    ...accountDetails,
+                };
+                const manufacturer = {
+                    name: element.ManufacturerName__c,
+                    id: element.ManufacturerId__c,
+                };
+
+                let orderType = "wholesale";
+                if (
+                    element?.Category__c?.toUpperCase() === "PREORDER" ||
+                    element?.Category__c?.toUpperCase().includes("EVENT")
+                ) {
+                    orderType = "pre-order";
+                }
+                element.orderType = orderType;
+
+                const discount =
+                    element?.Category__c === "TESTER"
+                        ? accountDetails?.Discount?.testerMargin || 0
+                        : element?.Category__c === "Samples"
+                        ? accountDetails?.Discount?.sample || 0
+                        : accountDetails?.Discount?.margin || 0;
+
+                const salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
+                element.price = salesPrice;
+                element.qty = element.Min_Order_QTY__c;
+
+                addOrder(element, account, manufacturer);
+            }
+        }
+    };
+
+    const accountSelectionHandler = () => {
+        onQuantityChange(replaceCartProduct.product, replaceCartProduct.quantity);
+        accountSelectionCloseHandler();
+    };
+
+    const accountSelectionCloseHandler = () => {
+        setReplaceCartProduct({});
+        setAccountList([]);
+        setSelectAccount(null);
+    };
+
+    const HtmlFieldSelect = ({ title, list = [], value, onChange }) => {
+        console.log('list' , list)
+        let styles = {
+            holder: {
+                border: '1px dashed #ccc',
+                padding: '10px',
+                width: '100%',
+                marginBottom: '20px' , 
+            
+            },
+            title: {
+                color: '#000',
+                textAlign: 'left',
+                fontFamily: 'Montserrat',
+                fontSize: '14px',
+                fontStyle: 'normal',
+                fontWeight: 500,
+                lineHeight: '24px',
+                letterSpacing: '2.2px',
+                textTransform: 'uppercase'
+            },
+            field: {
+                width: '100%',
+                minHeight: '40px',
+                borderBottom: '1px solid #ccc',
+                borderRadius: '10px',
+                background: '#f4f4f4',
+            }
+        }
+        return (<div style={styles.holder}>
+            <p style={styles.title}>{title}</p>
+            <Select
+                type="text"
+                id={title?.replaceAll(/\s+/g, '-')}
+                options={list}
+                onChange={(option) => {
+                    onChange?.(option)
+                }}
+                value={list ? list.find((option) => option.value === value?.value) : ""}
+            />
+        </div>)
+    }
+    let styles = {
+        btn: { color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: 600, lineHeight: 'normal', letterSpacing: '1.4px', backgroundColor: '#000', width: '100px', height: '30px', cursor: 'pointer' }
+    }
+    return (
+        <>
+            {dealAccountList.length > 0 && (
+                 <ModalPage
+                 styles={{ zIndex: 4022 }}
+                 open={dealAccountList?.length ? true : false}
+                 content={
+                     <div className="d-flex flex-column gap-3">
+                         <h2>Attention!</h2>
+                         <p>
+                             Please select store you want to order for
+                         </p>
+                         <div></div>
+                         <HtmlFieldSelect   value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
+                         <div className="d-flex justify-content-around ">
+                             <button style={styles.btn} onClick={accountSelectionHandler}>
+                                 OK
+                             </button>
+                             <button style={styles.btn} onClick={accountSelectionCloseHandler}>
+                                 Cancel
+                             </button>
+                         </div>
+                     </div>
+                 }
+                 onClose={accountSelectionCloseHandler}
+             />
+            )}
+
+            {isModalOpen ? (
+                <ModalPage
+                    open
+                    content={
+                        <div style={{ width: "75vw" }}>
+                            <div
+                                style={{
+                                    position: "sticky",
+                                    top: "-20px",
+                                    background: "#fff",
+                                    zIndex: 1,
+                                    padding: "15px 0 0 0",
+                                }}
+                            >
+                                <div className="d-flex align-items-center justify-content-between" style={{ minWidth: "75vw" }}>
+                                    <h1 className="font-[Montserrat-500] text-[22px] tracking-[2.20px] m-0 p-0">
+                                        Product Details
+                                    </h1>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsModalOpen(false);
+                                            setProductDetailId(null);
+                                        }}
+                                    >
+                                        <CloseButton />
+                                    </button>
+                                </div>
+                                <hr />
+                            </div>
+                            {isModalNoRepOpen ? (
+                                <ModalPage
+                                    open
+                                    content={
+                                        <div className="d-flex flex-column gap-3">
+                                            <h2>Warning</h2>
+                                            <p>
+                                                You cannot order from this brand.<br /> Kindly contact your Sales Rep.
+                                            </p>
+                                            <div className="d-flex justify-content-around">
+                                                <button
+                                                    style={{ color: "#fff", background: "#000" }}
+                                                    onClick={() => setIsModalNoRepOpen(false)}
+                                                >
+                                                    Ok
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                    onClose={() => setIsModalNoRepOpen(false)}
+                                />
+                            ) : null}
+                            {!product?.isLoaded ? (
+                                <Loading />
+                            ) : (
+                                <ProductDetailCard
+                                    product={product}
+                                    orders={isProductCarted(productId)}
+                                    onQuantityChange={onQuantityChange}
+                                />
+                            )}
+                        </div>
+                    }
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setProductDetailId(null);
+                    }}
+                />
+            ) : (
+                <div className="product-details-content">
+                    <h1>Product Details</h1>
+                    {!product?.isLoaded ? (
+                        <Loading />
+                    ) : (
+                        <ProductDetailCard
+                            product={product}
+                            orders={isProductCarted(productId)}
+                            onQuantityChange={onQuantityChange}
+                        />
+                    )}
+                </div>
+            )}
+        </>
+    );
+};
+
+export default ProductDetails;

@@ -1,0 +1,156 @@
+.container {
+  width: 75%;
+  margin: 1rem auto;
+}
+.containerTitle {
+  color: #000;
+  font-family: Montserrat;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.2px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.formContainer {
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #f8fafb;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+}
+.attachLabelDiv {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  text-align: center;
+  padding: 0.5rem 4rem;
+  width: 500px;
+  display: flex;
+  justify-content: center;
+}
+.attachHolder {
+  border: 0.5px solid #ccc;
+  padding: 10px;
+  background: #fff;
+  margin-top: 1rem;
+}
+.attachHolder label {
+  display: grid;
+  place-content: center;
+}
+.imgHolder {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 100px);
+  gap: 5px;
+}
+.imgHolder img {
+  width: 100px;
+  height: auto;
+}
+.subTitle {
+  color: #000;
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+}
+.labelHolder {
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #fff;
+  width: 100%;
+  /* min-height: 70px; */
+  display: flex;
+  color: #000;
+  padding: 0.5rem 1rem;
+  font-family: Montserrat;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.6px;
+  flex-direction: column;
+  /* margin-bottom: 0.5rem; */
+  margin-top: 1.5rem;
+  gap: 4px;
+}
+
+.labelHolder select,
+.labelHolder textarea,
+.labelHolder input {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  outline: none;
+}
+
+.labelHolder select::placeholder,
+.labelHolder textarea::placeholder,
+.labelHolder input::placeholder {
+  font-family: "Montserrat-400";
+  color: #ccc !important;
+}
+.btn {
+  padding: 0.5rem 2rem;
+  border: 1px solid #000;
+  background: #000;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  color: #fff;
+}
+.btn:hover {
+  background: #000;
+  color: #fff;
+}
+.dFlex {
+  display: flex;
+  margin: 20px 0;
+  gap: 20px;
+  justify-content: end;
+}
+
+.labelHolder textarea::placeholder {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: 1.12px;
+}
+
+
+@media (max-width: 769px) {
+  .container {
+    width: 80%;
+  }
+}
+@media (max-width: 500px) {
+  .container {
+    width: 95%;
+  }
+}
+@media (max-width: 1440.98px) {
+  .attachLabelDiv {
+    width: 100%;
+  }
+  .container {
+    width: 75%;
+  }
+}

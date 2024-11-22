@@ -1,0 +1,72 @@
+.reasonTitle {
+  color: #000;
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  margin-top: 25px;
+}
+.dGrid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.accountCard{
+  border-radius: 10px;
+    border: 1px solid #e4e4e4;
+    background: #fff;
+    padding: 15px;
+    width: 100%;
+    margin: 15px 0;
+}
+.accountTitle{
+  color: #000;
+  font-family: "Montserrat-700";
+  font-size: 16px;
+  font-style: normal;
+  letter-spacing: 1.9px;
+}
+.accountCardImgHolder{
+  width: 100%;
+  height: 100%;
+  min-height: 40px;
+  border: 1px solid #e1e1e1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  margin: auto;
+}
+.searchBox {
+  float: right;
+  /* border-radius: 50px; */
+  border-bottom: 1px solid #ccc;
+  font-size: 12px;
+  width: 200px;
+  text-align: right;
+}
+.searchBox::placeholder {
+  font-size: 12px;
+}
+.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(10px, 0);
+  }
+  66% {
+    transform: translate(-10px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}

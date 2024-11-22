@@ -1,0 +1,9 @@
+@media screen and (max-width: 1130px) and  (min-width: 700px){
+  #main {
+    flex-wrap: wrap;
+  }
+  .text{
+    font-size: 10px !important;
+
+  }
+}

@@ -1,0 +1,17 @@
+.markerHolder{
+    color: #000;
+    font-family: Montserrat-400;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 1.6px;
+}
+.markerHolder h2{
+    font-size: 14px;
+}
+.markerHolder p{
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+.markerHolder b {
+    line-height: 18px;
+}

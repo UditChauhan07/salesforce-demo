@@ -1,0 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
+
+
+
+
+.Retailer {
+  text-decoration: none;
+  height: 100%;
+}
+
+.mainRetailer {
+  border-radius: 10px;
+  border: 1px solid #e4e4e4;
+  background: #fff;
+  padding: 18px;
+  width: 100%;
+  margin: 15px 0;
+}
+
+.mainRetailer h2 {
+  color: #000;
+  font-family: "Montserrat-700";
+  font-size: 16px;
+  font-style: normal;
+  letter-spacing: 1.9px;
+}
+
+.RetailerImg {
+  background: #E5E5E5;
+  width: 100%;
+  height: 100%;
+  min-height: 40px;
+  border: 1px solid #e1e1e1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  margin: auto;
+}
+
+.ControlerImg {
+  left: 10px;
+  width: 16.198px;
+  height: 24.062px;
+  flex-shrink: 0;
+}
+
+.ControlerImg p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.BrandName {
+  cursor: pointer;
+}
+.Brandspan {
+  margin: 10px 0 0px 0;
+}
+
+.Brandspan span {
+  border-radius: 3px;
+  background: #ecfbff;
+  color: #000;
+  font-family: Arial-400;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 1.12px;
+  padding: 3px 5px;
+}
+
+.Brandspan {
+  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  height: 59px;
+  overflow: auto;
+}
+.KevynAucoinCosmeticsBg {
+  background-color: #ecfbff  !important;
+}
+
+.BYTERRYBg {
+  background-color: #eaffee  !important;
+}
+
+.BobbiBrownBg {
+  background-color: #ffdcdc  !important;
+}
+
+.BumbleandBumbleBg {
+  background-color: #ffead7  !important;
+}
+
+.ReViveBg {
+  background-color: #f0f6ff  !important;
+}
+
+.RMSBeautyBg{
+background-color: #fffac9 !important;
+}
+.MaisonMargielaBg {
+  background-color: #f0f6ff  !important;
+}
+
+.SmashboxBg {
+  background-color: #eaffee  !important;
+}
+.esteeLauderBg {
+  background-color: #ead7ff  !important;
+}
+
+.Brandspan::-webkit-scrollbar {
+  /* -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3); */
+  border-radius: 50px;
+  background-color: #d9d9d9;
+  width: 3px;
+}
+
+.Brandspan::-webkit-scrollbar-thumb {
+  border-radius: 50px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #000000;
+  width: 3px;
+}
+
+@media (max-width: 1399.98px) {
+  .mainRetailer {
+    padding: 15px;
+  }
+
+  .mainRetailer h2 {
+    font-size: 13px;
+  }
+}

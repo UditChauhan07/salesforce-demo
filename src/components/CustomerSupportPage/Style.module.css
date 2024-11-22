@@ -1,0 +1,234 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Open+Sans:wght@300;400;500;600&family=Rubik:wght@300;400;500;600;700;800&display=swap");
+
+.supportLeft {
+  border-right: 1px dashed #000;
+  width: 99%;
+  padding: 0 20px 0 0;
+  position: sticky;
+  top: 175px;
+}
+
+.supportLeftBox {
+  display: flex;
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #fff;
+  gap: 15px;
+  padding: 20px 15px;
+  align-items: center;
+  margin: 10px 0px 25px 0;
+}
+
+.supportLeftContent h2 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 1.6px;
+}
+
+.supportLeftContent p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 166.667% */
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.Queary {
+  font-weight: 700;
+}
+.Underline {
+  text-decoration-line: underline;
+  text-underline-offset: 4px;
+}
+.PoNumberStatus {
+  font-weight: 500;
+}
+.customerProblem p svg {
+  margin: 0 6px 0 0px;
+}
+
+.QuearyRiseDate {
+}
+.customerProblem p {
+  /* gap: 10px; */
+  display: flex;
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  /* line-height: 20px; */
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.QuearyTicket {
+  margin: 10px 0;
+  padding: 13px;
+  display: flex;
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  background: #fff;
+  /* gap: 23px; */
+  justify-content: space-between;
+}
+
+.QuearyTicket:hover {
+  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+}
+
+.CaseNumber {
+  border-left: 1px solid #e2e2e2;
+  padding: 0 23px;
+  /* border-right:1px solid #000 ; */
+}
+
+.SupportTicketMain .CaseNumber h3 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 166.667% */
+  letter-spacing: 1.12px;
+}
+
+.CaseNumber p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 153.846% */
+  letter-spacing: 1.12px;
+  margin: 0;
+}
+
+.ShopNameBrand {
+  border-left: 1px solid #e2e2e2;
+  padding: 0 15px;
+  min-width: 300px;
+  max-width: 300px;
+}
+
+.CostomerStatusVisit {
+  /* padding: 0 20px 0 0; */
+}
+
+.ShopNameBrand p {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 153.846% */
+  letter-spacing: 1.12px;
+  display: flex;
+  margin: 0;
+}
+
+.ShopNameBrand .BrandMName {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px; /* 166.667% */
+  letter-spacing: 1.12px;
+}
+
+.StatusColor {
+  color: #000;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 166.667% */
+  letter-spacing: 1.12px;
+  background-color: #ffead7;
+  margin: 0;
+  max-width: 200px;
+}
+
+.CostomerStatusVisit h6 {
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px; /* 166.667% */
+  letter-spacing: 1.12px;
+  margin: 5px 0 0 0;
+}
+
+.CustomerCloneColor {
+  width: 34.013px;
+  height: 32.292px;
+}
+
+.ColorBlue {
+  background: #e3fdff;
+}
+
+.ColorLightBlue {
+  background: #f0f6ff;
+}
+.CaseDivControll {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Para2 {
+  margin: 5px 0 0 0 !important;
+}
+.supportMain {
+  margin-top: 50px;
+}
+
+.SupportTicketMain .SupportTicketMain h3 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  letter-spacing: 2px;
+  margin: 0 0 24px 0;
+}
+@media (max-width: 1730px) {
+  .QuearyTicket {
+    display: block;
+  }
+
+  .CaseDivControll {
+    margin: 20px 0 0 0;
+  }
+}
+
+@media (max-width: 991px) {
+  .supportLeft {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .supportLeft {
+    gap: 10px;
+    grid-template-columns: repeat(1, auto);
+  }
+}
+@media (max-width: 1024.98px) {
+  .supportLeftBox {
+    flex-wrap: wrap;
+  }
+}

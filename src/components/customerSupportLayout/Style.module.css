@@ -1,0 +1,17 @@
+.activeReason{
+    position: relative;
+}
+.activeReason >div{
+ border: 1px dashed #3c74b4 !important;   
+}
+.activeReason >div::after {
+    content: "";
+    width: 14px;
+    height: 8px;
+    border-bottom: solid 2px #3c74b4;
+    border-left: solid 2px #3c74b4;
+    transform: rotate(-45deg);
+    position: absolute;
+    right: 3%;
+    top: 10%;
+  }

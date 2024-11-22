@@ -1,0 +1,364 @@
+h1.TopHeading {
+  color: #000;
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 22px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  margin-top: 25px;
+}
+.ProductImg img {
+  height: 85px;
+  width: 85px;
+  border: 1px solid #efefef;
+  border-radius: 100px;
+}
+.timeline {
+  list-style: none;
+  /* counter-reset: counter; */
+  position: relative;
+  color: rgb(17, 17, 17);
+}
+.timeline > li::before,
+.timelineHolder01 {
+  /* content: counter(counter, decimal-leading-zero); */
+  position: absolute;
+  padding: 16px;
+  width: 60px;
+  height: 60px;
+  left: 0;
+  /* color: #237c94; */
+  color: #000;
+  text-align: center;
+  background-color: #e5e5e5;
+  font-size: 18px;
+  border-radius: 100px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: flex;
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  margin: auto;
+  justify-content: center;
+  z-index: 1;
+  letter-spacing: 1.2px;
+  font-family: "Montserrat";
+}
+
+.timeline > li > .timeline-content {
+  border: 1px solid white;
+  margin-bottom: 25px;
+  background-color: #fff;
+  border-radius: 10px;
+  border: 1px dashed #000;
+}
+.timeline-content {
+  width: 95%;
+  padding: 12px 16px;
+  margin-left: 50px;
+}
+.DateCurrent01 {
+  background-color: #e5e5e5;
+  /* color: #237ca2; */
+  color: #000;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 3px 8px;
+  width: 155px;
+  border-radius: 6px;
+  text-align: center;
+  letter-spacing: 1.2px;
+}
+.DateCurrent02 {
+  background-color: #f3e8e0;
+  /* color: #3c9a4e; */
+  color: #000;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 3px 8px;
+  width: 155px;
+  border-radius: 6px;
+  text-align: center;
+  letter-spacing: 1.2px;
+}
+.DateCurrent03 {
+  background-color: #e0d3cc;
+  /* color: #9e4545; */
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 3px 8px;
+  width: 155px;
+  border-radius: 6px;
+  text-align: center;
+  letter-spacing: 1.2px;
+}
+
+.LaunchProductDetail {
+  margin-left: 20px;
+  font-family: "Montserrat";
+}
+.LaunchProductDetail h3 {
+  color: #000;
+  font-family: "Montserrat";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.size {
+  color: #9c9c9c;
+  font-family: Arial;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1.12px;
+  margin: 0 10px 8px 0;
+  display: flex;
+  justify-content: space-between;
+}
+span.ProductQty {
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 7px;
+  text-transform: uppercase;
+  font-size: 15px;
+}
+.LaunchProductDetail p {
+  color: #000;
+  font-family: Arial;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 1.12px;
+}
+
+.timeline > li::after {
+  display: block;
+  position: absolute;
+  content: "";
+  width: 2px;
+  top: 60px;
+  bottom: -25px;
+  left: 28px;
+  background-color: #ebebeb;
+  z-index: 0;
+  border: 1px dashed #000;
+}
+
+.LaunchProductDetail {
+  margin-left: 20px;
+  width: 80%;
+}
+.timeline > li::before,
+.timelineHolder02 {
+  /* content: counter(counter, decimal-leading-zero); */
+  position: absolute;
+  padding: 16px;
+  width: 60px;
+  height: 60px;
+  left: 0;
+  /* color: #3c9a4e; */
+  color: #000;
+  font-size: 18px;
+  text-align: center;
+  background-color: #f3e8e0;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 100px;
+  text-transform: uppercase;
+  display: flex;
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  margin: auto;
+  justify-content: center;
+  z-index: 1;
+  letter-spacing: 1.2px;
+  font-family: "Montserrat";
+}
+
+.timeline > li::before,
+.timelineHolder03 {
+  /* content: counter(counter, decimal-leading-zero); */
+  position: absolute;
+  padding: 16px;
+
+  width: 60px;
+  height: 60px;
+  left: 0;
+  /* color: #9e4545; */
+  color: #000;
+  font-size: 18px;
+  text-align: center;
+  background-color: #e0d3cc;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 100px;
+  text-transform: uppercase;
+  display: flex;
+  text-align: center;
+  vertical-align: middle;
+  align-items: center;
+  margin: auto;
+  justify-content: center;
+  z-index: 1;
+  letter-spacing: 1.2px;
+  font-family: "Montserrat";
+}
+
+.launchBrand img {
+  border-radius: unset;
+
+  display: flex;
+}
+.timeline-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.ProductInfo {
+  border-right: 1px dashed #000;
+  margin-right: 20px;
+  width: 90%;
+}
+.GrayBg {
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.PlusBtn {
+  padding: 35px;
+}
+.AddNewInner {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #d5d9d9;
+  text-align: center;
+  padding: 40px 10px;
+}
+
+.AddNewInner p {
+  color: #b5b5b5;
+  text-align: center;
+  font-family: Montserrat;
+  font-size: 25px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 2.5px;
+  margin-bottom: 0;
+}
+
+/* Add new css 17-01-2024*/
+.ShipDate {
+  display: flex;
+  align-items: center;
+}
+.ShipDate span {
+  margin-right: 8px;
+}
+.DateAlignEOD {
+  display: flex;
+  justify-content: space-between;
+}
+.AddNewInner button.btn.btn-btn {
+  display: none;
+}
+/* B2B PortAL  */
+.ShipDate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.BothDateTopFlex {
+  display: flex;
+  justify-content: space-between;
+}
+
+.DateEod {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 3px 8px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  text-align: center;
+  letter-spacing: 1.2px;
+}
+
+.EDate {
+  gap: 2px !important;
+}
+
+/* Media Query  */
+
+@media (min-width: 769.98px) {
+  .DateCurrent01 {
+    font-size: 16px;
+  }
+  span.ProductQty {
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    margin-left: 10px;
+    padding: 6px 8px 6px 8px;
+    border-radius: 7px;
+    text-transform: uppercase;
+    font-size: 14px;
+  }
+  .LaunchProductDetail h3 {
+    color: #000;
+    font-family: "Montserrat";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .LaunchProductDetail p {
+    color: #000;
+    font-family: Arial;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 1.12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ProductInfo .d-flex.mt-2 {
+    display: block !important;
+  }
+  .LaunchProductDetail {
+    margin: 15px;
+  }
+  .timeline-content {
+    width: 90%;
+    margin-left: 35px;
+  }
+}
+@media (max-width: 400px) {
+  .ProductInfo {
+    border-right: 0px dashed #000;
+  }
+  .timeline-content {
+    display: block;
+    width: 86%;
+  }
+}

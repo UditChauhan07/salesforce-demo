@@ -1,0 +1,136 @@
+.tableBoundary {
+  border: 1px dashed #000;
+}
+
+.th {
+  background-color: #f8f8f8 !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  /* line-height: 32px;  */
+  line-height: 23px;
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+  vertical-align: middle;
+}
+
+.month {
+  background-color: #eeeeee !important;
+  color: #000 !important;
+  font-family: Arial-500;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 17px;
+  vertical-align: middle;
+  letter-spacing: 1.12px;
+  padding-left: 20px !important;
+  text-transform: uppercase;
+}
+.stickyMonth {
+  position: sticky;
+  top: 0%;
+  z-index: 2;
+}
+.td {
+  color: #000;
+  font-family: Montserrat-400;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  /* line-height: 24px;  */
+  line-height: 22px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.stickyFirstColumn {
+  position: sticky;
+  left: 0%;
+  z-index: 2;
+}
+.stickyFirstColumnHeading {
+  position: sticky;
+  left: 0%;
+  top: 0%;
+  z-index: 5;
+}
+.stickySecondColumn {
+  position: sticky;
+  left: 180px;
+  z-index: 2;
+  /* max-width: 150px !important; */
+}
+.stickySecondColumnHeading {
+  position: sticky;
+  left: 180px;
+  top: 0%;
+  z-index: 5;
+}
+
+.stickyThirdColumn {
+  position: sticky;
+  left: 400px;
+  z-index: 2;
+}
+.stickyThirdColumnHeading {
+  position: sticky;
+  left: 400px;
+  top: 0%;
+  z-index: 5;
+  min-width: 130px !important;
+}
+.stickyThirdColumn1 {
+  position: sticky;
+  left: 375px;
+  z-index: 2;
+}
+
+.stickyThirdColumnHeading1 {
+  position: sticky;
+  left: 375px;
+  top: 0%;
+  z-index: 5;
+  min-width: 130px !important;
+}
+
+.stickyLastRow {
+  position: sticky;
+  bottom: 0%;
+}
+.lastRow {
+  background-color: #f8f8f8 !important;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 24px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.lastRowMonth {
+  background-color: #eeeeee !important;
+  color: #000;
+  font-family: Montserrat-500;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 24px; /* 150% */
+  letter-spacing: 1.6px;
+  padding-left: 20px !important;
+}
+.dateDisplay {
+  font-size: 10px;
+  line-height: 12px;
+  /* margin-bottom: 5px; */
+  background-color: #ffdcdc;
+  color: #9e4545;
+  width: 200px;
+  padding: 1px 2px;
+  margin: 0px;
+}
+/* #salesReportTable tbody tr:nth-last-child(1) {
+  position: sticky;
+  bottom: 0%;
+  z-index: 6;
+} */
