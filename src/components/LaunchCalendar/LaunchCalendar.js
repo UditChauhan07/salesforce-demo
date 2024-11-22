@@ -14,7 +14,7 @@ function LaunchCalendar({ productList, brand, month }) {
     let temp = true;
     products.map((month) => {
       month.content.map((item) => {
-        if (!brand || brand == item.brand) {
+        if (!brand || brand == item.brand||brand ==item.ManufacturerId__c) {
           temp = false;
         }
       });
@@ -34,7 +34,7 @@ function LaunchCalendar({ productList, brand, month }) {
         // console.log(match)
         if (month) {
           if (brand) {
-            if (brand == item.ManufacturerName__c) {
+            if (brand == item.ManufacturerId__c) {
               if (month == "TBD") {
                 return parseInt(item.Ship_Date__c.split("-")[2]) == 15;
               } else {
@@ -51,7 +51,7 @@ function LaunchCalendar({ productList, brand, month }) {
           // return match.includes(month.toUpperCase() )
         } else {
           if (brand) {
-            if (brand == item.ManufacturerName__c) {
+            if (brand == item.ManufacturerId__c) {
               return true;
             }
           } else {
@@ -124,7 +124,7 @@ function LaunchCalendar({ productList, brand, month }) {
                       <li key={index}>
                         <span className={`timelineHolder0${(index % 3) + 1}`} id={month.month}>{month.month}</span>
                         {month.content.map((product, productIndex) => {
-                          if (!brand || brand == product.brand || brand == product.ManufacturerName__c) {
+                          if (!brand || brand == product.brand || brand == product.ManufacturerId__c) {
                             let price = 'TBD';
                             if (product.usdRetail__c) {
                               if(product.usdRetail__c !="TBD"){
@@ -306,7 +306,7 @@ function LaunchCalendar1({ productList, brand, month }) {
                       <li key={index}>
                         <span className={`timelineHolder0${(index % 3) + 1}`}>{month.month}</span>
                         {month.content.map((product, productIndex) => {
-                          if (!brand || brand == product.brand || brand == product.ManufacturerName__c) {
+                          if (!brand || brand == product.brand || brand == product.ManufacturerId__c) {
                             return (
                               <>
                                 <div className="timeline-content" key={productIndex}>

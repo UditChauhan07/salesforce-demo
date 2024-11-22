@@ -1,6 +1,6 @@
 import AppLayout from "../components/AppLayout";
 import { useEffect, useState } from "react";
-import { GetAuthData, getProductDetails } from "../lib/store";
+import { defaultLoadTime, GetAuthData, getProductDetails } from "../lib/store";
 import Loading from "../components/Loading";
 import ModalPage from "../components/Modal UI";
 import ProductDetailCard from "../components/ProductDetailCard";
@@ -9,6 +9,8 @@ import { useCart } from "../context/CartContext";
 import Select from "react-select";
 import axios from "axios";
 import { originAPi } from "../lib/store";
+import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true }) => {
     const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
@@ -28,41 +30,51 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
         const { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
 
         try {
-            const res = await axios.post(`${originAPi}/beauty/v3/23n38hhduu`, { salesRepId, accessToken });
+            const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, { salesRepId, accessToken }));
             setAccountDetails(res.data.accountDetails);
         } catch (error) {
             console.error("Error fetching account details:", error);
         }
     };
-
+    const fetchProductDetailHandler = () => {
+        GetAuthData()
+            .then((user) => {
+                const rawData = { productId, key: user?.x_access_token };
+                dataStore.getPageData("/productPage/" + productId, () => getProductDetails({ rawData }))
+                    .then((productRes) => {
+                        readyProductDetails(productRes)
+                    })
+                    .catch((err) => console.error("Error fetching product details:", err));
+            })
+            .catch((err) => console.error("Error fetching auth data:", err));
+    }
+    const readyProductDetails = (data) => {
+        const manufacturer = data.data?.ManufacturerId__c;
+        setManufacturerId(manufacturer);
+        setClickedProduct(data.data);
+        setProduct({
+            isLoaded: true,
+            data: data.data,
+            discount: accountDetails[manufacturer] || {},
+        });
+    }
     useEffect(() => {
         fetchAccountDetails();
     }, []);
 
     useEffect(() => {
         if (productId) {
+            dataStore.subscribe("/productPage/" + productId, readyProductDetails);
             setIsModalOpen(isPopUp);
             setProduct({ isLoaded: false, data: [], discount: {} });
-
-            GetAuthData()
-                .then((user) => {
-                    const rawData = { productId, key: user?.x_access_token };
-                    getProductDetails({ rawData })
-                        .then((productRes) => {
-                            const manufacturer = productRes.data?.ManufacturerId__c;
-                            setManufacturerId(manufacturer);
-                            setClickedProduct(productRes.data);
-                            setProduct({
-                                isLoaded: true,
-                                data: productRes.data,
-                                discount: accountDetails[manufacturer] || {},
-                            });
-                        })
-                        .catch((err) => console.error("Error fetching product details:", err));
-                })
-                .catch((err) => console.error("Error fetching auth data:", err));
+            fetchProductDetailHandler();
+            return () => {
+                dataStore.unsubscribe("/productPage/" + productId, readyProductDetails);
+            }
         }
     }, [productId, isPopUp, accountDetails]);
+
+    useBackgroundUpdater(fetchProductDetailHandler, defaultLoadTime);
 
     if (!productId) return null;
 
@@ -112,8 +124,8 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                     element?.Category__c === "TESTER"
                         ? accountDetails?.Discount?.testerMargin || 0
                         : element?.Category__c === "Samples"
-                        ? accountDetails?.Discount?.sample || 0
-                        : accountDetails?.Discount?.margin || 0;
+                            ? accountDetails?.Discount?.sample || 0
+                            : accountDetails?.Discount?.margin || 0;
 
                 const salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
                 element.price = salesPrice;
@@ -136,14 +148,13 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     };
 
     const HtmlFieldSelect = ({ title, list = [], value, onChange }) => {
-        console.log('list' , list)
         let styles = {
             holder: {
                 border: '1px dashed #ccc',
                 padding: '10px',
                 width: '100%',
-                marginBottom: '20px' , 
-            
+                marginBottom: '20px',
+
             },
             title: {
                 color: '#000',
@@ -183,29 +194,29 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     return (
         <>
             {dealAccountList.length > 0 && (
-                 <ModalPage
-                 styles={{ zIndex: 4022 }}
-                 open={dealAccountList?.length ? true : false}
-                 content={
-                     <div className="d-flex flex-column gap-3">
-                         <h2>Attention!</h2>
-                         <p>
-                             Please select store you want to order for
-                         </p>
-                         <div></div>
-                         <HtmlFieldSelect   value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
-                         <div className="d-flex justify-content-around ">
-                             <button style={styles.btn} onClick={accountSelectionHandler}>
-                                 OK
-                             </button>
-                             <button style={styles.btn} onClick={accountSelectionCloseHandler}>
-                                 Cancel
-                             </button>
-                         </div>
-                     </div>
-                 }
-                 onClose={accountSelectionCloseHandler}
-             />
+                <ModalPage
+                    styles={{ zIndex: 4022 }}
+                    open={dealAccountList?.length ? true : false}
+                    content={
+                        <div className="d-flex flex-column gap-3">
+                            <h2>Attention!</h2>
+                            <p>
+                                Please select store you want to order for
+                            </p>
+                            <div></div>
+                            <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
+                            <div className="d-flex justify-content-around ">
+                                <button style={styles.btn} onClick={accountSelectionHandler}>
+                                    OK
+                                </button>
+                                <button style={styles.btn} onClick={accountSelectionCloseHandler}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    onClose={accountSelectionCloseHandler}
+                />
             )}
 
             {isModalOpen ? (

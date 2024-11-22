@@ -13,12 +13,15 @@ import { useManufacturer } from "../api/useManufacturer";
 import { getPermissions } from "../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import ModalPage from "../components/Modal UI";
 
 const fileExtension = ".xlsx";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const MarketingCalendar = () => {
+  const { data: manufacturers } = useManufacturer();
+  const [isAlert, setIsAlert] = useState(false);
   let date = new Date();
   // const [isLoading, setIsLoading] = useState(true);
   const [brand, setBrand] = useState(null);
@@ -30,33 +33,14 @@ const MarketingCalendar = () => {
   const [selectYear, setSelectYear] = useState(date.getFullYear())
   let yearList = [
     { value: date.getFullYear(), label: date.getFullYear() },
-    { value: date.getFullYear()+1, label: date.getFullYear()+1 }
+    { value: date.getFullYear() + 1, label: date.getFullYear() + 1 }
   ]
-  let brands = [
-    { value: null, label: "All" },
-    { value: "AERIN", label: "AERIN" },
-    { value: "ARAMIS", label: "ARAMIS" },
-    { value: "Bobbi Brown", label: "Bobbi Brown" },
-    { value: "Bumble and Bumble", label: "Bumble and Bumble" },
-    { value: "BY TERRY", label: "BY TERRY" },
-    { value: "Byredo", label: "Byredo" },
-    { value: "Diptyque", label: "Diptyque" },
-    { value: "ESTEE LAUDER", label: "ESTEE LAUDER" },
-    { value: "Kevyn Aucoin Cosmetics", label: "Kevyn Aucoin Cosmetics" },
-    { value: "LOccitane", label: "L'Occitane" },
-    { value: "Maison Margiela", label: "Maison Margiela" },
-    { value: "Re-Nutriv", label: "Re-Nutriv" },
-    { value: "ReVive", label: "ReVive" },
-    { value: "RMS Beauty", label: "RMS Beauty" },
-    { value: "Smashbox", label: "Smashbox" },
-    { value: "Victoria Beckham Beauty", label: "Victoria Beckham Beauty" },
-  ];
 
   useEffect(() => {
     setIsloaed(false)
     GetAuthData().then((user) => {
-      
-      getMarketingCalendar({ key: user.x_access_token,year:selectYear }).then((productRes) => {        
+
+      getMarketingCalendar({ key: user.x_access_token, year: selectYear }).then((productRes) => {
         setProductList(productRes)
         setIsloaed(true)
         setTimeout(() => {
@@ -91,8 +75,8 @@ const MarketingCalendar = () => {
     const element = document.getElementById('CalenerContainer'); // The HTML element you want to convert
     // element.style.padding = "10px"
     let filename = `Marketing Calender `;
-    if (brand) {
-      filename = brand + " "
+    if (brand?.label) {
+      filename = brand?.label + " "
     }
     filename += new Date();
     const opt = {
@@ -127,68 +111,71 @@ const MarketingCalendar = () => {
     };
   }
 
-  const { data: manufacturers } = useManufacturer();
   const generatePdfServerSide = (version = 0) => {
     setPDFIsloaed(true);
     LoadingEffect();
     GetAuthData().then((user) => {
-      let manufacturerId = null;
-      manufacturers.data.filter(item => { if (item?.Name?.toLowerCase() == brand?.toLowerCase()) { manufacturerId = item.Id } })
-      if (version == 1) {
-        getMarketingCalendarPDFV2({ key: user.x_access_token, manufacturerId, month,year:selectYear }).then((file) => {
-          if (file) {
-            const a = document.createElement('a');
-            a.href = originAPi + "/download/" + file + "/1/index";
-            // a.target = '_blank'
-            setPDFIsloaed(false);
-            a.click();
-          } else {
-            const a = document.createElement('a');
-            a.href = originAPi + "/download/blank.pdf/1/index";
-            // a.target = '_blank'
-            setPDFIsloaed(false);
-            a.click();
-          }
-        }).catch((pdfErr) => {
-          console.log({ pdfErr });
-        })
-      } else if (version == 2) {
-        getMarketingCalendarPDFV3({ key: user.x_access_token, manufacturerId, month,year:selectYear }).then((file) => {
-          if (file) {
-            const a = document.createElement('a');
-            a.href = originAPi + "/download/" + file + "/1/index";
-            // a.target = '_blank'
-            setPDFIsloaed(false);
-            a.click();
-          } else {
-            const a = document.createElement('a');
-            a.href = originAPi + "/download/blank.pdf/1/index";
-            // a.target = '_blank'
-            setPDFIsloaed(false);
-            a.click();
-          }
-        }).catch((pdfErr) => {
-          console.log({ pdfErr });
-        })
-      }
-      else {
-        getMarketingCalendarPDF({ key: user.x_access_token, manufacturerId, month,year:selectYear }).then((file) => {
-          if (file) {
-            const a = document.createElement('a');
-            a.href = originAPi + "/download/" + file + "/1/index";
-            // a.target = '_blank'
-            setPDFIsloaed(false);
-            a.click();
-          } else {
-            const a = document.createElement('a');
-            a.href = originAPi + "/download/blank.pdf/1/index";
-            // a.target = '_blank'
-            setPDFIsloaed(false);
-            a.click();
-          }
-        }).catch((pdfErr) => {
-          console.log({ pdfErr });
-        })
+      let manufacturerId = brand ?? null;
+      if (manufacturerId) {
+        if (version == 1) {
+          getMarketingCalendarPDFV2({ key: user.x_access_token, manufacturerId, month, year: selectYear }).then((file) => {
+            if (file) {
+              const a = document.createElement('a');
+              a.href = originAPi + "/download/" + file + "/1/index";
+              // a.target = '_blank'
+              setPDFIsloaed(false);
+              a.click();
+            } else {
+              const a = document.createElement('a');
+              a.href = originAPi + "/download/blank.pdf/1/index";
+              // a.target = '_blank'
+              setPDFIsloaed(false);
+              a.click();
+            }
+          }).catch((pdfErr) => {
+            console.log({ pdfErr });
+          })
+        } else if (version == 2) {
+          getMarketingCalendarPDFV3({ key: user.x_access_token, manufacturerId, month, year: selectYear }).then((file) => {
+            if (file) {
+              const a = document.createElement('a');
+              a.href = originAPi + "/download/" + file + "/1/index";
+              // a.target = '_blank'
+              setPDFIsloaed(false);
+              a.click();
+            } else {
+              const a = document.createElement('a');
+              a.href = originAPi + "/download/blank.pdf/1/index";
+              // a.target = '_blank'
+              setPDFIsloaed(false);
+              a.click();
+            }
+          }).catch((pdfErr) => {
+            console.log({ pdfErr });
+          })
+        }
+        else {
+          getMarketingCalendarPDF({ key: user.x_access_token, manufacturerId, month, year: selectYear }).then((file) => {
+            if (file) {
+              const a = document.createElement('a');
+              a.href = originAPi + "/download/" + file + "/1/index";
+              // a.target = '_blank'
+              setPDFIsloaed(false);
+              a.click();
+            } else {
+              const a = document.createElement('a');
+              a.href = originAPi + "/download/blank.pdf/1/index";
+              // a.target = '_blank'
+              setPDFIsloaed(false);
+              a.click();
+            }
+          }).catch((pdfErr) => {
+            console.log({ pdfErr });
+          })
+        }
+      } else {
+        setIsAlert(true);
+        setPDFIsloaed(false);
       }
     }).catch((userErr) => {
       console.log({ userErr });
@@ -202,7 +189,7 @@ const MarketingCalendar = () => {
       if (!monthData.content || !monthData.content.length) return null;
 
       const filteredContent = monthData.content.filter((item) => {
-        const itemBrand = item.ManufacturerName__c;
+        const itemBrand = item.ManufacturerId__c;
 
         // Check for brand and month match
         const brandMatch = brand ? itemBrand === brand : true;
@@ -221,7 +208,7 @@ const MarketingCalendar = () => {
   const csvData = ({ data }) => {
     let finalData = [];
     data.forEach((monthData) => {
-      monthData.content.forEach((item) => {
+      monthData?.content.forEach((item) => {
         let temp = {};
         temp["MC Month"] = monthData.month;
         temp["Product Title"] = item.Name;
@@ -249,7 +236,7 @@ const MarketingCalendar = () => {
     const data = new Blob([excelBuffer], { type: fileType });
     let filename = `Marketing Calendar`;
     if (brand) {
-      filename += ` - ${brand}`;
+      filename += ` - ${brand?.label}`;
     }
     FileSaver.saveAs(data, `${filename} ${new Date().toISOString()}` + fileExtension);
   };
@@ -269,7 +256,6 @@ const MarketingCalendar = () => {
     <AppLayout
       filterNodes={
         <>
-
           <FilterItem
             label="year"
             name="Year"
@@ -282,7 +268,10 @@ const MarketingCalendar = () => {
             label="All Brands"
             name="All-Brand"
             value={brand}
-            options={brands}
+            options={manufacturers?.data?.map((manufacturer) => ({
+              label: manufacturer.Name,
+              value: manufacturer.Id,
+            }))}
             onChange={(value) => {
               setBrand(value);
             }}
@@ -346,6 +335,24 @@ const MarketingCalendar = () => {
         </>
       }
     >
+      <ModalPage
+        open={isAlert}
+        content={
+          <div className="d-flex flex-column gap-3 ">
+            <h2>Internal Server Error</h2>
+            <p className="modalContent">
+            <b>We apologize</b>, Currently the Server is unable to Take the load of Full Marketing Calendar including all brands.<br /><br />
+
+              Kindly select 1 brand at time and try to download again.
+            </p>
+            <div className="d-flex justify-content-around ">
+              <button className="modalButton" onClick={() => setIsAlert(false)}>
+                Go Back
+              </button>
+            </div>
+          </div>
+        }
+        onClose={() => setIsAlert(false)} />
       {isPDFLoaded ? <div><img src="https://i.giphy.com/7jtU9sxHNLZuv8HZCa.webp" style={{ margin: 'auto', mixBlendMode: 'luminosity' }} width="480" height="480" /><p className="text-center mt-2">{`Generating PDF`}</p></div> :
         isLoaded ? <LaunchCalendar brand={brand} month={month} productList={productList} /> : <Loading height={'50vh'} />}
 
