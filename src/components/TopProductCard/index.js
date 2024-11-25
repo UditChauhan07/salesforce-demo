@@ -150,20 +150,45 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
         textTransform: "uppercase",
       },
     };
-
+  
+    // Custom styles for react-select
+    const customSelectStyles = {
+      option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isSelected ? "black" : state.isFocused ? "lightgray" : "white",
+        color: state.isSelected ? "white" : "black",
+      }),
+      control: (provided) => ({
+        ...provided,
+        border: "1px solid #ccc",
+      }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (provided) => ({
+        ...provided,
+        maxHeight: "200px", // Maximum height for the dropdown
+        overflowY: "auto", // Adds vertical scrolling
+      }),
+      menuList: (provided) => ({
+        ...provided,
+        maxHeight: "200px", // Matches the menu height
+        overflowY: "auto", // Adds vertical scrolling
+      }),
+    };
+  
     return (
       <div style={styles.holder}>
         <p style={styles.title}>{title}</p>
         <Select
           options={list}
           menuPortalTarget={document.body}
-          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+          styles={customSelectStyles}
           onChange={onChange}
           value={list.find((option) => option.value === value?.value) || ""}
         />
       </div>
     );
   };
+  
 
   useEffect(() => {}, [productDetailId, productImages]);
   return (

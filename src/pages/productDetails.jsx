@@ -192,7 +192,7 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                          <p>
                              Please select store you want to order for
                          </p>
-                         <div></div>
+                         
                          <HtmlFieldSelect   value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
                          <div className="d-flex justify-content-around ">
                              <button style={styles.btn} onClick={accountSelectionHandler}>
