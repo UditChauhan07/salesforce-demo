@@ -2,6 +2,7 @@ import axios from 'axios';
 import { GetAuthData, DestoryAuth } from './store'; // Import any necessary functions
 import { originAPi } from './store';
 import { getPermissions } from './permission';
+import dataStore from './dataStore';
 
 export const fetchAccountDetails = async (
   setLoading,
@@ -33,7 +34,7 @@ export const fetchAccountDetails = async (
     };
 
     // Make the API request
-    const res = await axios.post(apiUrl, requestBody);
+    const res = await dataStore.getPageData("/account-contact-detailed-Report"+saleRepId,()=> axios.post(apiUrl, requestBody));
     console.log("API Response:", res.data);
 
     if (res.data) {

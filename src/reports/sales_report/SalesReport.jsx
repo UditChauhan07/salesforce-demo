@@ -18,8 +18,10 @@ import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import Pagination from "../../components/Pagination/Pagination";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
+let PageSize = 3;
 
 const SalesReport = () => {
   const [manufacturers, setManufacturers] = useState([]);
@@ -40,7 +42,9 @@ const SalesReport = () => {
   const [userData, setUserData] = useState({});
   const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
-  const [dateFilter, setDateFilter] = useState("Created-Date")
+  const [dateFilter, setDateFilter] = useState("Created-Date");
+  const [currentPage, setCurrentPage] = useState(1);
+
 
   const filteredSalesReportData = useMemo(() => {
     let filtered = salesReportData.filter((ele) => {
@@ -213,6 +217,7 @@ const SalesReport = () => {
     FileSaver.saveAs(data, `Sales Report ${new Date().toDateString()}` + fileExtension);
   };
   const resetFilter = () => {
+    setCurrentPage(1);
     setManufacturerFilter(null);
     setHighestOrders(true);
     setActiveAccounts("Active Account");
@@ -229,8 +234,6 @@ const SalesReport = () => {
 
 
   const readyReportHandler = (data) => {
-    console.warn({data});
-    
     let salesListName = [];
     let salesList = [];
     let manuIds = [];
@@ -269,14 +272,14 @@ const SalesReport = () => {
   const getSalesData = async (yearFor, dateFilter) => {
     setIsLoading(true);
     setYearForTableSort(yearFor);
-    const result = await dataStore.getPageData("/sales-report" + JSON.stringify({yearFor,dateFilter }), () => salesReportApi.salesReportData({ yearFor, dateFilter }));
+    const result = await dataStore.getPageData("/sales-report" + JSON.stringify({ yearFor, dateFilter }), () => salesReportApi.salesReportData({ yearFor, dateFilter }));
+    setCurrentPage(1);
     if (result) {
       readyReportHandler(result);
     }
   };
-  // console.log("salesReportData", salesReportData);
   useEffect(() => {
-    dataStore.subscribe("/sales-report" + JSON.stringify({yearFor,dateFilter }), readyReportHandler);
+    dataStore.subscribe("/sales-report" + JSON.stringify({ yearFor, dateFilter }), readyReportHandler);
     const userData = localStorage.getItem("Name");
     if (userData) {
       getSalesData(yearFor, dateFilter);
@@ -284,11 +287,11 @@ const SalesReport = () => {
       navigate("/");
     }
     return () => {
-      dataStore.unsubscribe("/sales-report" + JSON.stringify({yearFor,dateFilter }), readyReportHandler);
+      dataStore.unsubscribe("/sales-report" + JSON.stringify({ yearFor, dateFilter }), readyReportHandler);
     }
   }, []);
-  console.log(JSON.stringify(localStorage).length, 'bytes used');
-  useBackgroundUpdater(()=>getSalesData(yearFor, dateFilter), defaultLoadTime);
+  // console.log(JSON.stringify(localStorage).length, 'bytes used');
+  useBackgroundUpdater(() => getSalesData(yearFor, dateFilter), defaultLoadTime);
   const sendApiCall = () => {
     setManufacturerFilter(null);
     setSearchBySalesRep("");
@@ -502,7 +505,19 @@ const SalesReport = () => {
       </div>
 
       {filteredSalesReportData?.length && !isLoading ? (
-        <SalesReportTable salesData={filteredSalesReportData} year={yearForTableSort} ownerPermission={ownerPermission} />
+        <>
+          <SalesReportTable salesData={filteredSalesReportData?.slice(
+            (currentPage - 1) * PageSize,
+            currentPage * PageSize
+          )} year={yearForTableSort} ownerPermission={ownerPermission} />
+          <Pagination
+            className="pagination-bar"
+            currentPage={currentPage}
+            totalCount={filteredSalesReportData.length}
+            pageSize={PageSize}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
+        </>
       ) : filteredSalesReportData.length === 0 && !isLoading ? (
         <div className="flex justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]">No data found</div>
       ) : (

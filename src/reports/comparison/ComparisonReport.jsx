@@ -17,6 +17,7 @@ import { GetAuthData } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../../lib/dataStore";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const date = new Date();
@@ -66,8 +67,27 @@ const ComparisonReport = () => {
       "Wholesales Amount": `$${Number(totalWhole).toFixed(2)}`,
     })
   }
+  const readyComparisonReady = (result)=>{
+    let short = result.data.filter(item => status === 1 ? item.Status !== "In-Active" : item);
+    let temp = {
+      ...result,
+      data: short,
+    };
+    setFilter(prev => ({
+      ...prev,
+      dataDisplay: status === 1 ? "Active Account" : "All Account",
+    }));
+    setApiData(temp);
+
+    setIsLoading(false);
+  }
   useEffect(() => {
+    dataStore.subscribe("/comparison-report"+JSON.stringify(filter),readyComparisonReady);
     sendApiCall();
+    return ()=>{
+    dataStore.unsubscribe("/comparison-report"+JSON.stringify(filter),readyComparisonReady);
+
+    }
   }, []);
 
   const handleExportToExcel = () => {
@@ -83,8 +103,8 @@ const ComparisonReport = () => {
   };
   const resetFilter = async () => {
     setIsLoading(true);
-    const result = await originalApiData.fetchComparisonReportAPI(initialValues);
-    setApiData(result);
+    const result = await dataStore.getPageData("/comparison-report"+JSON.stringify(initialValues),()=> originalApiData.fetchComparisonReportAPI(initialValues));
+    readyComparisonReady(result);
     setFilter(initialValues);
     setIsLoading(false);
     setstatus(1);
@@ -98,19 +118,8 @@ const ComparisonReport = () => {
   // ..........
   const sendApiCall = async () => {
     setIsLoading(true);
-    const result = await originalApiData.fetchComparisonReportAPI(filter);
-    let short = result.data.filter(item => status === 1 ? item.Status !== "In-Active" : item);
-    let temp = {
-      ...result,
-      data: short,
-    };
-    setFilter(prev => ({
-      ...prev,
-      dataDisplay: status === 1 ? "Active Account" : "All Account",
-    }));
-    setApiData(temp);
-
-    setIsLoading(false);
+    const result = await dataStore.getPageData("/comparison-report"+JSON.stringify(filter),()=> originalApiData.fetchComparisonReportAPI(filter));
+    readyComparisonReady(result)
   };
 
   // Fetch user data and permissions
