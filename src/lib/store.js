@@ -5,7 +5,7 @@ export const originAPi = process.env.REACT_APP_OA_URL || "https://staging.beauty
 //  export const originAPi = "https://live.beautyfashionsales.com"
 
 // local LINk 
-// export const originAPi = "http://localhost:2611"
+// export const originAPi = "http://localhost:3001"
 export const defaultLoadTime = 300000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;

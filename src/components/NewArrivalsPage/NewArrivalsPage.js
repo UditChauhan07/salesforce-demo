@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , accountDetails={}}) {
+  console.log({productList})
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
   const [products, setProducts] = useState(productList);
