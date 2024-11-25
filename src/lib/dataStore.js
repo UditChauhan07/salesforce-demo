@@ -1,3 +1,5 @@
+import LZString from 'lz-string';
+
 const dataStore = {
     listeners: {}, // Store listeners for each pageKey
 
@@ -25,15 +27,16 @@ const dataStore = {
 
     // Method to store or update data based on page
     async getPageData(pageKey, fetchData) {
-        
         try {
-            // Check if there's already data in localStorage
+            // Check if there's already compressed data in localStorage
             const cachedData = localStorage.getItem(pageKey);
 
             let parsedData = null;
             if (cachedData) {
                 try {
-                    parsedData = JSON.parse(cachedData);
+                    // Decompress the data before parsing it
+                    const decompressedData = LZString.decompress(cachedData);
+                    parsedData = JSON.parse(decompressedData);
                 } catch (error) {
                     console.error(error);
                 }
@@ -49,7 +52,9 @@ const dataStore = {
             // No cached data: fetch fresh data immediately, store it, and return it
             const data = await fetchData?.();
             if (data) {
-                localStorage.setItem(pageKey, JSON.stringify(data));
+                // Compress and store the data in localStorage
+                const compressedData = LZString.compress(JSON.stringify(data));
+                localStorage.setItem(pageKey, compressedData);
                 this.notify(pageKey, data); // Notify listeners
                 return data;
             }
@@ -62,8 +67,13 @@ const dataStore = {
     // Retrieve data from localStorage
     retrieve(pageKey) {
         try {
-            const data = JSON.parse(localStorage.getItem(pageKey));
-            return data || null;
+            const cachedData = localStorage.getItem(pageKey);
+            if (cachedData) {
+                // Decompress the data before parsing it
+                const decompressedData = LZString.decompress(cachedData);
+                return decompressedData ? JSON.parse(decompressedData) : null;
+            }
+            return null;
         } catch (error) {
             console.error('Error retrieving data:', error);
             return null;
@@ -75,7 +85,9 @@ const dataStore = {
         try {
             const data = await fetchData?.(); // Fetch new data
             if (data) {
-                localStorage.setItem(pageKey, JSON.stringify(data));
+                // Compress and store the data in localStorage
+                const compressedData = LZString.compress(JSON.stringify(data));
+                localStorage.setItem(pageKey, compressedData);
                 this.notify(pageKey, data); // Notify listeners
                 return data;
             }
@@ -88,7 +100,9 @@ const dataStore = {
     async updateData(pageKey, data) {
         try {
             if (data) {
-                localStorage.setItem(pageKey, JSON.stringify(data));
+                // Compress and store the data in localStorage
+                const compressedData = LZString.compress(JSON.stringify(data));
+                localStorage.setItem(pageKey, compressedData);
                 this.notify(pageKey, data); // Notify listeners
                 return data;
             }

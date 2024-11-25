@@ -14,6 +14,7 @@ import { getPermissions } from "../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import ModalPage from "../components/Modal UI";
+import dataStore from "../lib/dataStore";
 
 const fileExtension = ".xlsx";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -35,14 +36,18 @@ const MarketingCalendar = () => {
     { value: date.getFullYear(), label: date.getFullYear() },
     { value: date.getFullYear() + 1, label: date.getFullYear() + 1 }
   ]
+  const readyCalenderHandle = (data)=>{
+    setProductList(data)
+    setIsloaed(true)
+  }
 
   useEffect(() => {
+    dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
     setIsloaed(false)
     GetAuthData().then((user) => {
 
-      getMarketingCalendar({ key: user.x_access_token, year: selectYear }).then((productRes) => {
-        setProductList(productRes)
-        setIsloaed(true)
+      dataStore.getPageData("/marketing-calendar" + selectYear, () =>getMarketingCalendar({ key: user.x_access_token, year: selectYear })).then((productRes) => {
+        readyCalenderHandle(productRes);
         setTimeout(() => {
 
           let getMonth = new Date().getMonth();
@@ -53,6 +58,9 @@ const MarketingCalendar = () => {
         }, 2000);
       }).catch((err) => console.log({ err }))
     }).catch((e) => console.log({ e }))
+    return ()=>{
+      dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
+    }
   }, [selectYear])
   const [month, setMonth] = useState("");
   let months = [

@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import AppLayout from "../../components/AppLayout";
 import Loading from "../../components/Loading";
@@ -13,9 +13,11 @@ import { MdOutlineDownload } from "react-icons/md";
 import ModalPage from "../../components/Modal UI";
 import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
-import { GetAuthData } from "../../lib/store";
+import dataStore from "../../lib/dataStore";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import { defaultLoadTime } from "../../lib/store";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const NewnessReport = () => {
@@ -52,7 +54,7 @@ const NewnessReport = () => {
     setLoading(true);
     setstatus(1)
     setFilter(initialValues);
-    const result = await originalApiData.fetchNewnessApiData(initialValues);
+    const result =  await dataStore.getPageData("/newness-report" + JSON.stringify({ ...initialValues, dataDisplay: null }), () => originalApiData.fetchNewnessApiData(initialValues));
     setNewnessData(result);
     setLoading(false);
   };
@@ -195,57 +197,68 @@ const NewnessReport = () => {
       navigate("/");
     }
   }, []);
-  useEffect(() => {
-    sendApiCall();
-  }, []);
-  const sendApiCall = async () => {
-    setLoading(true);
-    const result = await originalApiData.fetchNewnessApiData(filter);
-    let short = result.AccountList.filter(item => status == 1 ? item.Active_Closed__c !== "Closed Account" : item)
+  const readyNewnessReady = (data) => {
+    let short = data.AccountList.filter(item => status == 1 ? item.Active_Closed__c !== "Closed Account" : item)
     setFilter((prev) => ({
       ...prev,
       dataDisplay: dataDisplayHandler,
     }));
     let temp = {
-      status: result.status,
-      header: result.header,
+      status: data.status,
+      header: data.header,
       AccountList: short,
     }
     setNewnessData(temp);
     setLoading(false);
+  }
+  const sendApiCall = async () => {
+    setLoading(true);
+    const result = await dataStore.getPageData("/newness-report" + JSON.stringify({ ...filter, dataDisplay: null }), () => originalApiData.fetchNewnessApiData(filter));
+    if (result) {
+      readyNewnessReady(result);
+    }
   };
+  useEffect(() => {
+    dataStore.subscribe("/newness-report" + JSON.stringify({ ...filter, dataDisplay: null }), readyNewnessReady);
+    sendApiCall();
+    return () => {
+      dataStore.unsubscribe("/newness-report" + JSON.stringify({ ...filter, dataDisplay: null }), readyNewnessReady);
+    }
+  }, []);
 
-    // Fetch user data and permissions
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-  
-          const userPermissions = await getPermissions();
-          setPermissions(userPermissions);
-          setHasPermission(userPermissions?.modules?.reports?.newnessReport?.view );
-  
-          // If no permission, redirect to dashboard
-          if (userPermissions?.modules?.reports?.newnessReport?.view === false) {
-            PermissionDenied()
-            navigate("/dashboard");
-          }
-          
-        } catch (error) {
-          console.log({ error });
+  useBackgroundUpdater(sendApiCall,defaultLoadTime)
+
+  // Fetch user data and permissions
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+
+        const userPermissions = await getPermissions();
+        setPermissions(userPermissions);
+        setHasPermission(userPermissions?.modules?.reports?.newnessReport?.view);
+
+        // If no permission, redirect to dashboard
+        if (userPermissions?.modules?.reports?.newnessReport?.view === false) {
+          PermissionDenied()
+          navigate("/dashboard");
         }
-      };
-      
-      fetchData();
-    }, []);
-  
-    // Memoize permissions to avoid unnecessary re-calculations
-    const memoizedPermissions = useMemo(() => permissions, [permissions]);
+
+      } catch (error) {
+        console.log({ error });
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Memoize permissions to avoid unnecessary re-calculations
+  const memoizedPermissions = useMemo(() => permissions, [permissions]);
   return (
     <AppLayout
       filterNodes={
         <>
 
-      
+
           <FilterItem
             minWidth="200px"
             label="All Manufacturers"
@@ -337,8 +350,8 @@ const NewnessReport = () => {
             <MdOutlineDownload size={16} className="m-auto" />
             <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
           </button>
-        
-         
+
+
         </>
       }
     >

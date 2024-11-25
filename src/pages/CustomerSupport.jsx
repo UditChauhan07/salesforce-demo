@@ -10,6 +10,7 @@ import { CloseButton } from "../lib/svg";
 import { getPermissions } from "../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../lib/dataStore";
 let PageSize = 10;
 const CustomerSupport = () => {
   const [supportList, setSupportList] = useState([]);
@@ -27,17 +28,17 @@ const CustomerSupport = () => {
   const [permissions, setPermissions] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const userPermissions = await getPermissions();
-            setPermissions(userPermissions);
-            if (userPermissions?.modules?.customerSupport?.view === false) { PermissionDenied();navigate('/dashboard'); }
-        } catch (error) {
-            console.log("Permission Error", error)
-        }
+      try {
+        const userPermissions = await getPermissions();
+        setPermissions(userPermissions);
+        if (userPermissions?.modules?.customerSupport?.view === false) { PermissionDenied(); navigate('/dashboard'); }
+      } catch (error) {
+        console.log("Permission Error", error)
+      }
     }
     fetchData()
-}, [])
-  let statusList = ["Open","New", "Follow up Needed By Brand Customer Service", "Follow up needed by Rep", "Follow up Needed By Brand Accounting", "Follow up needed by Order Processor", "RTV Approved", "Closed"];
+  }, [])
+  let statusList = ["Open", "New", "Follow up Needed By Brand Customer Service", "Follow up needed by Rep", "Follow up Needed By Brand Accounting", "Follow up needed by Order Processor", "RTV Approved", "Closed"];
   const [status, setStatus] = useState(["Open"]);
   const navigate = useNavigate()
   useEffect(() => {
@@ -45,6 +46,11 @@ const CustomerSupport = () => {
       .then((user) => {
         if (user) {
           setUserData(user)
+          dataStore.subscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
+            let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
+            setSupportList(sorting);
+            setLoaded(true);
+          })
           if (!selectedSalesRepId) setSelectedSalesRepId(user.Sales_Rep__c)
           supportHandler({ key: user.x_access_token, salesRepId: selectedSalesRepId ?? user.Sales_Rep__c })
           reatilerHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
@@ -56,6 +62,13 @@ const CustomerSupport = () => {
               console.log({ repErr });
             })
           }
+          return () => {
+            dataStore.unsubscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
+              let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
+              setSupportList(sorting);
+              setLoaded(true);
+            })
+          }
         } else {
           DestoryAuth()
         }
@@ -65,19 +78,19 @@ const CustomerSupport = () => {
       });
   }, []);
   const reatilerHandler = ({ key, userId }) => {
-    getRetailerList({ key, userId }).then((retailerRes) => {
+    dataStore.getPageData("getRetailerList" + userId, () => getRetailerList({ key, userId })).then((retailerRes) => {
       setRetailerList(retailerRes.data)
     }).catch((retailerErr) => console.log({ retailerErr }))
   }
   const brandhandler = ({ key, userId }) => {
-    getBrandList({ key, userId }).then((brandRes) => {
+    dataStore.getPageData("getBrandList" + userId, () => getBrandList({ key, userId })).then((brandRes) => {
       setbrandList(brandRes.data)
     }).catch((brandErr) => console.log({ brandErr }))
   }
   const supportHandler = ({ key, salesRepId }) => {
-    getSupportList({ key, salesRepId })
+    dataStore.getPageData("/customer-support" + salesRepId, () => getSupportList({ key, salesRepId }))
       .then((supports) => {
-        let sorting  = sortArrayHandler(supports,g=>g.CreatedDate,'desc')
+        let sorting = sortArrayHandler(supports, g => g.CreatedDate, 'desc')
         setSupportList(sorting);
         setLoaded(true);
       })
@@ -100,9 +113,9 @@ const CustomerSupport = () => {
   const filteredData = useMemo(() => {
     let newValues = supportList;
     if (status.length > 0) {
-      if(status == "Open"){
-        newValues = newValues.filter((item) => !"Approved".includes(item.Status)&&!"Closed".includes(item.Status));
-      }else{
+      if (status == "Open") {
+        newValues = newValues.filter((item) => !"Approved".includes(item.Status) && !"Closed".includes(item.Status));
+      } else {
         newValues = newValues.filter((item) => status.includes(item.Status));
       }
     }
@@ -116,9 +129,9 @@ const CustomerSupport = () => {
       newValues = newValues.filter((item) => item.AccountId === retailerFilter);
     }
     return newValues;
-  }, [supportList, retailerFilter, manufacturerFilter, searchBy,status]);
+  }, [supportList, retailerFilter, manufacturerFilter, searchBy, status]);
 
- 
+
 
   // Memoize permissions to avoid unnecessary re-calculations
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
@@ -126,8 +139,8 @@ const CustomerSupport = () => {
     <AppLayout
       filterNodes={
         <>
-        {memoizedPermissions?.modules?.godLevel   ?  <> 
-          <FilterItem
+          {memoizedPermissions?.modules?.godLevel ? <>
+            <FilterItem
               minWidth="220px"
               label="salesRep"
               name="salesRep"
@@ -138,7 +151,7 @@ const CustomerSupport = () => {
               }))}
               onChange={(value) => supportBasedOnSalesRep(value)}
             />
-           </> : null}
+          </> : null}
           {retailerList?.length > 0 &&
             <FilterItem
               minWidth="220px"
@@ -151,7 +164,7 @@ const CustomerSupport = () => {
               }))}
               onChange={(value) => setRetailerFilter(value)}
             />}
-              
+
           {brandList?.length > 0 &&
             <FilterItem
               minWidth="220px"
@@ -202,9 +215,9 @@ const CustomerSupport = () => {
             <CloseButton crossFill={'#fff'} height={20} width={20} />
             <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
           </button>
-     
-        
-           
+
+
+
         </>
       }
     >
@@ -234,5 +247,5 @@ const CustomerSupport = () => {
     </AppLayout>
   );
 };
-export default CustomerSupport 
+export default CustomerSupport
 

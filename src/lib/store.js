@@ -6,7 +6,7 @@ import { getPermissions } from "./permission";
 
 // local LINk 
 // export const originAPi = "http://localhost:2611"
-export const defaultLoadTime = 300000;
+export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;
 let URL = `${originAPi}/beauty/0DS68FOD7s`;

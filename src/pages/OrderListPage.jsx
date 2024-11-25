@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Filters from "../components/OrderList/Filters";
 import Styles from "../components/OrderList/style.module.css";
 import AppLayout from "../components/AppLayout";
-import { GetAuthData, admins, getOrderList, getSalesRepList } from "../lib/store";
+import { GetAuthData, admins, defaultLoadTime, getOrderList, getSalesRepList } from "../lib/store";
 import Loading from "../components/Loading";
 import Pagination from "../components/Pagination/Pagination";
 import OrderListContent from "../components/OrderList/OrderListContent";
@@ -10,6 +10,8 @@ import { FilterItem } from "../components/FilterItem";
 import { useNavigate } from "react-router-dom";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 let PageSize = 10;
 
 const OrderListPage = () => {
@@ -36,8 +38,8 @@ const OrderListPage = () => {
     const fetchData = async () => {
       try {
         const userPermissions = await getPermissions();
-        console.log({userPermissions});
-        
+        console.log({ userPermissions });
+
         setPermissions(userPermissions);
         if (userPermissions?.modules?.order?.view === false) { PermissionDenied(); navigate('/dashboard'); }
       } catch (error) {
@@ -109,19 +111,29 @@ const OrderListPage = () => {
     );
   }, [filterValue, orders, searchShipBy]);
 
+  const readyOrderList = (order) => {
+    let sorting = sortingList(order);
+    setOrders(sorting);
+    setLoaded(true);
+  }
+
   useEffect(() => {
     setLoaded(false);
     GetAuthData()
       .then((response) => {
         setUserData(response)
+        dataStore.subscribe("/orderList" + `${selectedSalesRepId ?? response.Sales_Rep__c}${filterValue.month}`, readyOrderList)
         if (!selectedSalesRepId) setSelectedSalesRepId(response.Sales_Rep__c)
         getOrderlIsthandler({ key: response.x_access_token, Sales_Rep__c: selectedSalesRepId ?? response.Sales_Rep__c })
         if (admins.includes(response.Sales_Rep__c)) {
-          getSalesRepList({ key: response.x_access_token }).then((repRes) => {
+          dataStore.getPageData(getSalesRepList, () => getSalesRepList({ key: response.x_access_token })).then((repRes) => {
             setSalesRepList(repRes.data)
           }).catch((repErr) => {
             console.log({ repErr });
           })
+        }
+        return () => {
+          dataStore.unsubscribe("/orderList" + `${selectedSalesRepId ?? response.Sales_Rep__c}${filterValue.month}`, readyOrderList)
         }
       })
       .catch((err) => {
@@ -133,24 +145,25 @@ const OrderListPage = () => {
     setShipByText(searchShipBy);
   }, [searchShipBy]);
 
+  
+
   const getOrderlIsthandler = ({ key, Sales_Rep__c }) => {
-    getOrderList({
+    
+    dataStore.getPageData("/orderList" + Sales_Rep__c + filterValue.month, () => getOrderList({
       user: {
         key,
         Sales_Rep__c,
       },
       month: filterValue.month,
-    })
+    }))
       .then((order) => {
-        console.log({ order });
-        let sorting = sortingList(order);
-        setOrders(sorting);
-        setLoaded(true);
+        readyOrderList(order);
       })
       .catch((error) => {
         console.log({ error });
       });
   }
+  useBackgroundUpdater(()=>getOrderlIsthandler(userData.x_access_token,userData.Sales_Rep__c),defaultLoadTime);
   const orderListBasedOnRepHandler = (value) => {
     setSelectedSalesRepId(value)
     setLoaded(false)
@@ -188,6 +201,7 @@ const OrderListPage = () => {
               });
               setSearchShipBy("");
               setSelectedSalesRepId(userData.Sales_Rep__c);
+              orderListBasedOnRepHandler(userData.Sales_Rep__c);
             }}
           />
         </>

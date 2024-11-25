@@ -15,6 +15,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CloseButton, SearchIcon } from "../../lib/svg";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../../lib/dataStore";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 
@@ -40,25 +41,28 @@ const TargetReport = () => {
     const navigate = useNavigate()
     // let brandcount = {}
     // let sum = 0;
+    const handleTargetReady = (data)=>{
+        if (data) {
+            setIsLoaded(true);
+        }
+        let salesRep = [];
+        data.list.map((tar) => {
+            if (!salesRep.includes(tar.salesRepName)) {
+                salesRep.push(tar.salesRepName);
+            }
+        });
+        setSalesRepList(salesRep);
+        setTarget(data);
+        setManufacturerFilter(data.ownerPermission ? state?.manufacturerId : null);
+        setSearchSaleBy(data.ownerPermission ? state?.salesRepId : null);
+    }
     useEffect(() => {
+        dataStore.subscribe("/Target-Report"+JSON.stringify({year, preOrder}),handleTargetReady)
         GetAuthData()
             .then((user) => {
-                getRollOver({ user, year, preOrder })
+                dataStore.subscribe("/Target-Report"+JSON.stringify({year, preOrder}),()=>getRollOver({ user, year, preOrder }))
                     .then((targetRes) => {
-                        console.log(targetRes)
-                        if (targetRes) {
-                            setIsLoaded(true);
-                        }
-                        let salesRep = [];
-                        targetRes.list.map((tar) => {
-                            if (!salesRep.includes(tar.salesRepName)) {
-                                salesRep.push(tar.salesRepName);
-                            }
-                        });
-                        setSalesRepList(salesRep);
-                        setTarget(targetRes);
-                        setManufacturerFilter(targetRes.ownerPermission ? state?.manufacturerId : null);
-                        setSearchSaleBy(targetRes.ownerPermission ? state?.salesRepId : null);
+                        handleTargetReady(targetRes)
                     })
                     .catch((targetErr) => {
                         console.error({ targetErr });
@@ -67,6 +71,9 @@ const TargetReport = () => {
             .catch((userErr) => {
                 console.error({ userErr });
             });
+            return ()=>{
+                dataStore.unsubscribe("/Target-Report"+JSON.stringify({year, preOrder}),handleTargetReady)
+            }
     }, []);
     const filteredTargetData = useMemo(() => {
         let filtered = target.list.filter((ele) => {
