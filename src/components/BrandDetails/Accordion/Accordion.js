@@ -29,6 +29,10 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
     let checkProduct = isProductCarted(element.Id);
     if (checkProduct) {
       let cartStatus = updateProductQty(element.Id, quantity);
+      if (order?.Account?.id === localStorage.getItem("AccountId__c")) {
+        updateProductQty(element.Id, quantity);
+        return;
+      } 
     } else {
       let listPrice = Number(element?.usdRetail__c?.replace("$", "")?.replace(",", ""));
       let account = {
@@ -191,10 +195,22 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
                                       removeProduct(value.Id);
                                     }
                                   }}
-                                  value={qtyofItem}
+                                  value={ order?.Account?.id ===
+                                    localStorage.getItem("AccountId__c")
+                                    ? qtyofItem
+                                    : 0}
                                 />
                               </td>
-                              <td>{(qtyofItem > 0) ? '$' + (inputPrice * qtyofItem).toFixed(2) : '----'}</td>
+                              <td>
+                                  {" "}
+                                  {order?.Account?.id ===
+                                    localStorage.getItem("AccountId__c")
+                                    ? qtyofItem > 0
+                                      ? "$" +
+                                      (inputPrice * qtyofItem).toFixed(2)
+                                      : "----"
+                                    : "----"}
+                                </td>
                             </tr>
                           );
                         })}

@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , accountDetails={}}) {
+  console.log({productList})
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
   const [products, setProducts] = useState(productList);
@@ -180,45 +181,63 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
   }
 
   const HtmlFieldSelect = ({ title, list = [], value, onChange }) => {
-    let styles = {
+    const styles = {
       holder: {
-        border: '1px dashed #ccc',
-        padding: '10px',
-        width: '100%',
-        marginBottom: '20px'
+        border: "1px dashed #ccc",
+        padding: "10px",
+        width: "100%",
+        marginBottom: "20px",
       },
       title: {
-        color: '#000',
-        textAlign: 'left',
-        fontFamily: 'Montserrat',
-        fontSize: '14px',
-        fontStyle: 'normal',
+        color: "#000",
+        textAlign: "left",
+        fontFamily: "Montserrat",
+        fontSize: "14px",
+        fontStyle: "normal",
         fontWeight: 500,
-        lineHeight: '24px',
-        letterSpacing: '2.2px',
-        textTransform: 'uppercase'
+        lineHeight: "24px",
+        letterSpacing: "2.2px",
+        textTransform: "uppercase",
       },
-      field: {
-        width: '100%',
-        minHeight: '40px',
-        borderBottom: '1px solid #ccc',
-        borderRadius: '10px',
-        background: '#f4f4f4'
-      }
-    }
-    return (<div style={styles.holder}>
-      <p style={styles.title}>{title}</p>
-      <Select
-        type="text"
-        id={title?.replaceAll(/\s+/g, '-')}
-        options={list}
-        onChange={(option) => {
-          onChange?.(option)
-        }}
-        value={list ? list.find((option) => option.value === value?.value) : ""}
-      />
-    </div>)
-  }
+    };
+  
+    // Custom styles for react-select
+    const customSelectStyles = {
+      option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isSelected ? "black" : state.isFocused ? "lightgray" : "white",
+        color: state.isSelected ? "white" : "black",
+      }),
+      control: (provided) => ({
+        ...provided,
+        border: "1px solid #ccc",
+      }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menu: (provided) => ({
+        ...provided,
+        maxHeight: "200px", // Maximum height for the dropdown
+        overflowY: "auto", // Adds vertical scrolling
+      }),
+      menuList: (provided) => ({
+        ...provided,
+        maxHeight: "200px", // Matches the menu height
+        overflowY: "auto", // Adds vertical scrolling
+      }),
+    };
+  
+    return (
+      <div style={styles.holder}>
+        <p style={styles.title}>{title}</p>
+        <Select
+          options={list}
+          menuPortalTarget={document.body}
+          styles={customSelectStyles}
+          onChange={onChange}
+          value={list.find((option) => option.value === value?.value) || ""}
+        />
+      </div>
+    );
+  };
 
 
   return (
