@@ -9,6 +9,7 @@ import LoaderV2 from "../loader/v2";
 import { Link } from "react-router-dom";
 import ContentLoader from "react-content-loader";
 import ProductDetails from "../../pages/productDetails";
+import dataStore from "../../lib/dataStore";
 
 const BrandDetailCard = ({ brandId }) => {
     const brand = brandDetails[brandId];
@@ -33,7 +34,7 @@ const BrandDetailCard = ({ brandId }) => {
             }
         }
         GetAuthData().then((user) => {
-            topProduct({ manufacturerId: brandId }).then((products) => {
+            dataStore.getPageData("/top-products" + brandId, () => topProduct({ manufacturerId: brandId })).then((products) => {
                 setTopProduct({ isLoaded: true, data: products.data })
                 let productCode = "";
                 products.data?.map((product, index) => {
@@ -118,7 +119,7 @@ const BrandDetailCard = ({ brandId }) => {
                     </div>
                 </div>
 
-                {(topProducts.isLoaded && topProducts?.data.length)||(!topProducts.isLoaded) ?
+                {(topProducts.isLoaded && topProducts?.data.length) || (!topProducts.isLoaded) ?
                     <div className={`${Styles.TopProducts} ${Styles.NewArriavalsList}`}>
                         <h3 className="mt-5">Popular selling products</h3>
                         <OwlCarousel className="owl-theme" {...options}>

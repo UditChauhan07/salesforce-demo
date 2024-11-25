@@ -13,6 +13,7 @@ import { fetchAccountDetails } from "../lib/store";
 import axios from "axios";
 import { originAPi } from "../lib/store";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../lib/dataStore";
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 const TopProducts = () => {
@@ -26,34 +27,87 @@ const TopProducts = () => {
   const [searchText, setSearchText] = useState();
   const [productImages, setProductImages] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
-  const [accountDetails , setAccountDetails] = useState()
+  const [accountDetails, setAccountDetails] = useState()
+
   const navigate = useNavigate()
   const fetchAccountDetails = async () => {
     let data = await GetAuthData(); // Fetch authentication data
     let salesRepId = data.Sales_Rep__c;
     let accessToken = data.x_access_token;
-  
+
+    dataStore.subscribe("actBndRelated" + salesRepId, (data) => setAccountDetails(data));
     try {
       // Await the axios.post call to resolve the Promise
-      let res = await axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+      let res = await dataStore.getPageData("actBndRelated" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
         salesRepId,
         accessToken,
-      });
-  
-       
-      setAccountDetails(res.data.accountDetails)
+      }));
+
+
+      setAccountDetails(res.data.accountDetails);
+      return () => {
+        dataStore.unsubscribe("actBndRelated" + salesRepId, (data) => setAccountDetails(data));
+      }
     } catch (error) {
       console.error("Error", error); // Log error details
     }
   };
-  
-  
-  useEffect(()=>{
 
-    fetchAccountDetails()
-  } , [])
+
   useEffect(() => {
-    btnHandler({manufacturerId:null,month:monthIndex + 1});
+    fetchAccountDetails()
+  }, [])
+
+
+  const readyTopProducthandle = (products) => {
+    let data = ShareDrive();
+    if (!data) {
+      data = {};
+    }
+    if (manufacturerFilter) {
+      if (!data[manufacturerFilter]) {
+        data[manufacturerFilter] = {};
+      }
+      if (Object.values(data[manufacturerFilter]).length > 0) {
+        setIsLoaded(true)
+        setProductImages({ isLoaded: true, images: data[manufacturerFilter] })
+      } else {
+        setProductImages({ isLoaded: false, images: {} })
+      }
+    }
+    let result = products.data.sort(function (a, b) {
+      return b.Sales - a.Sales;
+    });
+    setTopProductList({ isLoaded: true, data: result, message: products.message })
+    if (result.length > 0) {
+      let productCode = "";
+      result?.map((product, index) => {
+        productCode += `'${product.ProductCode}'`
+        if (result.length - 1 != index) productCode += ', ';
+      })
+      getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
+        if (res) {
+          if (data[manufacturerFilter]) {
+            data[manufacturerFilter] = { ...data[manufacturerFilter], ...res }
+          } else {
+            data[manufacturerFilter] = res
+          }
+          ShareDrive(data)
+          setProductImages({ isLoaded: true, images: res });
+          setIsLoaded(true)
+        } else {
+          setIsLoaded(true)
+          setProductImages({ isLoaded: true, images: {} });
+        }
+      }).catch((err) => {
+        console.log({ err });
+      })
+    }
+  }
+
+  useEffect(() => {
+    dataStore.subscribe("/top-productsnull" + monthIndex + 1, readyTopProducthandle);
+    btnHandler({ manufacturerId: null, month: monthIndex + 1 });
     let indexMonth = [];
     let helperArray = [];
     months.map((month, i) => {
@@ -65,6 +119,9 @@ const TopProducts = () => {
     })
     let finalArray = indexMonth.concat(helperArray)
     setMonthList(finalArray.reverse())
+    return () => {
+      dataStore.unsubscribe("/top-productsnull" + monthIndex + 1, readyTopProducthandle);
+    }
   }, [])
 
   // const topProductData = useMemo(() => {
@@ -87,113 +144,72 @@ const TopProducts = () => {
   //   );
   // }, [searchText, topProductList, selectedMonth]);
   const SearchData = ({ selectedMonth, manufacturerFilter }) => {
-    let data = ShareDrive();
-    if (!data) {
-      data = {};
-    }
-    if (manufacturerFilter) {
-      if (!data[manufacturerFilter]) {
-        data[manufacturerFilter] = {};
-      }
-      if (Object.values(data[manufacturerFilter]).length > 0) {
-        setIsLoaded(true)
-        setProductImages({ isLoaded: true, images: data[manufacturerFilter] })
-      } else {
-        setProductImages({ isLoaded: false, images: {} })
-      }
-    }
-    topProduct({ month: selectedMonth, manufacturerId: manufacturerFilter }).then((products) => {
-      let result = products.data.sort(function (a, b) {
-        return b.Sales - a.Sales;
-      });
-      setTopProductList({ isLoaded: true, data: result, message: products.message })
-      if (result.length > 0) {
-        let productCode = "";
-        result?.map((product, index) => {
-          productCode += `'${product.ProductCode}'`
-          if (result.length - 1 != index) productCode += ', ';
-        })
-        getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
-          if (res) {
-            if (data[manufacturerFilter]) {
-              data[manufacturerFilter] = { ...data[manufacturerFilter], ...res }
-            } else {
-              data[manufacturerFilter] = res
-            }
-            ShareDrive(data)
-            setProductImages({ isLoaded: true, images: res });
-            setIsLoaded(true)
-          } else {
-            setIsLoaded(true)
-            setProductImages({ isLoaded: true, images: {} });
-          }
-        }).catch((err) => {
-          console.log({ err });
-        })
-      }
+
+    dataStore.getPageData("/top-products" + manufacturerFilter + selectedMonth, () => topProduct({ month: selectedMonth, manufacturerId: manufacturerFilter })).then((products) => {
+      readyTopProducthandle(products)
     }).catch((err) => {
       console.log({ err });
     })
   }
-  const btnHandler = ({month,manufacturerId}) => {
+  const btnHandler = ({ month, manufacturerId }) => {
     setIsLoaded(false)
     setTopProductList({ isLoaded: false, data: [], message: null })
-      setManufacturerFilter(manufacturerId);
-      setSelectedMonth(month);
-      SearchData({ selectedMonth:month, manufacturerFilter:manufacturerId })
+    setManufacturerFilter(manufacturerId);
+    setSelectedMonth(month);
+    SearchData({ selectedMonth: month, manufacturerFilter: manufacturerId })
   }
 
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const userPermissions = await getPermissions()
-            if (userPermissions?.modules?.topProducts?.view === false) { PermissionDenied();navigate('/dashboard'); }
-        } catch (error) {
-            console.log("Permission Error", error)
-        }
+      try {
+        const userPermissions = await getPermissions()
+        if (userPermissions?.modules?.topProducts?.view === false) { PermissionDenied(); navigate('/dashboard'); }
+      } catch (error) {
+        console.log("Permission Error", error)
+      }
     }
     fetchData()
-}, [])
+  }, [])
 
   return (
     <AppLayout filterNodes={<>
-  
-    <>
-      <FilterItem
-      minWidth="220px"
-      label="All Brands"
-      name="Manufacturer1"
-      value={manufacturerFilter}
-      options={manufacturers?.data?.map((manufacturer) => ({
-        label: manufacturer.Name,
-        value: manufacturer.Id,
-      }))}
-      onChange={(value) => btnHandler({manufacturerId:value,month:selectedMonth})}
-    />
-       
-    <FilterItem
-    label="Month"
-    minWidth="220px"
-    name="Month"
-    value={selectedMonth}
-    options={monthList}
-    onChange={(value) => btnHandler({manufacturerId:manufacturerFilter,month:value})}
-  />
-    
-    <button
-        className="border px-2 py-1 leading-tight d-grid"
-        onClick={() => { btnHandler({manufacturerId:null,month:monthIndex + 1}); }}
-      >
-        <CloseButton crossFill={'#fff'} height={20} width={20} />
-        <small style={{ fontSize: '6px',letterSpacing: '0.5px',textTransform:'uppercase'}}>clear</small>
-      </button>
-  </>
-   
- 
-  
+
+      <>
+        <FilterItem
+          minWidth="220px"
+          label="All Brands"
+          name="Manufacturer1"
+          value={manufacturerFilter}
+          options={manufacturers?.data?.map((manufacturer) => ({
+            label: manufacturer.Name,
+            value: manufacturer.Id,
+          }))}
+          onChange={(value) => btnHandler({ manufacturerId: value, month: selectedMonth })}
+        />
+
+        <FilterItem
+          label="Month"
+          minWidth="220px"
+          name="Month"
+          value={selectedMonth}
+          options={monthList}
+          onChange={(value) => btnHandler({ manufacturerId: manufacturerFilter, month: value })}
+        />
+
+        <button
+          className="border px-2 py-1 leading-tight d-grid"
+          onClick={() => { btnHandler({ manufacturerId: null, month: monthIndex + 1 }); }}
+        >
+          <CloseButton crossFill={'#fff'} height={20} width={20} />
+          <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
+        </button>
+      </>
+
+
+
     </>
     }>
-      {!topProductList.isLoaded ? <Loading height={"70vh"}/> : (topProductList.data.length == 0 && topProductList.message) ?
+      {!topProductList.isLoaded ? <Loading height={"70vh"} /> : (topProductList.data.length == 0 && topProductList.message) ?
         <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]">
           <div className="col-4">
             <p className="m-0 fs-2 font-[Montserrat-400] text-[14px] tracking-[2.20px] text-center">
@@ -202,7 +218,7 @@ const TopProducts = () => {
           </div>
         </div>
         :
-        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages}  accountDetails = {accountDetails}/>}
+        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages} accountDetails={accountDetails} />}
     </AppLayout>
   );
 };

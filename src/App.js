@@ -53,80 +53,81 @@ import ContactDetailedReport from "./reports/ContactDetailedreport/ContactDetail
 import CartHover from "./components/CartHover";
 import { CartProvider } from "./context/CartContext";
 import ProductPage from "./components/ProductPage/ProductPage";
+import { AnimatePresence } from 'framer-motion';
 function App() {
   // const Redirect = ({ href }) => {
   //   window.location.href = href;
   // };
   return (
-    <UserProvider>
-      <BagProvider>
-       
-      <CartProvider>
-   
-        <BrowserRouter>
-        <CartHover/>
-          <Routes>
-            <Route path="/sales-report" element={<SalesReport />}></Route>
-            <Route path="/newness-report" element={<NewnessReport />}></Route>
-            {/* <Route path="/Target-Report" element={<TargetReport />}></Route> */}
-            <Route path="/Target-Report" element={<TargetRollOver />}></Route>
-            <Route path="/comparison-report" element={<ComparisonReport />}></Route>
-            <Route path="/comparison" element={<YearlyComparisonReport />}></Route>
-            <Route path="/order-list" element={<OrderListPage />}></Route>
-            <Route path="/testing" element={<Testing />}></Route>
-            <Route path="/top-products" element={<TopProducts />}></Route>
-            <Route path="/login" element={<Login />}></Route>
-            <Route path="/" element={<Login />}></Route>
-            <Route path="/logout" element={<Logout />}></Route>
-            <Route path="/my-retailers" element={<MyRetailersPage />}></Route>
-            {/* need to check */}
-            <Route path="/dashboard" element={<Dashboard />}></Route>
-            <Route path="/product" element={<Product/>}></Route>
-            {/* <Route path="/product/:name" element={<ProductDetails/>}></Route> */}
-            <Route path="/my-bag" element={<MyBag />}></Route>
-            <Route path="/brand" element={<BrandsPage />}></Route>
-            <Route path="/order/complete" element={<OrderComplete/>}></Route>
-            {/*  */}
-            <Route path="/customer-care" element={<CustomerCare />}></Route>
-            <Route path="/customer-support" element={<CustomerSupport />}></Route>
-            <Route path="/CustomerSupportDetails" element={<CustomerSupportDetails />}></Route>
-            <Route path="/new-arrivals" element={<NewArrivals />}></Route>
-            <Route path="/marketing-calendar" element={<MarketingCalendar />}></Route>
-            <Route path="/education-center" element={<EducationCenter />}></Route>
-            <Route path="/about-us" element={<AboutUs />}></Route>
-            <Route path="/wholesale-inquiry" element={<WholesaleInquiry />}></Route>
-            <Route path="/careers" element={<Careers/>}></Route>
-            <Route path="/instagram" element={<Instagram/>}></Route>
-            <Route path="/linkdin" element={<Linkdin/>}></Route>
-            <Route path="/join-us" element={<JoinUs/>}></Route>
-            <Route path="logout" element={<Logout />}></Route>
-            <Route path="/lead" element={<SignUp />}></Route>
-            <Route path="/orderDetails" element={<MyBagOrder />}></Route>
-            {/* <Route path="/customerService" element={<CustomerServiceForm />}></Route> */}
-            <Route path="/customerService" element={<CustomerService />}></Route>
-            <Route path="/orderStatus" element={<OrderStatusIssues />}></Route>
-            <Route path="/orderStatusForm" element={<OrderStatusForm />}></Route>
-            <Route path="/newsletter" element={<EmailSetting />}></Route>
-            <Route path="/newsletter/report" element={<NewsLetterReport />}></Route>
-            <Route path="/newsletter/create" element={<CreateNewsletter />}></Route>
-            <Route path="/newsletter/setting" element={<NewsletterSetting />}></Route>
-            <Route path="/brandManagementApproval" element={<BMAIssues />}></Route>
-            <Route path="/public/product/:id/:token/details" element={<PublicProduct />}></Route>
-            <Route path="/Help-Section" element={<HelpSection/>}></Route>
-            <Route path="/store/:id" element={<StoreDetails/>}/>
-            <Route path="/Brand/:id" element={<BrandDetails/>}/>
-            <Route path="/TierStanding" element={<Tier/>}/>
-            <Route path="/AuditReport" element={<AuditReport/>}/>
-            <Route path="/account-contact-detailed-Report" element={<ContactDetailedReport/>}/>
-            <Route path = '/productPage/:id' element ={<ProductPage/>} />
-            <Route path="*" element={<PageNotFound />}></Route>
-            
-            {/* 1234 */}  
-          </Routes>
-        </BrowserRouter>
+    <AnimatePresence>
+      <UserProvider>
+
+        <CartProvider>
+
+          <BrowserRouter>
+            <CartHover />
+            <Routes>
+              <Route path="/sales-report" element={<SalesReport />}></Route>
+              <Route path="/newness-report" element={<NewnessReport />}></Route>
+
+
+              <Route path="/Target-Report" element={<TargetRollOver />}></Route>
+              <Route path="/comparison-report" element={<ComparisonReport />}></Route>
+              <Route path="/comparison" element={<YearlyComparisonReport />}></Route>
+              <Route path="/order-list" element={<OrderListPage />}></Route>
+
+              <Route path="/top-products" element={<TopProducts />}></Route>
+              <Route path="/login" element={<Login />}></Route>
+              <Route path="/" element={<Login />}></Route>
+              <Route path="/logout" element={<Logout />}></Route>
+              <Route path="/my-retailers" element={<MyRetailersPage />}></Route>
+              <Route path="/dashboard" element={<Dashboard />}></Route>
+              <Route path="/product" element={<Product />}></Route>
+              {/* <Route path="/product/:name" element={<ProductDetails/>}></Route> */}
+              <Route path="/my-bag" element={<MyBag />}></Route>
+              <Route path="/brand" element={<BrandsPage />}></Route>
+              <Route path="/order/complete" element={<OrderComplete />}></Route>
+              {/*  */}
+              <Route path="/customer-care" element={<CustomerCare />}></Route>
+              <Route path="/customer-support" element={<CustomerSupport />}></Route>
+              <Route path="/CustomerSupportDetails" element={<CustomerSupportDetails />}></Route>
+              <Route path="/new-arrivals" element={<NewArrivals />}></Route>
+              <Route path="/marketing-calendar" element={<MarketingCalendar />}></Route>
+              <Route path="/education-center" element={<EducationCenter />}></Route>
+              <Route path="/about-us" element={<AboutUs />}></Route>
+              <Route path="/wholesale-inquiry" element={<WholesaleInquiry />}></Route>
+              <Route path="/careers" element={<Careers />}></Route>
+              <Route path="/instagram" element={<Instagram />}></Route>
+              <Route path="/linkdin" element={<Linkdin />}></Route>
+              <Route path="/join-us" element={<JoinUs />}></Route>
+              <Route path="logout" element={<Logout />}></Route>
+              <Route path="/lead" element={<SignUp />}></Route>
+              <Route path="/orderDetails" element={<MyBagOrder />}></Route>
+              {/* <Route path="/customerService" element={<CustomerServiceForm />}></Route> */}
+              <Route path="/customerService" element={<CustomerService />}></Route>
+              <Route path="/orderStatus" element={<OrderStatusIssues />}></Route>
+              <Route path="/orderStatusForm" element={<OrderStatusForm />}></Route>
+              <Route path="/newsletter" element={<EmailSetting />}></Route>
+              <Route path="/newsletter/report" element={<NewsLetterReport />}></Route>
+              <Route path="/newsletter/create" element={<CreateNewsletter />}></Route>
+              <Route path="/newsletter/setting" element={<NewsletterSetting />}></Route>
+              <Route path="/brandManagementApproval" element={<BMAIssues />}></Route>
+              <Route path="/public/product/:id/:token/details" element={<PublicProduct />}></Route>
+              <Route path="/Help-Section" element={<HelpSection />}></Route>
+              <Route path="/store/:id" element={<StoreDetails />} />
+              <Route path="/Brand/:id" element={<BrandDetails />} />
+              <Route path="/TierStanding" element={<Tier />} />
+              <Route path="/AuditReport" element={<AuditReport />} />
+              <Route path="/account-contact-detailed-Report" element={<ContactDetailedReport />} />
+              <Route path='/productPage/:id' element={<ProductPage />} />
+              <Route path="*" element={<PageNotFound />}></Route>
+
+              {/* 1234 */}
+            </Routes>
+          </BrowserRouter>
         </CartProvider>
-      </BagProvider>
-    </UserProvider>
+      </UserProvider>
+    </AnimatePresence>
   );
 }
 

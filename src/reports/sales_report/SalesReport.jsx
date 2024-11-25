@@ -13,9 +13,11 @@ import { MdOutlineDownload } from "react-icons/md";
 import ModalPage from "../../components/Modal UI";
 import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
-import { GetAuthData } from "../../lib/store";
+import { defaultLoadTime, GetAuthData } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../../lib/dataStore";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 
@@ -36,11 +38,10 @@ const SalesReport = () => {
   const [exportToExcelState, setExportToExcelState] = useState(false);
   const [selectedSalesRepId, setSelectedSalesRepId] = useState();
   const [userData, setUserData] = useState({});
-  const [hasPermission, setHasPermission] = useState(null); 
+  const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
   const [dateFilter, setDateFilter] = useState("Created-Date")
-  console.log({salesRepList});
-  
+
   const filteredSalesReportData = useMemo(() => {
     let filtered = salesReportData.filter((ele) => {
       return !manufacturerFilter || !ele.ManufacturerName__c.localeCompare(manufacturerFilter);
@@ -48,7 +49,7 @@ const SalesReport = () => {
     if (searchBy) {
       filtered = filtered?.map((ele) => {
         const Orders = ele.Orders.filter((item) => {
-          if (item.Name?.toLowerCase().includes(searchBy?.toLowerCase())||item.AccountName?.toLowerCase().includes(searchBy?.toLowerCase())) {
+          if (item.Name?.toLowerCase().includes(searchBy?.toLowerCase()) || item.AccountName?.toLowerCase().includes(searchBy?.toLowerCase())) {
             return item;
           }
         });
@@ -76,7 +77,7 @@ const SalesReport = () => {
     //     ele.Orders.find((item) => item.Status === "Active Account"));
     //   // i need only active account in this function but is not working?
     // }
-    
+
     if (activeAccounts === "Active Account") {
       filtered = filtered?.map((ele) => {
         const Orders = ele.Orders.filter((item) => {
@@ -89,7 +90,7 @@ const SalesReport = () => {
           Orders,
         };
       });
-    }else {
+    } else {
       filtered = filtered;
     };
     // ..........
@@ -119,7 +120,7 @@ const SalesReport = () => {
     const dataWithTotals = filteredSalesReportData?.map((ele) =>
       ele.Orders.map((item) => ({
         "Brand Name": ele.ManufacturerName__c,
-        "Retailer Name": item.AccountName??item.Name,
+        "Retailer Name": item.AccountName ?? item.Name,
         "Retailer Type": item.AccountType,
         "Date Open": item.DateOpen,
         Status: item.Status,
@@ -223,23 +224,18 @@ const SalesReport = () => {
   const navigate = useNavigate();
 
 
-// Memoize permissions to avoid unnecessary re-calculations
-const memoizedPermissions = useMemo(() => permissions, [permissions]);
+  // Memoize permissions to avoid unnecessary re-calculations
+  const memoizedPermissions = useMemo(() => permissions, [permissions]);
 
 
-
-
-
-  // 
-  const getSalesData = async (yearFor, dateFilter) => {
-    setIsLoading(true);
-    setYearForTableSort(yearFor);
-    const result = await salesReportApi.salesReportData({ yearFor, dateFilter });
+  const readyReportHandler = (data) => {
+    console.warn({data});
+    
     let salesListName = [];
     let salesList = [];
     let manuIds = [];
     let manufacturerList = [];
-    result?.data?.data?.map((manu) => {
+    data?.data?.data?.map((manu) => {
       if (!manuIds.includes(manu.ManufacturerId__c)) {
         manuIds.push(manu.ManufacturerId__c);
         manufacturerList.push({
@@ -250,9 +246,9 @@ const memoizedPermissions = useMemo(() => permissions, [permissions]);
       }
       if (manu.Orders.length) {
         manu.Orders.map((item) => {
-          if (!salesListName.includes(item.AccountRepo)&&item.AccountRepo) {
+          if (!salesListName.includes(item.AccountRepo) && item.AccountRepo) {
             salesListName.push(item.AccountRepo);
-            
+
             salesList.push({
               label: item.AccountRepo,
               value: item.AccountRepo,
@@ -263,20 +259,36 @@ const memoizedPermissions = useMemo(() => permissions, [permissions]);
     });
     setManufacturers(manufacturerList)
     setSalesRepList(salesList);
-    setSalesReportData(result?.data?.data);
-    setOwnerPermission(result.data.ownerPermission);
+    setSalesReportData(data?.data?.data);
+    setOwnerPermission(data.data.ownerPermission);
     setIsLoading(false);
+  }
+
+
+  // 
+  const getSalesData = async (yearFor, dateFilter) => {
+    setIsLoading(true);
+    setYearForTableSort(yearFor);
+    const result = await dataStore.getPageData("/sales-report" + JSON.stringify({yearFor,dateFilter }), () => salesReportApi.salesReportData({ yearFor, dateFilter }));
+    if (result) {
+      readyReportHandler(result);
+    }
   };
-  console.log("owner Permissions " ,ownerPermission )
   // console.log("salesReportData", salesReportData);
   useEffect(() => {
+    dataStore.subscribe("/sales-report" + JSON.stringify({yearFor,dateFilter }), readyReportHandler);
     const userData = localStorage.getItem("Name");
     if (userData) {
       getSalesData(yearFor, dateFilter);
     } else {
       navigate("/");
     }
+    return () => {
+      dataStore.unsubscribe("/sales-report" + JSON.stringify({yearFor,dateFilter }), readyReportHandler);
+    }
   }, []);
+  console.log(JSON.stringify(localStorage).length, 'bytes used');
+  useBackgroundUpdater(()=>getSalesData(yearFor, dateFilter), defaultLoadTime);
   const sendApiCall = () => {
     setManufacturerFilter(null);
     setSearchBySalesRep("");
@@ -310,112 +322,112 @@ const memoizedPermissions = useMemo(() => permissions, [permissions]);
         setHasPermission(userPermissions?.modules?.reports?.salesReport?.view);
 
         // If no permission, redirect to dashboard
-        if (userPermissions?.modules?.reports?.salesReport?.view  === false) {
+        if (userPermissions?.modules?.reports?.salesReport?.view === false) {
           PermissionDenied()
           navigate("/dashboard");
         }
-        
+
       } catch (error) {
         console.log({ error });
       }
     };
-    
+
     fetchData();
   }, []);
 
 
-  
+
   return (
     <AppLayout
       filterNodes={
         <>
-        
+
           <div className="d-flex justify-content-between m-auto" style={{ width: '99%' }}>
-          <div className="d-flex justify-content-start gap-4 col-4">
-          <FilterItem
-              label="year"
-              name="Year"
-              value={yearFor}
-              options={yearList}
-              onChange={(value) => setYearFor(value)}
-            />
-            <FilterItem
-              label="date"
-              name="date"
-              value={dateFilter}
-              options={[{ label: "Created Date", value: "Created-Date" }, { label: "Closed Date", value: "Closed-Date" }]}
-              onChange={(value) => setDateFilter(value)}
-            />
-            <button onClick={() => sendApiCall()} className="border px-2 py-1 leading-tight d-grid"> <SearchIcon fill="#fff" width={20} height={20} />
-              <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>search</small>
-            </button>
+            <div className="d-flex justify-content-start gap-4 col-4">
+              <FilterItem
+                label="year"
+                name="Year"
+                value={yearFor}
+                options={yearList}
+                onChange={(value) => setYearFor(value)}
+              />
+              <FilterItem
+                label="date"
+                name="date"
+                value={dateFilter}
+                options={[{ label: "Created Date", value: "Created-Date" }, { label: "Closed Date", value: "Closed-Date" }]}
+                onChange={(value) => setDateFilter(value)}
+              />
+              <button onClick={() => sendApiCall()} className="border px-2 py-1 leading-tight d-grid"> <SearchIcon fill="#fff" width={20} height={20} />
+                <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>search</small>
+              </button>
             </div>
-       
-         <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
-         <div className="d-flex justify-content-end gap-4 col-7">
-           {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={salesRepList} onChange={(value) => setSearchBySalesRep(value)} />}
-           <FilterItem
-             minWidth="220px"
-             label="All Brands"
-             name="AllManufacturers1"
-             value={manufacturerFilter}
-             options={manufacturers}
-             onChange={(value) => setManufacturerFilter(value)}
-           />
-           <FilterItem
-             minWidth="220px"
-             label="Lowest Amount Orders"
-             name="LowestOrders"
-             value={highestOrders}
-             options={[
-               {
-                 label: "Highest Amount Orders",
-                 value: true,
-               },
-               {
-                 label: "Lowest Amount Orders",
-                 value: false,
-               },
-             ]}
-             onChange={(value) => setHighestOrders(value)}
-           />
-           <FilterItem
-             minWidth="220px"
-             label="Status"
-             name="Status"
-             value={activeAccounts}
-             options={[
-               {
-                 label: "Active Account",
-                 value: "Active Account",
-               },
-               {
-                 label: "All Account",
-                 value: "All Account",
-               },
-             ]}
-             onChange={(value) => {
-               setActiveAccounts(value);
-             }}
-           />
 
-           {/* First Calender Filter-- start date */}
-           <FilterSearch onChange={(e) => setSearchBy(e.target.value)} value={searchBy} placeholder={"Search by account"} minWidth={"167px"} />
-           <div className="d-flex gap-3">
-             <button className="border px-2 py-1 leading-tight d-grid" onClick={resetFilter}>
-               <CloseButton crossFill={'#fff'} height={20} width={20} />
-               <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
-             </button>
-           </div>
-           <button className="border px-2 py-1 leading-tight d-grid" onClick={handleExportToExcel}>
+            <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
+            <div className="d-flex justify-content-end gap-4 col-7">
+              {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={salesRepList} onChange={(value) => setSearchBySalesRep(value)} />}
+              <FilterItem
+                minWidth="220px"
+                label="All Brands"
+                name="AllManufacturers1"
+                value={manufacturerFilter}
+                options={manufacturers}
+                onChange={(value) => setManufacturerFilter(value)}
+              />
+              <FilterItem
+                minWidth="220px"
+                label="Lowest Amount Orders"
+                name="LowestOrders"
+                value={highestOrders}
+                options={[
+                  {
+                    label: "Highest Amount Orders",
+                    value: true,
+                  },
+                  {
+                    label: "Lowest Amount Orders",
+                    value: false,
+                  },
+                ]}
+                onChange={(value) => setHighestOrders(value)}
+              />
+              <FilterItem
+                minWidth="220px"
+                label="Status"
+                name="Status"
+                value={activeAccounts}
+                options={[
+                  {
+                    label: "Active Account",
+                    value: "Active Account",
+                  },
+                  {
+                    label: "All Account",
+                    value: "All Account",
+                  },
+                ]}
+                onChange={(value) => {
+                  setActiveAccounts(value);
+                }}
+              />
 
-             <MdOutlineDownload size={16} className="m-auto" />
-             <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>EXPORT</small>
-           </button>
-         </div>
-       </div>
-         
-       
+              {/* First Calender Filter-- start date */}
+              <FilterSearch onChange={(e) => setSearchBy(e.target.value)} value={searchBy} placeholder={"Search by account"} minWidth={"167px"} />
+              <div className="d-flex gap-3">
+                <button className="border px-2 py-1 leading-tight d-grid" onClick={resetFilter}>
+                  <CloseButton crossFill={'#fff'} height={20} width={20} />
+                  <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
+                </button>
+              </div>
+              <button className="border px-2 py-1 leading-tight d-grid" onClick={handleExportToExcel}>
+
+                <MdOutlineDownload size={16} className="m-auto" />
+                <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>EXPORT</small>
+              </button>
+            </div>
+          </div>
+
+
         </>
       }
     >

@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useMemo} from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Styles from "./Dashboard.module.css";
 import Chart from "react-apexcharts";
 import img1 from "./Images/Active-1.png";
@@ -19,6 +19,7 @@ import { BiRefresh } from "react-icons/bi";
 import { getPermissions } from "../../lib/permission";
 import { salesRepIdKey } from "../../lib/store";
 import { useSearchParams } from "react-router-dom";
+import dataStore from "../../lib/dataStore";
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const monthList = [
   {
@@ -72,7 +73,7 @@ const monthList = [
 ];
 
 function Dashboard({ dashboardData }) {
-  
+
   const bgColors = {
     "Kevyn Aucoin Cosmetics": "KevynAucoinCosmeticsBg",
     "Bumble and Bumble": "BumbleandBumbleBg",
@@ -84,7 +85,7 @@ function Dashboard({ dashboardData }) {
     "RMS Beauty": "RMSBeautyBg",
     "ESTEE LAUDER": "esteeLauderBg",
   };
-  
+
   const [dataa, setDataa] = useState({
     series: [
       {
@@ -176,7 +177,7 @@ function Dashboard({ dashboardData }) {
   const [accountPerformance, setAccountPerformance] = useState({ isLoaded: false, data: [] });
   const [leadsbybrand, setleadsbtbrand] = useState({ isLoaded: false, data: [] });
   const [salesByBrandData, setSalesByBrandData] = useState({
- 
+
     series: [],
     options: {
       chart: {
@@ -227,44 +228,276 @@ function Dashboard({ dashboardData }) {
   const [selectedSalesRepId, setSelectedSalesRepId] = useState(null);
   // navigation of manufacturer to product page 
   const handleBrandClick = (brand) => {
-    
+
     setModalOpen(true);
     setBrandData(brand.ManufacturerList);
-    localStorage.setItem("Account", brand.Name); 
-    localStorage.setItem("AccountId__c", brand.AccountId); 
+    localStorage.setItem("Account", brand.Name);
+    localStorage.setItem("AccountId__c", brand.AccountId);
     localStorage.setItem("address", JSON.stringify(brand.Address));
   };
-  
+
   const handleManufacturerSelect = (selectedBrand) => {
     GetAuthData()
-    .then((user) => {
-      setSelectedSalesRepId(user.Sales_Rep__c);
-  })
+      .then((user) => {
+        setSelectedSalesRepId(user.Sales_Rep__c);
+      })
     localStorage.setItem("manufacturer", selectedBrand.ManufacturerName__c || selectedBrand.Name);
-    localStorage.setItem("ManufacturerId__c", selectedBrand.ManufacturerId__c  || selectedBrand.Id);
-    localStorage.setItem(salesRepIdKey, salesRepId); 
+    localStorage.setItem("ManufacturerId__c", selectedBrand.ManufacturerId__c || selectedBrand.Id);
+    localStorage.setItem(salesRepIdKey, salesRepId);
     localStorage.setItem("shippingMethod", JSON.stringify({
       number: selectedBrand.Shipping_Account_Number__c,
       method: selectedBrand.Shipping_Method__c,
     }));
-  
+
     navigate(`/product`);
   };
   const [manufacturerSalesYear, setManufacturerSalesYaer] = useState([]);
-  const [salesRepAdmin,setSalesRepAdmin]=useState();
+  const [salesRepAdmin, setSalesRepAdmin] = useState();
 
   // API INTEGRATION
   // search params work 
   const [searchParams] = useSearchParams();
   const saleRepId = searchParams.get('saleRep')
   // 
+  const readyDashboardHandle = (dashboard) => {
+    GetAuthData()
+      .then((user) => {
+        let oldSalesAmount = dashboard?.oldSalesAmount || 0;
+        let currentSalesAmount = dashboard.monthlySalesRepData?.[user.Sales_Rep__c]?.sale || 0
+        let growth = parseInt(((currentSalesAmount - oldSalesAmount) / oldSalesAmount) * 100)
+        setBox({ RETAILERS: dashboard?.activeAccount || 0, GROWTH: growth || 0, ORDERS: dashboard?.totalOrder || 0, REVENUE: dashboard?.totalPrice || 0, TARGET: dashboard.salesRepTarget || 0 })
+        let tempValue = (dashboard?.totalPrice / dashboard.salesRepTarget * 100) <= 100 ? dashboard?.totalPrice / dashboard.salesRepTarget * 100 : 100;
+        setValue(tempValue)
+        setNeedle_data([
+          { name: "A", value: parseInt(tempValue), color: "#16BC4E" },
+          { name: "B", value: parseInt(tempValue > 0 ? 100 - tempValue : 100), color: "#C7C7C7" },
+        ])
+        setTargetValue(Number(dashboard.salesRepTarget));
+        setAchievedSales(Number(dashboard?.totalPrice));
+        setIsLoading(true)
+        if (dashboard.rawPerformance?.length) {
+          setAccountPerformance({ isLoaded: true, data: dashboard?.rawPerformance || [] })
+        } else {
+          setAccountPerformance({ isLoaded: true, data: [] })
+        }
+        if (dashboard?.monthlySalesRepData) {
+          let monthlyDataKey = Object.keys(dashboard?.monthlySalesRepData)
+          let temp = [];
+          monthlyDataKey.map((id) => {
+            temp.push(dashboard.monthlySalesRepData[id])
+          })
+          setMonthlydata({ isLoaded: true, data: temp })
+        }
+        if (dashboard.yearlySalesRepData) {
+          let monthlyDataKey = Object.keys(dashboard?.yearlySalesRepData)
+          let temp = [];
+          monthlyDataKey.map((id) => {
+            temp.push(dashboard.yearlySalesRepData[id])
+          })
+          setYearlydata({ isLoaded: true, data: temp })
+        }
+        if (dashboard?.monthlyManufactureData) {
+          let monthlyDataKey = Object.keys(dashboard?.monthlyManufactureData)
+          let temp = [];
+          monthlyDataKey.map((id) => {
+            temp.push(dashboard.monthlyManufactureData[id])
+          })
+          setBrandData({ isLoaded: true, data: temp })
+        }
+        //ownManuFactureData
+        if (dashboard?.monthlyManufactureData) {
+          let colorArray = [];
+          Object.values(dashboard?.monthlyManufactureData).map((value) => {
+            colorArray.push(hexabrand[value.id]);
+          })
+          setDataa({
+            series: [
+              {
+                name: "Diptyque",
+                data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+              },
+              {
+                name: "Byredo",
+                data: [76, 85, 87, 98, 87, 97, 91, 74, 94],
+              },
+              {
+                name: "Bobbi Brown",
+                data: [16, 25, 37, 48, 57, 67, 73, 84, 94],
+              },
+              {
+                name: "By Terry",
+                data: [6, 15, 23, 35, 41, 53, 66, 74, 87],
+              },
+              {
+                name: "Revive",
+                data: [2, 12, 21, 30, 33, 42, 37, 41, 54],
+              },
+              {
+                name: "Kevyn Aucoin",
+                data: [71, 88, 83, 91, 82, 99, 61, 70, 98],
+              },
+              {
+                name: "Smashbox",
+                data: [10, 12, 14, 11, 16, 20, 24, 29, 32],
+              },
+            ],
+            options: {
+              chart: {
+                type: "area",
+              },
+              stroke: {
+                curve: "smooth",
+                width: 2,
+              },
 
+              dataLabels: {
+                enabled: true,
+              },
+              colors: colorArray,
+              fill: {
+                type: "gradient",
+                gradient: {
+                  opacityFrom: 0,
+                  opacityTo: 0,
+                },
+              },
+
+              xaxis: {
+                categories: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+              },
+              yaxis: {
+                title: {
+                  text: "$ (Dollar)",
+                },
+              },
+
+              tooltip: {
+                y: {
+                  formatter: function (val) {
+                    return "$" + Number(val).toFixed(2) + "";
+                  },
+                },
+              },
+            },
+          })
+          setSalesByBrandData({
+            series: Object.values(dashboard?.monthlyManufactureData).map((value) => {
+              return value?.own || 0;
+            }),
+            options: {
+              chart: {
+                type: "donut",
+              },
+              labels: {
+                show: true,
+                name: {
+                  show: true,
+                  offsetY: 38,
+                  formatter: () => "out of 553 points",
+                },
+              },
+              plotOptions: {
+                pie: {
+                  donut: {
+                    labels: {
+                      show: true,
+
+                      total: {
+                        show: true,
+                        showAlways: true,
+                        label: "Total Orders",
+                        formatter: function (w) {
+                          const t = w.globals.seriesTotals;
+                          const result = t.reduce((a, b) => a + b, 0);
+                          return result;
+                          // return result < 1000 ? result.toFixed(1) : `${(result / 1000).toFixed(1)}K`;
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+
+              responsive: [
+                {
+                  breakpoint: 100,
+                  options: {
+                    chart: {
+                      width: "100px",
+                    },
+                  },
+                },
+              ],
+              colors: colorArray,
+
+              labels: Object.values(dashboard?.monthlyManufactureData).map((value) => {
+                return value?.brandName || 0;
+              }),
+            },
+          });
+        }
+        if (dashboard?.yearlyManufacturerData) {
+          let monthlyDataKey = Object.keys(dashboard.yearlyManufacturerData)
+          let temp = [];
+          monthlyDataKey.map((id) => {
+            let indexValue = dashboard.yearlyManufacturerData[id];
+            let raw = {
+              name: indexValue.name,
+              data: []
+            }
+            monthNames.map((month, index) => {
+              raw.data.push(parseFloat(indexValue[month].sale).toFixed(2))
+            })
+            temp.push(raw)
+          })
+          setManufacturerSalesYaer(temp)
+        }
+        if (dashboard?.leadManufacturerRaw) {
+          let monthlyDataKey = Object.keys(dashboard?.leadManufacturerRaw)
+          let temp = [];
+          monthlyDataKey.map((id) => {
+            temp.push(dashboard.leadManufacturerRaw[id])
+          })
+          setleadsbtbrand({ isLoaded: true, data: temp })
+        }
+      })
+      .catch((error) => {
+        console.error({ error });
+      });
+  }
+  const getDataHandler = (headers = null) => {
+    // setIsLoaded(true);
+    GetAuthData()
+      .then((user) => {
+        setSalesRepId(user.Sales_Rep__c);
+        if (headers) {
+          user.headers = headers;
+        }
+        if (admins.includes(user.Sales_Rep__c)) {
+          setSalesRepAdmin(true)
+        }
+        dataStore.getPageData("/dashboard"+headers.month??currentMonth+headers.year??currentYear,()=>getDashboardata({ user, saleRepId }))
+          .then((dashboard) => {
+            readyDashboardHandle(dashboard)
+          })
+          .catch((err) => {
+            console.error({ err });
+          });
+      })
+      .catch((error) => {
+        console.error({ error });
+      });
+  };
   useEffect(() => {
     if (localStorage.getItem("Name")) {
+      dataStore.subscribe("/dashboard" + currentMonth + currentYear, readyDashboardHandle);
       // getDataHandler();
       setYear(currentYear)
       setMonth(currentMonth)
       getDataHandler({ month: currentMonth, year: currentYear });
+      return () => {
+        dataStore.unsubscribe("/dashboard" + currentMonth + currentYear, readyDashboardHandle);
+      }
     } else {
       navigate("/");
     }
@@ -276,226 +509,7 @@ function Dashboard({ dashboardData }) {
     }
   }, []);
   const [salesRepId, setSalesRepId] = useState();
-  const getDataHandler = (headers = null) => {
-    // setIsLoaded(true);
-    GetAuthData()
-      .then((user) => {
-        setSalesRepId(user.Sales_Rep__c);
-        if (headers) {
-          user.headers = headers;
-        }
-        if(admins.includes(user.Sales_Rep__c)){
-          setSalesRepAdmin(true)
-        }
-        getDashboardata({ user , saleRepId })
-          .then((dashboard) => {
-            let oldSalesAmount = dashboard?.oldSalesAmount || 0;
-            let currentSalesAmount = dashboard.monthlySalesRepData?.[user.Sales_Rep__c]?.sale || 0
-            let growth = parseInt(((currentSalesAmount - oldSalesAmount) / oldSalesAmount) * 100)
-            setBox({ RETAILERS: dashboard?.activeAccount || 0, GROWTH: growth || 0, ORDERS: dashboard?.totalOrder || 0, REVENUE: dashboard?.totalPrice || 0, TARGET: dashboard.salesRepTarget || 0 })
-            let tempValue = (dashboard?.totalPrice / dashboard.salesRepTarget * 100) <= 100 ? dashboard?.totalPrice / dashboard.salesRepTarget * 100 : 100;
-            setValue(tempValue)
-            setNeedle_data([
-              { name: "A", value: parseInt(tempValue), color: "#16BC4E" },
-              { name: "B", value: parseInt(tempValue > 0 ? 100 - tempValue : 100), color: "#C7C7C7" },
-            ])
-            setTargetValue(Number(dashboard.salesRepTarget));
-            setAchievedSales(Number(dashboard?.totalPrice));
-            setIsLoading(true)
-            if (dashboard.rawPerformance?.length) {
-              setAccountPerformance({ isLoaded: true, data: dashboard?.rawPerformance || [] })
-            } else {
-              setAccountPerformance({ isLoaded: true, data: [] })
-            }
-            if (dashboard?.monthlySalesRepData) {
-              let monthlyDataKey = Object.keys(dashboard?.monthlySalesRepData)
-              let temp = [];
-              monthlyDataKey.map((id) => {
-                temp.push(dashboard.monthlySalesRepData[id])
-              })
-              setMonthlydata({ isLoaded: true, data: temp })
-            }
-            if (dashboard.yearlySalesRepData) {
-              let monthlyDataKey = Object.keys(dashboard?.yearlySalesRepData)
-              let temp = [];
-              monthlyDataKey.map((id) => {
-                temp.push(dashboard.yearlySalesRepData[id])
-              })
-              setYearlydata({ isLoaded: true, data: temp })
-            }
-            if (dashboard?.monthlyManufactureData) {
-              let monthlyDataKey = Object.keys(dashboard?.monthlyManufactureData)
-              let temp = [];
-              monthlyDataKey.map((id) => {
-                temp.push(dashboard.monthlyManufactureData[id])
-              })
-              setBrandData({ isLoaded: true, data: temp })
-            }
-            //ownManuFactureData
-            if (dashboard?.monthlyManufactureData) {
-              let colorArray = [];
-              Object.values(dashboard?.monthlyManufactureData).map((value) => {
-                colorArray.push(hexabrand[value.id]);
-              })
-              setDataa({
-                series: [
-                  {
-                    name: "Diptyque",
-                    data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-                  },
-                  {
-                    name: "Byredo",
-                    data: [76, 85, 87, 98, 87, 97, 91, 74, 94],
-                  },
-                  {
-                    name: "Bobbi Brown",
-                    data: [16, 25, 37, 48, 57, 67, 73, 84, 94],
-                  },
-                  {
-                    name: "By Terry",
-                    data: [6, 15, 23, 35, 41, 53, 66, 74, 87],
-                  },
-                  {
-                    name: "Revive",
-                    data: [2, 12, 21, 30, 33, 42, 37, 41, 54],
-                  },
-                  {
-                    name: "Kevyn Aucoin",
-                    data: [71, 88, 83, 91, 82, 99, 61, 70, 98],
-                  },
-                  {
-                    name: "Smashbox",
-                    data: [10, 12, 14, 11, 16, 20, 24, 29, 32],
-                  },
-                ],
-                options: {
-                  chart: {
-                    type: "area",
-                  },
-                  stroke: {
-                    curve: "smooth",
-                    width: 2,
-                  },
 
-                  dataLabels: {
-                    enabled: true,
-                  },
-                  colors: colorArray,
-                  fill: {
-                    type: "gradient",
-                    gradient: {
-                      opacityFrom: 0,
-                      opacityTo: 0,
-                    },
-                  },
-
-                  xaxis: {
-                    categories: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-                  },
-                  yaxis: {
-                    title: {
-                      text: "$ (Dollar)",
-                    },
-                  },
-
-                  tooltip: {
-                    y: {
-                      formatter: function (val) {
-                        return "$" + Number(val).toFixed(2) + "";
-                      },
-                    },
-                  },
-                },
-              })
-              setSalesByBrandData({
-                series: Object.values(dashboard?.monthlyManufactureData).map((value) => {
-                  return value?.own || 0;
-                }),
-                options: {
-                  chart: {
-                    type: "donut",
-                  },
-                  labels: {
-                    show: true,
-                    name: {
-                      show: true,
-                      offsetY: 38,
-                      formatter: () => "out of 553 points",
-                    },
-                  },
-                  plotOptions: {
-                    pie: {
-                      donut: {
-                        labels: {
-                          show: true,
-
-                          total: {
-                            show: true,
-                            showAlways: true,
-                            label: "Total Orders",
-                            formatter: function (w) {
-                              const t = w.globals.seriesTotals;
-                              const result = t.reduce((a, b) => a + b, 0);
-                              return result;
-                              // return result < 1000 ? result.toFixed(1) : `${(result / 1000).toFixed(1)}K`;
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-
-                  responsive: [
-                    {
-                      breakpoint: 100,
-                      options: {
-                        chart: {
-                          width: "100px",
-                        },
-                      },
-                    },
-                  ],
-                  colors: colorArray,
-
-                  labels: Object.values(dashboard?.monthlyManufactureData).map((value) => {
-                    return value?.brandName || 0;
-                  }),
-                },
-              });
-            }
-            if (dashboard?.yearlyManufacturerData) {
-              let monthlyDataKey = Object.keys(dashboard.yearlyManufacturerData)
-              let temp = [];
-              monthlyDataKey.map((id) => {
-                let indexValue = dashboard.yearlyManufacturerData[id];
-                let raw = {
-                  name: indexValue.name,
-                  data: []
-                }
-                monthNames.map((month, index) => {
-                  raw.data.push(parseFloat(indexValue[month].sale).toFixed(2))
-                })
-                temp.push(raw)
-              })
-              setManufacturerSalesYaer(temp)
-            }
-            if (dashboard?.leadManufacturerRaw) {
-              let monthlyDataKey = Object.keys(dashboard?.leadManufacturerRaw)
-              let temp = [];
-              monthlyDataKey.map((id) => {
-                temp.push(dashboard.leadManufacturerRaw[id])
-              })
-              setleadsbtbrand({ isLoaded: true, data: temp })
-            }
-          })
-          .catch((err) => {
-            console.error({ err });
-          });
-      })
-      .catch((error) => {
-        console.error({ error });
-      });
-  };
   let lowPerformanceArray = accountPerformance?.data?.slice(0)?.reverse()?.map((ele) => ele);
 
 
@@ -562,9 +576,9 @@ function Dashboard({ dashboardData }) {
 
     fetchPermissions(); // Fetch permissions on mount
   }, []);
-  
+
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
-  
+
   function IsTableLoading() {
     return (
       <>
@@ -613,7 +627,7 @@ function Dashboard({ dashboardData }) {
   const sendDataTargetHandler = ({ salesRepId = null, manufacturerId = null }) => {
     navigate('/Target-Report', { state: { salesRepId, manufacturerId } });
   }
-  const targeetRollReferesh=()=>{
+  const targeetRollReferesh = () => {
     setIsLoading(false);
     setleadsbtbrand({ isLoaded: false, data: [] })
     setAccountPerformance({ isLoaded: false, data: [] })
@@ -622,19 +636,19 @@ function Dashboard({ dashboardData }) {
     setBrandData({ isLoaded: false, data: [] })
     setManufacturerSalesYaer([]);
     setBox({ RETAILERS: 0, GROWTH: 0, ORDERS: 0, REVENUE: 0, TARGET: 0 })
-    refreshTargetRollOver().then((status)=>{
-      if(status){
+    refreshTargetRollOver().then((status) => {
+      if (status) {
         getDataHandler({ month: selectMonth, year: selectYear });
       }
-    }).catch((statusErr)=>{
-      console.log({statusErr});
+    }).catch((statusErr) => {
+      console.log({ statusErr });
     })
   }
   return (
     <AppLayout
       filterNodes={
         <>
-      
+
           <FilterItem
             minWidth="220px"
             label="Month-Year"
@@ -648,8 +662,8 @@ function Dashboard({ dashboardData }) {
             }}
             name={"dashboard-manu"}
           />
-      
-     
+
+
         </>
       }
     >
@@ -657,19 +671,19 @@ function Dashboard({ dashboardData }) {
         <div className="row mt-4 justify-between">
           <div className="col-lg-6 my-2">
             <div className={Styles.DashboardWidth}>
-              {salesRepAdmin?<p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Sales By Rep 
-              {permissions?.modules?.godLevel ?  
-              <span>{Monthlydataa.isLoaded ?
-              
-              
-              <BiRefresh className="cursor-pointer" size={25} onClick={targeetRollReferesh} title="Click here for Refresh"/>
-              
-              :null}</span>
-              : null
-}
-              
-              
-              </p>:<p className={Styles.Tabletext}>Month to date(MTD): Sales By Rep</p>}
+              {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Sales By Rep
+                {permissions?.modules?.godLevel ?
+                  <span>{Monthlydataa.isLoaded ?
+
+
+                    <BiRefresh className="cursor-pointer" size={25} onClick={targeetRollReferesh} title="Click here for Refresh" />
+
+                    : null}</span>
+                  : null
+                }
+
+
+              </p> : <p className={Styles.Tabletext}>Month to date(MTD): Sales By Rep</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className="">
                   <div className={Styles.table_scroll}>
@@ -677,7 +691,7 @@ function Dashboard({ dashboardData }) {
                       <thead>
                         <tr className={Styles.tablerow}>
                           <th scope="col" className="ps-3">
-                          Sales Rep Name
+                            Sales Rep Name
                           </th>
                           <th scope="col">Sale Target</th>
                           <th scope="col">Sale Amount</th>
@@ -694,23 +708,23 @@ function Dashboard({ dashboardData }) {
                                 // console.log("e.....", e);
                                 totalTargetForMTDSalesRep = Number(e?.StaticTarget || 0) + Number(totalTargetForMTDSalesRep);
                                 totalAmountForMTDSalesRep = Number(e.MonthlySale || 0) + Number(totalAmountForMTDSalesRep);
-                                totalDiffForMTDSalesRep = Number(e?.StaticTarget-e.MonthlySale || 0) + Number(totalDiffForMTDSalesRep);
+                                totalDiffForMTDSalesRep = Number(e?.StaticTarget - e.MonthlySale || 0) + Number(totalDiffForMTDSalesRep);
                                 let targetDiff = e.TargetRollover
                                 return (
                                   <tr key={e}>
-                                    {memoizedPermissions?.modules?.dashboard?.redirect ?  <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} onClick={() => { sendDataTargetHandler({ salesRepId: e.SalesRepName }) }} style={{ cursor: 'pointer' }}>
+                                    {memoizedPermissions?.modules?.dashboard?.redirect ? <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} onClick={() => { sendDataTargetHandler({ salesRepId: e.SalesRepName }) }} style={{ cursor: 'pointer' }}>
                                       <UserIcon /> {e.SalesRepName}
-                                    </td> : <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`}  style={{ pointerEvents: 'none' }}>
+                                    </td> : <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} style={{ pointerEvents: 'none' }}>
                                       <UserIcon /> {e.SalesRepName}
-                                    </td> }
-                                   
-                                    <td className={Styles.tabletd}>${formatNumber(e?.StaticTarget || 0)} 
+                                    </td>}
+
+                                    <td className={Styles.tabletd}>${formatNumber(e?.StaticTarget || 0)}
                                       {/* {targetDiff ? (targetDiff > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formatNumber(targetDiff)}</small>+{formatNumber(e.StaticTarget)}</p></> : <><br /><p className={Styles.calHolder}>{formatNumber(e.StaticTarget)}-<small style={{ color: 'green' }}>{formatNumber(-targetDiff)}</small></p></>) : null} */}
-                                      </td>
+                                    </td>
                                     <td className={Styles.tabletd}>${formatNumber(e.MonthlySale || 0)}</td>
                                     {/* <td className={Styles.tabletd}>${formatNumber(e?.diff || 0)}</td> */}
-                                    <td className={`${Styles.tabletd} ${Styles.flex}`}><span style={{ lineHeight: '20px' }}>${formatNumber((Math.abs(e?.StaticTarget-e.MonthlySale)) || 0)}</span>
-                                    <span className={e?.StaticTarget-e.MonthlySale <= 0 ? Styles.matchHolder : Styles.shortHolder}>{e?.StaticTarget-e.MonthlySale <= 0 ? 'MATCH' : 'SHORT'}</span>
+                                    <td className={`${Styles.tabletd} ${Styles.flex}`}><span style={{ lineHeight: '20px' }}>${formatNumber((Math.abs(e?.StaticTarget - e.MonthlySale)) || 0)}</span>
+                                      <span className={e?.StaticTarget - e.MonthlySale <= 0 ? Styles.matchHolder : Styles.shortHolder}>{e?.StaticTarget - e.MonthlySale <= 0 ? 'MATCH' : 'SHORT'}</span>
                                     </td>
                                   </tr>
                                 );
@@ -746,11 +760,11 @@ function Dashboard({ dashboardData }) {
           {/* Yearly SALESBYREP */}
           <div className="col-lg-6 my-2">
             <div className={Styles.DashboardWidth}>
-            {salesRepAdmin?<p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Year to date(YTD): Sales By Rep
-              {permissions?.modules?.godLevel ?
-              <span>{Yearlydataa.isLoaded ?<BiRefresh size={25} className="cursor-pointer" onClick={targeetRollReferesh} title="Click here for Refresh"/>:null}</span>
-              : null}
-              </p>:<p className={Styles.Tabletext}>Year to date(YTD): Sales By Rep</p>}
+              {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Year to date(YTD): Sales By Rep
+                {permissions?.modules?.godLevel ?
+                  <span>{Yearlydataa.isLoaded ? <BiRefresh size={25} className="cursor-pointer" onClick={targeetRollReferesh} title="Click here for Refresh" /> : null}</span>
+                  : null}
+              </p> : <p className={Styles.Tabletext}>Year to date(YTD): Sales By Rep</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className="">
                   <div className={Styles.table_scroll}>
@@ -758,7 +772,7 @@ function Dashboard({ dashboardData }) {
                       <thead>
                         <tr className={Styles.tablerow}>
                           <th scope="col" className="ps-3">
-                          Sales Rep Name
+                            Sales Rep Name
                           </th>
                           <th scope="col">Sale Target</th>
                           <th scope="col">Sale Amount</th>
@@ -774,29 +788,29 @@ function Dashboard({ dashboardData }) {
                               {Yearlydataa.data?.map((e, index) => {
                                 totalTargetForYTDSalesRep = Number(e?.StaticTarget || 0) + Number(totalTargetForYTDSalesRep);
                                 totalAmountForYTDSalesRep = Number(e.MonthlySale || 0) + Number(totalAmountForYTDSalesRep);
-                                totalDiffForYTDSalesRep = Number(e?.StaticTarget-e.MonthlySale || 0) + Number(totalDiffForYTDSalesRep);
+                                totalDiffForYTDSalesRep = Number(e?.StaticTarget - e.MonthlySale || 0) + Number(totalDiffForYTDSalesRep);
                                 let targetDiff = e.TargetRollover
                                 return (
                                   <tr key={e}>
-                                    {memoizedPermissions?.modules?.dashboard?.redirect ? 
-                                     <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} onClick={() => { sendDataTargetHandler({ salesRepId: e.SalesRepName }) }} style={{ cursor: 'pointer' }}>
-                                     <UserIcon /> {e.SalesRepName}
-                                   </td>
-                                    :
-                                    <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} style={{ pointerEvents: 'none' }}>
-                                    <UserIcon /> {e.SalesRepName}
-                                  </td>
-                                    }
-                                   
-                                    <td className={Styles.tabletd}>${formatNumber(e?.StaticTarget || 0)} 
-                                      {/* {targetDiff ? (targetDiff > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formatNumber(targetDiff)}</small>+{formatNumber(e.StaticTarget)}</p></> : <><br /><p className={Styles.calHolder}>{formatNumber(e.StaticTarget)}-<small style={{ color: 'green' }}>{formatNumber(-targetDiff)}</small></p></>) : null} */}
+                                    {memoizedPermissions?.modules?.dashboard?.redirect ?
+                                      <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} onClick={() => { sendDataTargetHandler({ salesRepId: e.SalesRepName }) }} style={{ cursor: 'pointer' }}>
+                                        <UserIcon /> {e.SalesRepName}
                                       </td>
+                                      :
+                                      <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} style={{ pointerEvents: 'none' }}>
+                                        <UserIcon /> {e.SalesRepName}
+                                      </td>
+                                    }
+
+                                    <td className={Styles.tabletd}>${formatNumber(e?.StaticTarget || 0)}
+                                      {/* {targetDiff ? (targetDiff > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formatNumber(targetDiff)}</small>+{formatNumber(e.StaticTarget)}</p></> : <><br /><p className={Styles.calHolder}>{formatNumber(e.StaticTarget)}-<small style={{ color: 'green' }}>{formatNumber(-targetDiff)}</small></p></>) : null} */}
+                                    </td>
                                     <td className={Styles.tabletd}>${formatNumber(e.MonthlySale || 0)}</td>
                                     {/* <td className={Styles.tabletd}>${formatNumber(e?.diff || 0)}</td> */}
-                                    <td className={`${Styles.tabletd} ${Styles.flex}`}><span style={{ lineHeight: '20px' }}>${formatNumber((Math.abs(e?.StaticTarget-e.MonthlySale)) || 0)}</span>
-                                    <span className={e?.StaticTarget-e.MonthlySale <= 0 ? Styles.matchHolder : Styles.shortHolder}>{e?.StaticTarget-e.MonthlySale <= 0 ? 'MATCH' : 'SHORT'}</span>
+                                    <td className={`${Styles.tabletd} ${Styles.flex}`}><span style={{ lineHeight: '20px' }}>${formatNumber((Math.abs(e?.StaticTarget - e.MonthlySale)) || 0)}</span>
+                                      <span className={e?.StaticTarget - e.MonthlySale <= 0 ? Styles.matchHolder : Styles.shortHolder}>{e?.StaticTarget - e.MonthlySale <= 0 ? 'MATCH' : 'SHORT'}</span>
                                     </td>
-                                    </tr>
+                                  </tr>
                                 );
                               })}
                               <tr className={`${Styles.tablerow} ${Styles.stickyBottom}`}>
@@ -832,11 +846,11 @@ function Dashboard({ dashboardData }) {
           {/* monthly data goal by brand*/}
           <div className="col-lg-6 col-sm-12 my-2">
             <div className={Styles.DashboardWidth}>
-            {salesRepAdmin?<p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Goal by Brand
-              {permissions?.modules?.godLevel ? 
-              <span>{brandData.isLoaded ?<BiRefresh size={25} className="cursor-pointer" onClick={targeetRollReferesh} title="Click here for Refresh"/>:null}</span>
-              : null}
-              </p>:<p className={Styles.Tabletext}>Month to date(MTD): Goal by Brand</p>}
+              {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Goal by Brand
+                {permissions?.modules?.godLevel ?
+                  <span>{brandData.isLoaded ? <BiRefresh size={25} className="cursor-pointer" onClick={targeetRollReferesh} title="Click here for Refresh" /> : null}</span>
+                  : null}
+              </p> : <p className={Styles.Tabletext}>Month to date(MTD): Goal by Brand</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className={Styles.table_scroll}>
                   <table className="table table-borderless ">
@@ -859,30 +873,30 @@ function Dashboard({ dashboardData }) {
                               {brandData.data?.map((e, i) => {
                                 totalTargetForMTDGoalBrand = Number(e?.StaticTarget || 0) + Number(totalTargetForMTDGoalBrand);
                                 totalAmountForMTDGoalBrand = Number(e.MonthlySale || 0) + Number(totalAmountForMTDGoalBrand);
-                                totalDiffForMTDGoalBrand = Number((Number(e?.StaticTarget-e.MonthlySale || 0)).toFixed(0)) + Number(totalDiffForMTDGoalBrand);
+                                totalDiffForMTDGoalBrand = Number((Number(e?.StaticTarget - e.MonthlySale || 0)).toFixed(0)) + Number(totalDiffForMTDGoalBrand);
                                 // console.log({e,i});
                                 let targetDiff = e.TargetRollover
                                 return (
                                   <tr key={e}>
                                     {memoizedPermissions?.modules?.dashboard?.redirect ?
-                                    <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} onClick={() => { sendDataTargetHandler({ manufacturerId: e.ManufacturerId }) }} style={{ cursor: 'pointer' }}>
-                                    <UserIcon /> {e.brandName}
-                                  </td>
-                                    : 
-                                    <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} style={{ pointerEvent: 'none' }}>
-                                      <UserIcon /> {e.brandName}
-                                    </td>
-                                    }
-                                    
-                                    <td className={Styles.tabletd}>${formatNumber(e?.StaticTarget || 0)} 
-                                      {/* {targetDiff ? (targetDiff > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formatNumber(targetDiff)}</small>+{formatNumber(e.StaticTarget)}</p></> : <><br /><p className={Styles.calHolder}>{formatNumber(e.StaticTarget)}-<small style={{ color: 'green' }}>{formatNumber(-targetDiff)}</small></p></>) : null} */}
+                                      <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} onClick={() => { sendDataTargetHandler({ manufacturerId: e.ManufacturerId }) }} style={{ cursor: 'pointer' }}>
+                                        <UserIcon /> {e.brandName}
                                       </td>
+                                      :
+                                      <td className={`${Styles.tabletd} ps-3 d-flex justify-content-start align-items-center gap-2`} style={{ pointerEvent: 'none' }}>
+                                        <UserIcon /> {e.brandName}
+                                      </td>
+                                    }
+
+                                    <td className={Styles.tabletd}>${formatNumber(e?.StaticTarget || 0)}
+                                      {/* {targetDiff ? (targetDiff > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formatNumber(targetDiff)}</small>+{formatNumber(e.StaticTarget)}</p></> : <><br /><p className={Styles.calHolder}>{formatNumber(e.StaticTarget)}-<small style={{ color: 'green' }}>{formatNumber(-targetDiff)}</small></p></>) : null} */}
+                                    </td>
                                     <td className={Styles.tabletd}>${formatNumber(e.MonthlySale || 0)}</td>
                                     {/* <td className={Styles.tabletd}>${formatNumber(e?.diff || 0)}</td> */}
-                                    <td className={`${Styles.tabletd} ${Styles.flex}`}><span style={{ lineHeight: '20px' }}>${formatNumber((Math.abs(e?.StaticTarget-e.MonthlySale)) || 0)}</span>
-                                    <span className={e?.StaticTarget-e.MonthlySale <= 0 ? Styles.matchHolder : Styles.shortHolder}>{e?.StaticTarget-e.MonthlySale <= 0 ? 'MATCH' : 'SHORT'}</span>
+                                    <td className={`${Styles.tabletd} ${Styles.flex}`}><span style={{ lineHeight: '20px' }}>${formatNumber((Math.abs(e?.StaticTarget - e.MonthlySale)) || 0)}</span>
+                                      <span className={e?.StaticTarget - e.MonthlySale <= 0 ? Styles.matchHolder : Styles.shortHolder}>{e?.StaticTarget - e.MonthlySale <= 0 ? 'MATCH' : 'SHORT'}</span>
                                     </td>
-                                    </tr>
+                                  </tr>
                                 );
                               })}
                               <tr className={`${Styles.tablerow} ${Styles.stickyBottom}`}>
@@ -967,127 +981,127 @@ function Dashboard({ dashboardData }) {
         </div>
 
         <div className="my-5">
-      {((accountPerformance.data?.length > 0 && accountPerformance?.isLoaded) || !accountPerformance?.isLoaded) && (
-        <div className="row mt-1 justify-between">
-          {/* Top Performing Retailers */}
-          <div className={`col-lg-6 col-sm-12 ${Styles.top_perform1}`}>
-            <p className={Styles.Tabletext}>Top Performing Retailers</p>
-            <div className="row">
-              {!accountPerformance?.isLoaded ? (
-                <ContentLoader />
-              ) : (
-                <>
-                  {accountPerformance.data?.map((ele, index) => {
-                    if (index < 4) {
-                      return (
-                        <div key={index} className="col-lg-6 col-md-6 col-sm-12  ">
-                          <div className={Styles.top_perform}>
+          {((accountPerformance.data?.length > 0 && accountPerformance?.isLoaded) || !accountPerformance?.isLoaded) && (
+            <div className="row mt-1 justify-between">
+              {/* Top Performing Retailers */}
+              <div className={`col-lg-6 col-sm-12 ${Styles.top_perform1}`}>
+                <p className={Styles.Tabletext}>Top Performing Retailers</p>
+                <div className="row">
+                  {!accountPerformance?.isLoaded ? (
+                    <ContentLoader />
+                  ) : (
+                    <>
+                      {accountPerformance.data?.map((ele, index) => {
+                        if (index < 4) {
+                          return (
+                            <div key={index} className="col-lg-6 col-md-6 col-sm-12  ">
+                              <div className={Styles.top_perform}>
 
-                            {memoizedPermissions?.modules?.dashboard?.redirect ? 
-                            <Link to={'/store/' + ele.AccountId}>
-                            <div className={Styles.top_accnew}>
-                              <p className={Styles.top_accounttext}>{ele.Name}</p>
-                            </div>
-                          </Link>
-                            
-                            : 
-                            <span >
-                              <div className={Styles.top_accnew}>
-                                <p className={Styles.top_accounttext}>{ele.Name}</p>
-                              </div>
-                            </span>
-                            }
-                            
+                                {memoizedPermissions?.modules?.dashboard?.redirect ?
+                                  <Link to={'/store/' + ele.AccountId}>
+                                    <div className={Styles.top_accnew}>
+                                      <p className={Styles.top_accounttext}>{ele.Name}</p>
+                                    </div>
+                                  </Link>
 
-                            <div className={`${Styles.scrollbar}`}  style={{cursor : "pointer"}}>
-                              {ele.ManufacturerList.map((itemm, idx) => {
-                                const bgcolor = bgColors[itemm.Name];
-                                return (
-                                  <span
-                                    key={idx}
-                                    className={`${Styles.account} ${Styles[bgcolor]}`}
-                                    onClick={() => handleBrandClick(ele)}
-                                   
-                                  >
-                                    {itemm.Name}
+                                  :
+                                  <span >
+                                    <div className={Styles.top_accnew}>
+                                      <p className={Styles.top_accounttext}>{ele.Name}</p>
+                                    </div>
                                   </span>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </>
-              )}
-            </div>
-          </div>
+                                }
 
-          {/* Low Performing Retailers */}
-          <div className="col-lg-6 col-sm-12" style={{ width: "48%" }}>
-            <p className={Styles.Tabletext1}>Low Performing Retailers</p>
-            <div className="row">
-              {!accountPerformance?.isLoaded ? (
-                <ContentLoader />
-              ) : (
-                <>
-                  {lowPerformanceArray?.map((ele, index) => {
-                    if (index < 4) {
-                      return (
-                        <div key={index} className="col-lg-6 col-md-6 col-sm-12  cardHover">
-                          <div className={Styles.top_perform2}>
-                            {memoizedPermissions?.modules?.dasboard?.redirect ?
-                            <Link to={'/store/' + ele.AccountId}>
-                            <div className={Styles.top_account}>
-                              <p className={Styles.top_accounttext}>{ele.Name}</p>
-                            </div>
-                          </Link>
-                            : 
-                            <sapn >
-                              <div className={Styles.top_account}>
-                                <p className={Styles.top_accounttext}>{ele.Name}</p>
+
+                                <div className={`${Styles.scrollbar}`} style={{ cursor: "pointer" }}>
+                                  {ele.ManufacturerList.map((itemm, idx) => {
+                                    const bgcolor = bgColors[itemm.Name];
+                                    return (
+                                      <span
+                                        key={idx}
+                                        className={`${Styles.account} ${Styles[bgcolor]}`}
+                                        onClick={() => handleBrandClick(ele)}
+
+                                      >
+                                        {itemm.Name}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </sapn>
-                            }
-                            
-
-                            <div className={`${Styles.scrollbar}`} style={{cursor : "pointer"}}>
-                              {ele.ManufacturerList.map((item, idx) => {
-                                const bgcolor = bgColors[item.Name];
-                                return (
-                                  <span
-                                    key={idx}
-                                    className={`${Styles.account22} ${Styles[bgcolor]}`}
-                                    onClick={() => handleBrandClick(ele)}
-                                  >
-                                    {item.Name}
-                                  </span>
-                                );
-                              })}
                             </div>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })}
-                </>
-              )}
+                          );
+                        }
+                        return null;
+                      })}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Low Performing Retailers */}
+              <div className="col-lg-6 col-sm-12" style={{ width: "48%" }}>
+                <p className={Styles.Tabletext1}>Low Performing Retailers</p>
+                <div className="row">
+                  {!accountPerformance?.isLoaded ? (
+                    <ContentLoader />
+                  ) : (
+                    <>
+                      {lowPerformanceArray?.map((ele, index) => {
+                        if (index < 4) {
+                          return (
+                            <div key={index} className="col-lg-6 col-md-6 col-sm-12  cardHover">
+                              <div className={Styles.top_perform2}>
+                                {memoizedPermissions?.modules?.dasboard?.redirect ?
+                                  <Link to={'/store/' + ele.AccountId}>
+                                    <div className={Styles.top_account}>
+                                      <p className={Styles.top_accounttext}>{ele.Name}</p>
+                                    </div>
+                                  </Link>
+                                  :
+                                  <sapn >
+                                    <div className={Styles.top_account}>
+                                      <p className={Styles.top_accounttext}>{ele.Name}</p>
+                                    </div>
+                                  </sapn>
+                                }
+
+
+                                <div className={`${Styles.scrollbar}`} style={{ cursor: "pointer" }}>
+                                  {ele.ManufacturerList.map((item, idx) => {
+                                    const bgcolor = bgColors[item.Name];
+                                    return (
+                                      <span
+                                        key={idx}
+                                        className={`${Styles.account22} ${Styles[bgcolor]}`}
+                                        onClick={() => handleBrandClick(ele)}
+                                      >
+                                        {item.Name}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })}
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+
+          <ModalPage
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            content={<SelectBrandModel brands={brandData} onClose={() => setModalOpen(false)}
+              onChange={handleManufacturerSelect}
+            />}
+          />
         </div>
-      )}
-
-      <ModalPage
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        content={<SelectBrandModel brands={brandData} onClose={() => setModalOpen(false)}
-        onChange={handleManufacturerSelect}
-         />}
-      />
-    </div>
 
         <div className="row my-3">
           <div className="col-lg-7">

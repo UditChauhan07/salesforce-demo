@@ -9,6 +9,7 @@ import { DestoryAuth, GetAuthData, admins, getRetailerList, getSalesRepList } fr
 import { CloseButton } from "../lib/svg";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../lib/dataStore";
 const MyRetailersPage = () => {
   const { data: manufacturers } = useManufacturer();
   const [searchParams] = useSearchParams();
@@ -32,40 +33,42 @@ const MyRetailersPage = () => {
     }
   }, [manufacturerId]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const user = await GetAuthData();
-        setUserData(user);
-        if (!selectedSalesRepId) setSelectedSalesRepId(user.Sales_Rep__c);
+  const fetchData = async () => {
+    try {
+      const user = await GetAuthData();
+      setUserData(user);
+      if (!selectedSalesRepId) setSelectedSalesRepId(user.Sales_Rep__c);
 
-        // Fetch retailer list
-        getRetailerListHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c });
+      // Fetch retailer list
+      getRetailerListHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c });
 
-        // // Fetch sales reps if admin
-        if (admins.includes(user.Sales_Rep__c)) {
-          getSalesRepList({ key: user.x_access_token })
-            .then((repRes) => setSalesRepList(repRes.data))
-            .catch((repErr) => console.log({ repErr }));
-        }
-      } catch (err) {
-        console.log({ err });
-        DestoryAuth();
+      // // Fetch sales reps if admin
+      if (admins.includes(user.Sales_Rep__c)) {
+        getSalesRepList({ key: user.x_access_token })
+          .then((repRes) => setSalesRepList(repRes.data))
+          .catch((repErr) => console.log({ repErr }));
       }
-    };
-
+    } catch (err) {
+      console.log({ err });
+      DestoryAuth();
+    }
+  };
+  useEffect(() => {
+    dataStore.subscribe("/my-retailers" + selectedSalesRepId ?? userData.Sales_Rep__c, (data) => setRetailerList({ data: data?.data.length ? data?.data : [], isLoading: false }))
     fetchData();
+    return () => {
+      dataStore.unsubscribe("/my-retailers" + selectedSalesRepId ?? userData.Sales_Rep__c, (data) => setRetailerList({ data: data?.data.length ? data?.data : [], isLoading: false }))
+    }
   }, [selectedSalesRepId]);
 
 
 
   const getRetailerListHandler = ({ key, userId }) => {
     setRetailerList({ data: [], isLoading: true });
-    getRetailerList({ key, userId })
+    dataStore.getPageData("/my-retailers" + userId, () => getRetailerList({ key, userId }))
       .then((retailerRes) => {
-        console.log({retailerRes});
-        
-        setRetailerList({ data: retailerRes?.data.length ? retailerRes?.data : [], isLoading: false })})
+        setRetailerList({ data: retailerRes?.data.length ? retailerRes?.data : [], isLoading: false })
+      })
       .catch(e => console.error(e));
   };
 
@@ -78,8 +81,8 @@ const MyRetailersPage = () => {
       try {
         const user = await GetAuthData(); // Fetch user data
         const userPermissions = await getPermissions(); // Fetch permissions
-        console.log({userPermissions});
-        
+        console.log({ userPermissions });
+
         setPermissions(userPermissions); // Set permissions in state
         if (userPermissions?.modules?.order?.create === false) {
           PermissionDenied();

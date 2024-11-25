@@ -4,7 +4,7 @@ import Styles from "./Styles.module.css";
 import axios from "axios";
 import Loading from "../../Loading";
 import { Link, useNavigate } from "react-router-dom";
-import { DestoryAuth, ShareDrive, getOrderDetailsInvoice, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
+import { DestoryAuth, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
 import { MdOutlineDownload } from "react-icons/md";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
@@ -13,6 +13,8 @@ import { RxEyeOpen } from "react-icons/rx";
 import { TbEyeClosed } from "react-icons/tb";
 import ModalPage from "../../Modal UI";
 import { CustomerServiceIcon, OrderStatusIcon } from "../../../lib/svg";
+import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
+import dataStore from "../../../lib/dataStore";
 
 function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   let Img1 = "/assets/images/dummy.png";
@@ -26,8 +28,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [restrict, setRestrict] = useState();
 
   const OrderId = JSON.parse(localStorage.getItem("OpportunityId"));
-  console.log({OrderId});
-  
+
   const Key = JSON.parse(localStorage.getItem("Api Data"));
   if (!Key) {
     DestoryAuth();
@@ -36,35 +37,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [productDetailId, setProductDetailId] = useState(null)
   const [invoices, setInvoice] = useState([]);
   const [oldSupport, setOldSupport] = useState({});
-  useEffect(() => {
-    // let rawData = {key:Key.data.access_token,id:OrderId}
-    // getOrderDetailsBasedId({rawData}).then((res)=>{
-    //   console.warn({res});
-    // }).catch((error)=>{
-    //   console.warn({error});
-    // })
-    getOrderDetails();
-  }, []);
-
-  let headersList = {
-    Accept: "*/*",
-    "Content-Type": "application/json;charset=UTF-8",
-  };
-
-  let BodyContent = new FormData();
-  BodyContent.append("key", Key.data.access_token);
-  BodyContent.append("opportunity_id", OrderId);
-
-  function downloadFiles(invoices) {
-    invoices.forEach(file => {
-      const link = document.createElement("a");
-      link.href = `${file.VersionDataUrl}?oauth_token=${Key.data.access_token}`;
-      link.download = `${file.VersionDataUrl}?oauth_token=${Key.data.access_token}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
-  }
 
   const getOrderDetails = async () => {
 
@@ -72,11 +44,11 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     if (!data) {
       data = {};
     }
-    const response = await axios.post(
+    const response = await dataStore.getPageData('/orderDetails' + OrderId, () => axios.post(
       `${originAPi}/beauty/BKpeLbweyZPXmwe`,
       BodyContent,
       headersList
-    );
+    ));
     if (Object.values(data).length > 0) {
       if (response.data.data?.ManufacturerId__c) {
         if (data[response.data.data?.ManufacturerId__c]) {
@@ -131,34 +103,46 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     setOrderData(response.data.data);
     setOrderDetail(response.data.data)
     setIsLoading(true);
-    getOrderDetailsInvoice({ rawData: { key: Key.data.access_token, id: OrderId } }).then((response) => {
+    dataStore.getPageData('/orderDetails' + OrderId + "/invoice", () => getOrderDetailsInvoice({ rawData: { key: Key.data.access_token, id: OrderId } })).then((response) => {
       setInvoice(response.data)
-
-      // const base64String = response.attachment[0].base64;
-      // //can you read the value of base64String variable?
-
-      // let encoder = new TextEncoder('utf-8');
-      // let data = encoder.encode(base64String);
-      // let decoder = new TextDecoder('utf-8');
-      // let decodedString = decoder.decode(data);
-
-      // const arrayBuffer = new ArrayBuffer(decodedString.length);
-      // const uintArray = new Uint8Array(arrayBuffer);
-      // for (let i = 0; i < decodedString.length; i++) { uintArray[i] = decodedString.charCodeAt(i); }
-      // const file = new Blob([uintArray]);
-      // const url = URL.createObjectURL(file);
-      // const link = document.createElement("a");
-      // link.href = url;
-      // link.download = response.attachment[0].name;
-      // document.body.appendChild(link);
-      // link.click();
-      // document.body.removeChild(link);
 
 
     }).catch((error) => {
       console.error({ error });
     })
   };
+
+  useEffect(() => {
+    // let rawData = {key:Key.data.access_token,id:OrderId}
+    // getOrderDetailsBasedId({rawData}).then((res)=>{
+    //   console.warn({res});
+    // }).catch((error)=>{
+    //   console.warn({error});
+    // })
+    getOrderDetails();
+  }, []);
+  useBackgroundUpdater(getOrderDetails, defaultLoadTime);
+
+  let headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/json;charset=UTF-8",
+  };
+
+  let BodyContent = new FormData();
+  BodyContent.append("key", Key.data.access_token);
+  BodyContent.append("opportunity_id", OrderId);
+
+  function downloadFiles(invoices) {
+    invoices.forEach(file => {
+      const link = document.createElement("a");
+      link.href = `${file.VersionDataUrl}?oauth_token=${Key.data.access_token}`;
+      link.download = `${file.VersionDataUrl}?oauth_token=${Key.data.access_token}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  }
+
   const handleback = () => {
     navigate("/order-list");
   };
@@ -188,7 +172,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         });
     }
   };
-  if (!isLoading) return <Loading height={'50vh'}/>;
+  if (!isLoading) return <Loading height={'50vh'} />;
   const openInNewTab = (url) => {
     window.open(url, "_blank", "noreferrer");
   };
@@ -224,14 +208,14 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       return null;
     }
   }
-  const caseChangeHandler=(type,reason)=>{
-    console.log({type,reason,oldSupport});
-    
-    if(oldSupport){
-      if(Object.keys(oldSupport)){
-        if(oldSupport?.[type]){
-          if(oldSupport?.[type]?.[reason]){
-            if(oldSupport?.[type]?.[reason].Id){
+  const caseChangeHandler = (type, reason) => {
+    console.log({ type, reason, oldSupport });
+
+    if (oldSupport) {
+      if (Object.keys(oldSupport)) {
+        if (oldSupport?.[type]) {
+          if (oldSupport?.[type]?.[reason]) {
+            if (oldSupport?.[type]?.[reason].Id) {
               setRestrict(reason)
               return
             }
@@ -239,7 +223,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         }
       }
     }
-    setConfirm("Invoice") 
+    setConfirm("Invoice")
   }
 
   return (
@@ -436,7 +420,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                     {showTracking && OrderData.Tracking__c && <>
                       <h2>Tracking Number</h2>
                       <div className={Styles.ShipAdress} style={{ transition: 'all 250s linear' }}>
-                        {OrderData.Tracking_URL__c ? <button role="link" style={{textDecoration:'underline'}}
+                        {OrderData.Tracking_URL__c ? <button role="link" style={{ textDecoration: 'underline' }}
                           onClick={() => openInNewTab(OrderData.Tracking_URL__c)}>{OrderData.Tracking__c}</button> :
                           <p>
                             {OrderData.Tracking__c}
@@ -459,7 +443,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                         <button className="py-1 d-flex justify-content-center" onClick={() => downloadFiles(invoices)}>
                           <span style={{ margin: 'auto 0' }}><MdOutlineDownload size={16} /></span>&nbsp;Download INVOICE
                         </button>
-                      ) : <button className="py-1 d-flex justify-content-center" onClick={() => caseChangeHandler("0123b0000007zc8AAA","Invoice")}>
+                      ) : <button className="py-1 d-flex justify-content-center" onClick={() => caseChangeHandler("0123b0000007zc8AAA", "Invoice")}>
                         <span style={{ margin: 'auto 0' }}><VscGitPullRequestNewChanges size={16} /></span>&nbsp;Request Invoice
                       </button>}
                     </div>
@@ -469,7 +453,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                         <button className="py-1 d-flex justify-content-center" onClick={() => setShowTracking(!showTracking)}>
                           <span style={{ margin: 'auto 0' }} >{showTracking ? <RxEyeOpen size={16} style={{ transition: 'all 500s linear' }} /> : <TbEyeClosed size={16} style={{ transition: 'all 250s linear' }} />}</span>&nbsp;Tracking Status
                         </button>
-                      ) : <button className="py-1 d-flex justify-content-center" onClick={() =>  caseChangeHandler("0123b0000007zc8AAA","Tracking Status") }>
+                      ) : <button className="py-1 d-flex justify-content-center" onClick={() => caseChangeHandler("0123b0000007zc8AAA", "Tracking Status")}>
                         <span style={{ margin: 'auto 0' }}><VscGitPullRequestNewChanges size={16} /></span>&nbsp;Request Tracking
                       </button>}
                     </div>

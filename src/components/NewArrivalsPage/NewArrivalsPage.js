@@ -76,7 +76,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
         const filteredContent = months.content.filter((item) => {
           if (month) {
             if (brand && brand !== "All") {
-              return brand === item.ManufacturerName__c && item.date.toLowerCase().includes(month.toLowerCase());
+              return brand === item.ManufacturerId__c && item.date.toLowerCase().includes(month.toLowerCase());
             }
             return item.date.toLowerCase().includes(month.toLowerCase());
           }

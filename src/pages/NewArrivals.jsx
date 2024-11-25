@@ -11,65 +11,50 @@ import { originAPi } from "../lib/store";
 import axios from "axios";
 
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../lib/dataStore";
+import { useManufacturer } from "../api/useManufacturer";
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const NewArrivals = () => {
-  const [accountDetails , setAccountDetails] = useState()
+  const { data: manufacturers } = useManufacturer();
+  const [accountDetails, setAccountDetails] = useState()
 
   const fetchAccountDetails = async () => {
     let data = await GetAuthData(); // Fetch authentication data
     let salesRepId = data.Sales_Rep__c;
     let accessToken = data.x_access_token;
-  
+
     try {
       // Await the axios.post call to resolve the Promise
-      let res = await axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+      let res = await dataStore.getPageData("actBndRelated" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
         salesRepId,
         accessToken,
-      });
-  
-       
+      }));
+
+
       setAccountDetails(res.data.accountDetails)
     } catch (error) {
       console.error("Error", error); // Log error details
     }
   };
-  
-  
-  useEffect(()=>{
+
+
+  useEffect(() => {
 
     fetchAccountDetails()
-  } , [])
-
+  }, [])
+  let date = new Date();
   const [isLoaded, setIsloaed] = useState(false);
   const [productList, setProductList] = useState([]);
   const [permissions, setPermissions] = useState(null);
   const navigate = useNavigate()
-  let brands = [
-    { value: null, label: "All" },
-    { value: "111Skin", label: "111Skin" },
-    { value: "Susanne Kaufmann", label: "Susanne Kaufmann" },
-    { value: "AERIN", label: "AERIN" },
-    { value: "ARAMIS", label: "ARAMIS" },
-    { value: "Bobbi Brown", label: "Bobbi Brown" },
-    { value: "Bumble and Bumble", label: "Bumble and Bumble" },
-    { value: "Byredo", label: "Byredo" },
-    { value: "BY TERRY", label: "BY TERRY" },
-    { value: "Diptyque", label: "Diptyque" },
-    { value: "Kevyn Aucoin Cosmetics", label: "Kevyn Aucoin Cosmetics" },
-    { value: "ESTEE LAUDER", label: "ESTEE LAUDER" },
-    { value: "L'Occitane", label: "L'Occitane" },
-    { value: "Maison Margiela", label: "Maison Margiela" },
-    { value: "ReVive", label: "ReVive" },
-    { value: "RMS Beauty", label: "RMS Beauty" },
-    { value: "Smashbox", label: "Smashbox" },
-    { value: "Re-Nutriv", label: "Re-Nutriv" },
-    { value: "Victoria Beckham Beauty", label: "Victoria Beckham Beauty" },
-    
-  ];
+  const [selectYear, setSelectYear] = useState(date.getFullYear())
+  let yearList = [
+    { value: date.getFullYear(), label: date.getFullYear() },
+    { value: date.getFullYear() + 1, label: date.getFullYear() + 1 }
+  ]
   const [month, setMonth] = useState("");
   let months = [
-    // { value: null,  },
     { value: "JAN", label: "JAN" },
     { value: "FEB", label: "FEB" },
     { value: "MAR", label: "MAR" },
@@ -82,27 +67,36 @@ const NewArrivals = () => {
     { value: "OCT", label: "OCT" },
     { value: "NOV", label: "NOV" },
     { value: "DEC", label: "DEC" },
-    // { value: "TBD", label: "TBD" },
   ];
 
   const [brand, setBrand] = useState();
 
+  const readyCalenderHandle = (data) => {
+    data?.map((month) => {
+      month.content.map((element) => {
+        element.date = element.Ship_Date__c ? (element.Ship_Date__c.split("-")[2] == 15 ? 'TBD' : element.Ship_Date__c.split("-")[2]) + '/' + monthNames[parseInt(element.Ship_Date__c.split("-")[1]) - 1].toUpperCase() + '/' + element.Ship_Date__c.split("-")[0] : 'NA';
+        element.OCDDate = element.Launch_Date__c ? (element.Launch_Date__c.split("-")[2] == 15 ? 'TBD' : element.Launch_Date__c.split("-")[2]) + '/' + monthNames[parseInt(element.Launch_Date__c.split("-")[1]) - 1].toUpperCase() + '/' + element.Launch_Date__c.split("-")[0] : 'NA';
+        return element
+      })
+      return month;
+    })
+    setProductList(data)
+    setIsloaed(true)
+  }
+
   useEffect(() => {
+    dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
     GetAuthData().then((user) => {
-      getMarketingCalendar({ key: user.x_access_token }).then((productRes) => {
-        productRes?.map((month) => {
-          month.content.map((element) => {
-            element.date = element.Ship_Date__c ? (element.Ship_Date__c.split("-")[2] == 15 ? 'TBD' : element.Ship_Date__c.split("-")[2]) + '/' + monthNames[parseInt(element.Ship_Date__c.split("-")[1]) - 1].toUpperCase() + '/' + element.Ship_Date__c.split("-")[0] : 'NA';
-            element.OCDDate = element.Launch_Date__c ? (element.Launch_Date__c.split("-")[2] == 15 ? 'TBD' : element.Launch_Date__c.split("-")[2]) + '/' + monthNames[parseInt(element.Launch_Date__c.split("-")[1]) - 1].toUpperCase() + '/' + element.Launch_Date__c.split("-")[0] : 'NA';
-            return element
-          })
-          return month;
-        })
-        setProductList(productRes)
-        setIsloaed(true)
+      dataStore.getPageData("/marketing-calendar" + selectYear, () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })).then((productRes) => {
+        console.log({productRes,selectYear});
+        
+        readyCalenderHandle(productRes)
       }).catch((err) => console.log({ err }))
     }).catch((e) => console.log({ e }))
-  }, [isLoaded])
+    return () => {
+      dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
+    }
+  }, [isLoaded,selectYear])
 
   useEffect(() => {
     HendleClear();
@@ -146,13 +140,22 @@ const NewArrivals = () => {
     <AppLayout
       filterNodes={
         <>
-
+          {/* <FilterItem
+            label="year"
+            name="Year"
+            value={selectYear}
+            options={yearList}
+            onChange={(value) => setSelectYear(value)}
+          /> */}
           <FilterItem
             minWidth="220px"
             label="All Brands"
             name="All-Brand"
             value={brand}
-            options={brands}
+            options={manufacturers?.data?.map((manufacturer) => ({
+              label: manufacturer.Name,
+              value: manufacturer.Id,
+            }))}
             onChange={(value) => {
               setBrand(value);
             }}
@@ -179,7 +182,7 @@ const NewArrivals = () => {
       {!isLoaded ? (
         <Loading height={"70vh"} />
       ) : (
-        <NewArrivalsPage brand={brand} month={month} productList={productList} accountDetails= {accountDetails}/>
+        <NewArrivalsPage brand={brand} month={month} productList={productList} accountDetails={accountDetails} />
       )}
     </AppLayout>
   );

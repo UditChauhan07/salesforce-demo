@@ -28,13 +28,12 @@ const CustomerSupportDetails = () => {
     try {
       const user = await GetAuthData();
       const rawData = { key: user?.x_access_token, caseId: detailsId };
-  
-      getSupportDetails({ rawData })
+
+      dataStore.getPageData(location.pathname + location.search, () => getSupportDetails({ rawData }))
         .then((details) => {
-          console.log({ details });
           details.salesRepName = user.Name;
           details.salesRepId = user.Sales_Rep__c;
-  
+
           // Update state or call relevant functions
           setDetailsData(details);
           setLoaded(true);
@@ -47,7 +46,7 @@ const CustomerSupportDetails = () => {
       console.error("Error fetching support details:", error);
     }
   };
-  
+
   useEffect(() => {
     dataStore.subscribe(
       location.pathname + location.search,

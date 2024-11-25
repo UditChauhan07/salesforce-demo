@@ -39,33 +39,31 @@ function ContactDetailedReport() {
         }, 300);
         return () => clearTimeout(timeoutId);
     }, [filters]);
+    async function fetchData() {
+        setLoading(true);
+        await fetchAccountDetails(
+            setLoading,
+            setAccountManufacturerRecords,
+            setFilteredRecords,
+            setAccounts,
+            setSalesReps,
+            setManufacturers
+        );
 
-    useEffect(() => {
-        async function fetchData() {
-            setLoading(true);
-            await fetchAccountDetails(
-                setLoading,
-                setAccountManufacturerRecords,
-                setFilteredRecords,
-                setAccounts,
-                setSalesReps,
-                setManufacturers
-            );
-
-            try {
-                const userPermissions = await getPermissions();
-                setPermissions(userPermissions);
-                if (!userPermissions?.modules?.reports?.contactDetailedReport.view) {
-                    PermissionDenied();
-                    navigate('/dashboard');
-                }
-            } catch (err) {
-                console.error("Error fetching permissions", err);
-            } finally {
-                setLoading(false);
+        try {
+            const userPermissions = await getPermissions();
+            setPermissions(userPermissions);
+            if (!userPermissions?.modules?.reports?.contactDetailedReport.view) {
+                PermissionDenied();
+                navigate('/dashboard');
             }
+        } catch (err) {
+            console.error("Error fetching permissions", err);
+        } finally {
+            setLoading(false);
         }
-
+    }
+    useEffect(() => {
         fetchData();
     }, []);
 
