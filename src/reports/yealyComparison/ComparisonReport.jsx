@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import AppLayout from "../../components/AppLayout";
 import Loading from "../../components/Loading";
 import Styles from "./index.module.css";
@@ -16,6 +16,7 @@ import { GetAuthData } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../../lib/dataStore";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const date = new Date();
@@ -34,9 +35,9 @@ const YearlyComparisonReport = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSalesRepId, setSelectedSalesRepId] = useState();
   const [userData, setUserData] = useState({});
-  const [hasPermission, setHasPermission] = useState(null);  
+  const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
-const navigate = useNavigate()
+  const navigate = useNavigate()
   useEffect(() => {
     // Update API data when filter or status changes
     sendApiCall();
@@ -107,8 +108,8 @@ const navigate = useNavigate()
   if (apiData?.length) {
     apiData?.map((ele, index) => {
       if ((status == 1 && ele.Status == "Active") || status == 2) {
-        totalwholesale=0
-        totalretailer=0
+        totalwholesale = 0
+        totalretailer = 0
         totalretailer += ele.Jan.retail_revenue__c;
         monthTotalAmount.Jan.retailer += ele.Jan.retail_revenue__c;
         monthTotalAmount.Jan.wholesale += ele.Jan.Whole_Sales_Amount;
@@ -242,10 +243,13 @@ const navigate = useNavigate()
 
   const resetFilter = async () => {
     setIsLoading(true);
-    const result = await getYearlyComparison({
+    const result = await dataStore.getPageData("/comparison" + JSON.stringify({
       year: initialValues.year,
       manufacturerId: initialValues.ManufacturerId__c,
-    });
+    }), () => getYearlyComparison({
+      year: initialValues.year,
+      manufacturerId: initialValues.ManufacturerId__c,
+    }));
     sortArrayHandler(result?.data || [], g => g?.AccountName)
     setApiData(result.data);
     setFilter(initialValues);
@@ -254,8 +258,10 @@ const navigate = useNavigate()
   };
   const sendApiCall = async () => {
     setIsLoading(true);
-    const result = await getYearlyComparison({ ...filter });
-    console.log({ result });
+    const result = await dataStore.getPageData("/comparison" + JSON.stringify({
+      year: filter.year,
+      manufacturerId: filter.ManufacturerId__c,
+    }), () => getYearlyComparison({ ...filter }));
     sortArrayHandler(result || [], g => g?.AccountName)
     setApiData(result);
     setIsLoading(false);
@@ -275,12 +281,12 @@ const navigate = useNavigate()
           PermissionDenied();
           navigate("/dashboard");
         }
-        
+
       } catch (error) {
         console.log({ error });
       }
     };
-    
+
     fetchData();
   }, []);
 
@@ -291,7 +297,7 @@ const navigate = useNavigate()
     <AppLayout
       filterNodes={
         <>
-       
+
           <FilterItem
             minWidth="220px"
             label="All Manufacturers"
@@ -336,7 +342,7 @@ const navigate = useNavigate()
             <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
           </button>
 
-        
+
         </>
       }
     >

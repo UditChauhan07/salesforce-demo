@@ -73,24 +73,24 @@ function ContactDetailedReport() {
             const accountMatch = debouncedFilters.accountFilter
                 ? record.accountDetails?.Name?.toLowerCase().includes(debouncedFilters.accountFilter.toLowerCase())
                 : true;
-    
+
             const saleRepMatch = debouncedFilters.saleRepFilter
                 ? record.manufacturers?.salesRep?.toLowerCase().includes(debouncedFilters.saleRepFilter.toLowerCase())
                 : true;
-    
+
             const manufacturerMatch = debouncedFilters.manufacturerFilter
                 ? record.manufacturers?.manufacturerName?.toLowerCase().includes(debouncedFilters.manufacturerFilter.toLowerCase())
                 : true;
-    
+
             const accountStatusMatch = filters.accountStatusFilter === 'All'
-                ? true 
+                ? true
                 : filters.accountStatusFilter === 'Active Account'
                     ? record.accountDetails?.Active_Closed__c === 'Active Account' // Show only active accounts
                     : false;
-    
+
             return accountStatusMatch && manufacturerMatch && saleRepMatch && accountMatch;
         });
-    }, [debouncedFilters, accountManufacturerRecords, filters  ]);
+    }, [debouncedFilters, accountManufacturerRecords, filters]);
     useEffect(() => {
         setFilteredRecords(filteredData);
         console.log('filtered records', filteredRecords);
@@ -106,9 +106,9 @@ function ContactDetailedReport() {
             saleRepFilter: '',
             manufacturerFilter: 'Bobbi Brown',
             accountStatusFilter: 'Active Account',
-            
+
         });
-       
+
     };
 
     const handleExportToExcel = () => {
@@ -116,14 +116,14 @@ function ContactDetailedReport() {
             'Account Name': record.accountDetails?.Name || '',
             'First Name': record.contact?.FirstName || 'N/A',
             'Last Name': record.contact?.LastName || 'N/A',
-            'Sales Rep':record.manufacturers?.salesRep || 'N/A',
+            'Sales Rep': record.manufacturers?.salesRep || 'N/A',
             'Manufacturer': record.manufacturers?.manufacturerName || 'N/A',
             'Status': record.accountDetails?.Active_Closed__c,
             'Email': record.contact?.Email || 'N/A',
             'Phone': record.contact?.Phone || 'N/A',
             'Account Number': record.manufacturers?.accountNumber || 'N/A',
             'Margin': record.manufacturers?.margin || 'N/A',
-            'Payment Type': record.manufacturers?.paymentType  || 'N/A',
+            'Payment Type': record.manufacturers?.paymentType || 'N/A',
             'Store Street': record.accountDetails?.Store_Street__c || 'N/A',
             'Store City': record.accountDetails?.Store_City__c || 'N/A',
             'Store State': record.accountDetails?.Store_State__c || 'N/A',
@@ -145,105 +145,102 @@ function ContactDetailedReport() {
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Contacts');
         XLSX.writeFile(wb, `Contact Detailed Report ${new Date().toDateString()}.xlsx`);
-     
+
     };
 
     // Memoize permissions to avoid unnecessary re-calculations
     const memoizedPermissions = useMemo(() => permissions, [permissions]);
-   console.log("manufacturr name" , filters.manufacturerFilter
-    
-   )
-   const ensureBobbiBrown = (options) => {
-    const isBobbiBrownIncluded = options.some(option => option.value === 'BOBBI BROWN');
-    
-    if (!isBobbiBrownIncluded) {
-      return [{ label: 'BOBBI BROWN', value: 'BOBBI BROWN' }, ...options];
-    }
-    
-    return options;
-  };
+    const ensureBobbiBrown = (options) => {
+        const isBobbiBrownIncluded = options.some(option => option.value === 'BOBBI BROWN');
+
+        if (!isBobbiBrownIncluded) {
+            return [{ label: 'BOBBI BROWN', value: 'BOBBI BROWN' }, ...options];
+        }
+
+        return options;
+    };
     return (
         <AppLayout
-        filterNodes={
-          
-              <div className="d-flex justify-content-between m-auto" style={{ width: '99%' }}>
-              <div className="d-flex justify-content-start gap-4 col-4">
-              <FilterItem
-  minWidth="200px"
-  label="BOBBI BROWN"
-  value={selectedManufacturer} // Use temporary state
-  name="BOBBI BROWN"
-  options={ensureBobbiBrown(manufacturers)} // Ensure 'BOBBI BROWN' is in the options
-  onChange={(value) => {
-    // Update the temporary state only
-    setSelectedManufacturer(value);
-  }}
-  onFocus={() => setFilters((prev) => ({ ...prev, saleRepFilter: '' }))} // Optional
-/>
-      
-<button  onClick={() => {
-         
-          handleFilterChange('manufacturerFilter', selectedManufacturer);
-          // Also update the actual filter state
-          setFilters((prev) => ({ ...prev, manufacturerFilter: selectedManufacturer }));
-        }}  className="border px-2 py-1 leading-tight d-grid"> <SearchIcon fill="#fff" width={20} height={20} />
-              <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>search</small>
-            </button>
-          
-</div>
-            <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
-               {memoizedPermissions?.modules?.godLevel && (
+            filterNodes={
+
+                <div className="d-flex justify-content-between m-auto" style={{ width: '99%' }}>
+                    <div className="d-flex justify-content-start gap-4 col-4">
+                        <FilterItem
+                            minWidth="200px"
+                            label="BOBBI BROWN"
+                            value={selectedManufacturer} // Use temporary state
+                            name="BOBBI BROWN"
+                            options={ensureBobbiBrown(manufacturers)} // Ensure 'BOBBI BROWN' is in the options
+                            onChange={(value) => {
+                                // Update the temporary state only
+                                setSelectedManufacturer(value);
+                            }}
+                            onFocus={() => setFilters((prev) => ({ ...prev, saleRepFilter: '' }))} // Optional
+                        />
+
+                        <button onClick={() => {
+
+                            handleFilterChange('manufacturerFilter', selectedManufacturer);
+                            // Also update the actual filter state
+                            setFilters((prev) => ({ ...prev, manufacturerFilter: selectedManufacturer }));
+                        }} className="border px-2 py-1 leading-tight d-grid"> <SearchIcon fill="#fff" width={20} height={20} />
+                            <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>search</small>
+                        </button>
+
+                    </div>
+                    <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
+                    {memoizedPermissions?.modules?.godLevel && (
+                        <FilterItem
+                            minWidth="200px"
+                            label="Sales Rep"
+                            value={filters.saleRepFilter}
+                            name='Sales Rep'
+                            options={salesReps}
+                            onChange={(value) => handleFilterChange('saleRepFilter', value)}
+                            onFocus={() => setFilters(prev => ({ ...prev, manufacturerFilter: '' }))}
+                        />
+                    )}
+
+
                     <FilterItem
                         minWidth="200px"
-                        label="Sales Rep"
-                        value={filters.saleRepFilter}
-                        name='Sales Rep'
-                        options={salesReps}
-                        onChange={(value) => handleFilterChange('saleRepFilter', value)}
-                        onFocus={() => setFilters(prev => ({ ...prev, manufacturerFilter: '' }))}
+                        label="Account Status"
+                        name="Account Status"
+                        value={filters.accountStatusFilter} // Show current filter value
+                        options={[
+                            { label: 'Active Accounts', value: 'Active Account' }, // Default option
+                            { label: 'All Accounts', value: 'All' }, // Option to show all accounts
+                        ]}
+                        onChange={(value) => handleFilterChange('accountStatusFilter', value)} // Handle filter change
                     />
-                )}
-
-
-               <FilterItem
-    minWidth="200px"
-    label="Account Status"
-    name="Account Status"
-    value={filters.accountStatusFilter} // Show current filter value
-    options={[
-        { label: 'Active Accounts', value: 'Active Account' }, // Default option
-        { label: 'All Accounts', value: 'All' }, // Option to show all accounts
-    ]}
-    onChange={(value) => handleFilterChange('accountStatusFilter', value)} // Handle filter change
-/>
-                <FilterSearch
-                    onChange={(e) => handleFilterChange('accountFilter', e.target.value)}
-                    value={filters.accountFilter}
-                    placeholder={"Search by account"}
-                    minWidth={"167px"}
-                />
-                <div>
-                    <button className="border px-2 py-1 leading-tight d-grid" onClick={handleClearFilters}>
-                        <CloseButton crossFill={'#fff'} height={20} width={20} />
-                        <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
+                    <FilterSearch
+                        onChange={(e) => handleFilterChange('accountFilter', e.target.value)}
+                        value={filters.accountFilter}
+                        placeholder={"Search by account"}
+                        minWidth={"167px"}
+                    />
+                    <div>
+                        <button className="border px-2 py-1 leading-tight d-grid" onClick={handleClearFilters}>
+                            <CloseButton crossFill={'#fff'} height={20} width={20} />
+                            <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
+                        </button>
+                    </div>
+                    <button className="border px-2 py-1 leading-tight d-grid" onClick={handleExportToExcel}>
+                        <MdOutlineDownload size={16} className="m-auto" />
+                        <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
                     </button>
                 </div>
-                <button className="border px-2 py-1 leading-tight d-grid" onClick={handleExportToExcel}>
-                    <MdOutlineDownload size={16} className="m-auto" />
-                    <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
-                </button>
-                </div>
-          
-        }
+
+            }
         >
-             <div className={Styles.inorderflex}>
-        <div>
-          <h2>
-          Account Contact Detailed Report 
-          </h2>
-        </div>
-        <div></div>
-      </div>
+            <div className={Styles.inorderflex}>
+                <div>
+                    <h2>
+                        Account Contact Detailed Report
+                    </h2>
+                </div>
+                <div></div>
+            </div>
             {loading ? (
                 <Loading />
             ) : (
@@ -259,12 +256,12 @@ function ContactDetailedReport() {
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Status</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>First Name </th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Last Name</th>
-                                        
-                                     
+
+
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Email</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Phone</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Account Number</th>
-                                       
+
                                         <th className={`${styles.th} ${styles.stickyMonth} `} style={{ minWidth: "200px" }}>Margin</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Payment Type</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Street</th>
@@ -283,7 +280,7 @@ function ContactDetailedReport() {
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing State</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing  Zip</th>
                                         <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing Country</th>
-                                        
+
 
                                     </tr>
                                 </thead>
@@ -296,7 +293,7 @@ function ContactDetailedReport() {
                                         </tr>
                                     ) : (
                                         filteredData.map((record, index) => (
-                                            
+
                                             <tr key={index}>
                                                 <td className={`${styles.td} ${styles.stickyFirstColumn}`}>{record.accountDetails?.Name} </td>
                                                 <td className={`${styles.td} ${styles.stickySecondColumn}`}>{record.manufacturers?.salesRep || 'N/A'}</td>
@@ -314,8 +311,8 @@ function ContactDetailedReport() {
                                                 <td className={styles.td}>{record.accountDetails?.Store_City__c || 'N/A'}</td>
                                                 <td className={styles.td}>{record.accountDetails?.Store_State__c || 'N/A'}</td>
                                                 <td className={styles.td}>{record.accountDetails?.Store_Zip__c || 'N/A'}</td>
-                                                <td className={styles.td}>{record.accountDetails?.Store_Country__c || 'N/A'}</td> 
-                                                <td className={styles.td}>{record.accountDetails?.ShippingStreet || 'N/A'}</td> 
+                                                <td className={styles.td}>{record.accountDetails?.Store_Country__c || 'N/A'}</td>
+                                                <td className={styles.td}>{record.accountDetails?.ShippingStreet || 'N/A'}</td>
                                                 <td className={styles.td}>{record.accountDetails?.ShippingCity || 'N/A'}</td>
                                                 <td className={styles.td}>{record.accountDetails?.ShippingState || 'N/A'}</td>
                                                 <td className={styles.td}>{record.accountDetails?.ShippingPostalCode || 'N/A'}</td>
