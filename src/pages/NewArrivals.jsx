@@ -156,10 +156,13 @@ useEffect(()=>{
             label="All Brands"
             name="All-Brand"
             value={brand}
-            options={manufacturers?.data?.map((manufacturer) => ({
-              label: manufacturer.Name,
-              value: manufacturer.Id,
-            }))}
+            options={[
+              { label: "All Brands", value: null}, // Add the first option
+              ...(manufacturers?.data?.map((manufacturer) => ({
+                label: manufacturer.Name,
+                value: manufacturer.Id,
+              })) || []), // Safely map if manufacturers.data exists, fallback to an empty array
+            ]}
             onChange={(value) => {
               setBrand(value);
             }}
