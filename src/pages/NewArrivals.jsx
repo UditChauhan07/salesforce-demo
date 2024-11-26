@@ -98,6 +98,9 @@ const NewArrivals = () => {
     }
   }, [isLoaded,selectYear])
 
+  console.log({productList});
+  
+
   useEffect(() => {
     HendleClear();
   }, []);
@@ -105,6 +108,7 @@ const NewArrivals = () => {
     const currentMonthIndex = new Date().getMonth();
     setMonth(months[currentMonthIndex].value);
     setBrand(null);
+    setSelectYear(date.getFullYear())
   };
 
 
@@ -140,13 +144,13 @@ const NewArrivals = () => {
     <AppLayout
       filterNodes={
         <>
-          {/* <FilterItem
+          <FilterItem
             label="year"
             name="Year"
             value={selectYear}
             options={yearList}
             onChange={(value) => setSelectYear(value)}
-          /> */}
+          />
           <FilterItem
             minWidth="220px"
             label="All Brands"
