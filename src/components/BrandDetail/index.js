@@ -13,6 +13,7 @@ import dataStore from "../../lib/dataStore";
 
 const BrandDetailCard = ({ brandId }) => {
     const brand = brandDetails[brandId];
+    console.log(brand , "brand")
     const [topProducts, setTopProduct] = useState({ isLoaded: false, data: [] })
     const [productImages, setProductImages] = useState({ isLoaded: false, images: {} });
     const [productId, setProductId] = useState()

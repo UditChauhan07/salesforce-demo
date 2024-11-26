@@ -28,6 +28,7 @@ const TopProducts = () => {
   const [productImages, setProductImages] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [accountDetails, setAccountDetails] = useState()
+  const [accountDetails2, setAccountDetails2] = useState()
 
   const navigate = useNavigate()
   const fetchAccountDetails = async () => {
@@ -44,7 +45,7 @@ const TopProducts = () => {
       }));
 
 
-      setAccountDetails(res.data.accountDetails);
+      setAccountDetails2(res.data.accountDetails);
       return () => {
         dataStore.unsubscribe("actBndRelated" + salesRepId, (data) => setAccountDetails(data));
       }
@@ -221,7 +222,7 @@ const TopProducts = () => {
           </div>
         </div>
         :
-        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages} accountDetails={accountDetails} />}
+        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages} accountDetails={accountDetails2} />}
     </AppLayout>
   );
 };
