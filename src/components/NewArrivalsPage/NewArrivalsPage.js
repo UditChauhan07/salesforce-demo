@@ -15,6 +15,8 @@ import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , accountDetails={}}) {
+  console.log({brand});
+  
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
   useEffect(()=>{},[productList])
@@ -57,7 +59,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
     let temp = true;
     products.forEach((month) => {
       month.content.forEach((item) => {
-        if (!brand || brand === item.brand) {
+        if (!brand || brand === item.brand||brand == item.ManufacturerId__c) {
           temp = false;
         }
       });
