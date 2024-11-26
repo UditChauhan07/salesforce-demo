@@ -53,7 +53,7 @@ const QuantitySelector = ({ onChange, value = 0, min = 0 }) => {
             <div className="d-flex flex-column gap-3">
               <h2 className={`${Styles.warning} `}>Warning</h2>
               <p className={`${Styles.warningContent} `}>
-              Please add quantities in multiples of three to proceed with adding products to your cart.
+              Please add quantities in multiples of {min} to proceed with adding products to your cart.
                 <p className="mt-4">
                   <input type="number" className={`${Styles.customPriceInput} ms-1`} onKeyUp={(e) => customHandler(e.target.value || 0)} maxLength={5} max={5}
                     id="limit_input"

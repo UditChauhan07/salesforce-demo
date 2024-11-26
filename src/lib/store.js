@@ -1,11 +1,9 @@
 import axios from "axios";
 import { getPermissions } from "./permission";
-// live link
-export const originAPi = process.env.REACT_APP_OA_URL || "https://staging.beautyfashionsales.com/"
+export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
 //  export const originAPi = "https://live.beautyfashionsales.com"
-
-// local LINk 
 // export const originAPi = "http://localhost:2611"
+
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;
