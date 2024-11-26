@@ -73,6 +73,7 @@ const TopProducts = () => {
         setIsLoaded(true)
         setProductImages({ isLoaded: true, images: data[manufacturerFilter] })
       } else {
+        setIsLoaded(true)
         setProductImages({ isLoaded: false, images: {} })
       }
     }

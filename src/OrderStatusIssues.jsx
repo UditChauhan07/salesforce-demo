@@ -121,14 +121,26 @@ const OrderStatusIssues = () => {
         setLoaded(false);
         GetAuthData()
             .then((response) => {
+                dataStore.subscribe("/orderList" + selectedSalesRepId ?? response.Sales_Rep__c, (data) => {
+                    let sorting = sortingList(data);
+                    setOrders(sorting);
+                    setLoaded(true);
+                })
                 setUserData(response)
                 if (!selectedSalesRepId) setSelectedSalesRepId(response.Sales_Rep__c)
                 getOrderlIsthandler({ key: response.x_access_token, Sales_Rep__c: selectedSalesRepId ?? response.Sales_Rep__c })
                 if (admins.includes(response.Sales_Rep__c)) {
-                    getSalesRepList({ key: response.x_access_token }).then((repRes) => {
+                    dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: response.x_access_token })).then((repRes) => {
                         setSalesRepList(repRes.data)
                     }).catch((repErr) => {
                         console.log({ repErr });
+                    })
+                }
+                return () => {
+                    dataStore.unsubscribe("/orderList" + selectedSalesRepId ?? response.Sales_Rep__c, (data) => {
+                        let sorting = sortingList(data);
+                        setOrders(sorting);
+                        setLoaded(true);
                     })
                 }
             })

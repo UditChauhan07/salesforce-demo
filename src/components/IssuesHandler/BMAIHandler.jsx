@@ -2,6 +2,8 @@ import { useState } from "react";
 import Styles from "./Style.module.css"
 import ModalPage from "../Modal UI";
 const BMAIHandler = ({ reasons, reason, setReason,resetHandler }) => {
+    console.log({reason});
+    
     const [confirm,SetConfirm] = useState(false)
     const [temReason,SetTemReason] = useState()
     const shakeHandler = () => {

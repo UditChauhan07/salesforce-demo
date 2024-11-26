@@ -83,22 +83,22 @@ const NewArrivals = () => {
     setProductList(data)
     setIsloaed(true)
   }
-
+useEffect(()=>{
+  if(selectYear != date.getFullYear()){
+    setIsloaed(false);
+  }
+},[selectYear])
   useEffect(() => {
     dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
     GetAuthData().then((user) => {
       dataStore.getPageData("/marketing-calendar" + selectYear, () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })).then((productRes) => {
-        console.log({productRes,selectYear});
-        
         readyCalenderHandle(productRes)
       }).catch((err) => console.log({ err }))
     }).catch((e) => console.log({ e }))
     return () => {
       dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
     }
-  }, [isLoaded,selectYear])
-
-  console.log({productList});
+  }, [selectYear])
   
 
   useEffect(() => {
@@ -156,10 +156,13 @@ const NewArrivals = () => {
             label="All Brands"
             name="All-Brand"
             value={brand}
-            options={manufacturers?.data?.map((manufacturer) => ({
-              label: manufacturer.Name,
-              value: manufacturer.Id,
-            }))}
+            options={[
+              { label: "All Brands", value: null}, // Add the first option
+              ...(manufacturers?.data?.map((manufacturer) => ({
+                label: manufacturer.Name,
+                value: manufacturer.Id,
+              })) || []), // Safely map if manufacturers.data exists, fallback to an empty array
+            ]}
             onChange={(value) => {
               setBrand(value);
             }}
