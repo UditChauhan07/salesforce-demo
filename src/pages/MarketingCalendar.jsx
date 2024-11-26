@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import AppLayout from "../components/AppLayout";
 import LaunchCalendar from "../components/LaunchCalendar/LaunchCalendar";
 import { FilterItem } from "../components/FilterItem";
-import html2pdf from "html2pdf.js";
 import { MdOutlineDownload } from "react-icons/md";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
@@ -32,96 +31,60 @@ const MarketingCalendar = () => {
   const [productList, setProductList] = useState([]);
   const navigate = useNavigate();
   const [selectYear, setSelectYear] = useState(date.getFullYear())
-  let yearList = [
-    { value: date.getFullYear(), label: date.getFullYear() },
-    { value: date.getFullYear() + 1, label: date.getFullYear() + 1 }
-  ]
-  const readyCalenderHandle = (data)=>{
+  const yearList = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return [
+      { value: currentYear, label: currentYear },
+      { value: currentYear + 1, label: currentYear + 1 },
+    ];
+  }, []);
+
+  const months = useMemo(
+    () => [
+      { value: null, label: "All" },
+      ...monthNames.map((m, i) => ({ value: m.toUpperCase(), label: m.toUpperCase() })),
+      { value: "TBD", label: "TBD" },
+    ],
+    []
+  );
+  const readyCalenderHandle = (data) => {
     setProductList(data)
     setIsloaed(true)
   }
 
   useEffect(() => {
-    dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
-    setIsloaed(false)
-    GetAuthData().then((user) => {
+    const readyCalendarHandle = (data) => {
+      setProductList(data);
+      setIsloaed(true);
+    };
 
-      dataStore.getPageData("/marketing-calendar" + selectYear, () =>getMarketingCalendar({ key: user.x_access_token, year: selectYear })).then((productRes) => {
-        readyCalenderHandle(productRes);
-        setTimeout(() => {
+    const fetchData = async () => {
+      setIsloaed(false);
+      try {
+        const user = await GetAuthData();
+        dataStore.subscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+        let res =await dataStore.getPageData(
+          `/marketing-calendar${selectYear}`,
+          () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })
+        );
+        // if(res){
+        //   setProductList([]);
+        //   readyCalendarHandle(res);
+        // }
+        
+      } catch (error) {
+        console.error("Data Fetch Error", error);
+      }
+    };
 
-          let getMonth = new Date().getMonth();
-          var element = document.getElementById(monthNames[getMonth]);
-          if (element && selectYear == date.getFullYear()) {
-            element.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        }, 2000);
-      }).catch((err) => console.log({ err }))
-    }).catch((e) => console.log({ e }))
-    return ()=>{
-      dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
-    }
-  }, [selectYear])
+    fetchData();
+    return () => dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+  }, [selectYear]);
   const [month, setMonth] = useState("");
-  let months = [
-    { value: null, label: "All" },
-    { value: "JAN", label: "JAN" },
-    { value: "FEB", label: "FEB" },
-    { value: "MAR", label: "MAR" },
-    { value: "APR", label: "APR" },
-    { value: "MAY", label: "MAY" },
-    { value: "JUN", label: "JUN" },
-    { value: "JUL", label: "JUL" },
-    { value: "AUG", label: "AUG" },
-    { value: "SEP", label: "SEP" },
-    { value: "OCT", label: "OCT" },
-    { value: "NOV", label: "NOV" },
-    { value: "DEC", label: "DEC" },
-    { value: "TBD", label: "TBD" },
-  ];
-  const generatePdf = () => {
-    const element = document.getElementById('CalenerContainer'); // The HTML element you want to convert
-    // element.style.padding = "10px"
-    let filename = `Marketing Calender `;
-    if (brand?.label) {
-      filename = brand?.label + " "
-    }
-    filename += new Date();
-    const opt = {
-      margin: 1,
-      filename: filename + '.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      // jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
 
-    html2pdf().set(opt).from(element).save();
-  };
-  // .............
-
-  const LoadingEffect = () => {
-    const intervalId = setInterval(() => {
-      if (pdfLoadingText.length > 6) {
-        setPdfLoadingText('.');
-      } else {
-        setPdfLoadingText(prev => prev + '.');
-      }
-      if (pdfLoadingText.length > 12) {
-        setPdfLoadingText('');
-      }
-    }, 1000);
-    const timeoutId = setTimeout(() => {
-      clearInterval(intervalId);
-    }, 10000);
-    return () => {
-      clearTimeout(timeoutId);
-      clearInterval(intervalId);
-    };
-  }
 
   const generatePdfServerSide = (version = 0) => {
     setPDFIsloaed(true);
-    LoadingEffect();
     GetAuthData().then((user) => {
       let manufacturerId = brand ?? null;
       if (manufacturerId) {
@@ -260,6 +223,8 @@ const MarketingCalendar = () => {
     }
     fetchData()
   }, [])
+
+
   return (
     <AppLayout
       filterNodes={
@@ -349,7 +314,7 @@ const MarketingCalendar = () => {
           <div className="d-flex flex-column gap-3 ">
             <h2>Internal Server Error</h2>
             <p className="modalContent">
-            <b>We apologize</b>, Currently the Server is unable to Take the load of Full Marketing Calendar including all brands.<br /><br />
+              <b>We apologize</b>, Currently the Server is unable to Take the load of Full Marketing Calendar including all brands.<br /><br />
 
               Kindly select 1 brand at time and try to download again.
             </p>
