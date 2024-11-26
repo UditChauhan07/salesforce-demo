@@ -450,7 +450,13 @@ function MyBagFinal({ showOrderFor }) {
                                     </div>
 
                                     <div className={Styles.Mainbox2M}>
-                                      <div className={Styles.Mainbox4} onClick={() => removeProduct(ele.Id)}>
+                                      <div className={Styles.Mainbox4} onClick={() => {
+                                        if (order.items.length == 1) {
+                                          setClearConfim(true);
+                                        } else {
+                                        removeProduct(ele.Id)
+                                      }
+                                      }}>
                                         <DeleteIcon fill="red" />
                                       </div>
                                       <div className={Styles.Mainbox5}>
