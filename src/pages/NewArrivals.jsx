@@ -1,160 +1,152 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import Loading from "../components/Loading";
 import NewArrivalsPage from "../components/NewArrivalsPage/NewArrivalsPage";
 import { FilterItem } from "../components/FilterItem";
 import { CloseButton } from "../lib/svg";
-import { GetAuthData, getMarketingCalendar } from "../lib/store";
+import { fetchAccountDetails, GetAuthData, getMarketingCalendar } from "../lib/store";
 import { useNavigate } from "react-router-dom";
 import { getPermissions } from "../lib/permission";
 import { originAPi } from "../lib/store";
 import axios from "axios";
-
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
 import { useManufacturer } from "../api/useManufacturer";
+
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const currentYear = new Date().getFullYear();
+const yearList = [
+  { value: currentYear, label: currentYear },
+  { value: currentYear + 1, label: currentYear + 1 }
+];
+const months = monthNames.map((month, index) => ({ value: month.toUpperCase(), label: month.toUpperCase() }));
 
 const NewArrivals = () => {
   const { data: manufacturers } = useManufacturer();
-  const [accountDetails, setAccountDetails] = useState()
+  const navigate = useNavigate();
 
-  const fetchAccountDetails = async () => {
-    let data = await GetAuthData(); // Fetch authentication data
-    let salesRepId = data.Sales_Rep__c;
-    let accessToken = data.x_access_token;
-
-    try {
-      // Await the axios.post call to resolve the Promise
-      let res = await dataStore.getPageData("actBndRelated" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
-        salesRepId,
-        accessToken,
-      }));
-
-
-      setAccountDetails(res.data.accountDetails)
-    } catch (error) {
-      console.error("Error", error); // Log error details
-    }
-  };
-
-
-  useEffect(() => {
-
-    fetchAccountDetails()
-  }, [])
-  let date = new Date();
-  const [isLoaded, setIsloaed] = useState(false);
+  const [accountDetails, setAccountDetails] = useState(null);
   const [productList, setProductList] = useState([]);
+  const [brand, setBrand] = useState(null);
+  const [month, setMonth] = useState(months[new Date().getMonth()].value);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [permissions, setPermissions] = useState(null);
-  const navigate = useNavigate()
-  const [selectYear, setSelectYear] = useState(date.getFullYear())
-  let yearList = [
-    { value: date.getFullYear(), label: date.getFullYear() },
-    { value: date.getFullYear() + 1, label: date.getFullYear() + 1 }
-  ]
-  const [month, setMonth] = useState("");
-  let months = [
-    { value: "JAN", label: "JAN" },
-    { value: "FEB", label: "FEB" },
-    { value: "MAR", label: "MAR" },
-    { value: "APR", label: "APR" },
-    { value: "MAY", label: "MAY" },
-    { value: "JUN", label: "JUN" },
-    { value: "JUL", label: "JUL" },
-    { value: "AUG", label: "AUG" },
-    { value: "SEP", label: "SEP" },
-    { value: "OCT", label: "OCT" },
-    { value: "NOV", label: "NOV" },
-    { value: "DEC", label: "DEC" },
-  ];
+  const [selectYear, setSelectYear] = useState(currentYear);
 
-  const [brand, setBrand] = useState();
+  // Fetch account details
+  // const fetchAccountDetails = async () => {
+  //   try {
+  //     const { Sales_Rep__c: salesRepId, x_access_token: accessToken } = await GetAuthData();
+  //     const { data } = await dataStore.getPageData(
+  //       `actBndRelated${salesRepId}`,
+  //       () =>
+  //         axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+  //           salesRepId,
+  //           accessToken
+  //         })
+  //     );
+  //     setAccountDetails(data.accountDetails);
+  //   } catch (error) {
+  //     console.error("Error fetching account details:", error);
+  //   }
+  // };
 
-  const readyCalenderHandle = (data) => {
-    data?.map((month) => {
-      month.content.map((element) => {
-        element.date = element.Ship_Date__c ? (element.Ship_Date__c.split("-")[2] == 15 ? 'TBD' : element.Ship_Date__c.split("-")[2]) + '/' + monthNames[parseInt(element.Ship_Date__c.split("-")[1]) - 1].toUpperCase() + '/' + element.Ship_Date__c.split("-")[0] : 'NA';
-        element.OCDDate = element.Launch_Date__c ? (element.Launch_Date__c.split("-")[2] == 15 ? 'TBD' : element.Launch_Date__c.split("-")[2]) + '/' + monthNames[parseInt(element.Launch_Date__c.split("-")[1]) - 1].toUpperCase() + '/' + element.Launch_Date__c.split("-")[0] : 'NA';
-        return element
-      })
-      return month;
-    })
-    setProductList(data)
-    setIsloaed(true)
-  }
-
-  const getCalenderData = (year=null)=>{
-    GetAuthData().then((user) => {
-      dataStore.getPageData("/marketing-calendar" + selectYear, () => getMarketingCalendar({ key: user.x_access_token, year: year??selectYear??date.getFullYear()})).then((productRes) => {
-        readyCalenderHandle(productRes)
-      }).catch((err) => console.log({ err }))
-    }).catch((e) => console.log({ e }))
-  }
-
-  useEffect(() => {
-    HendleClear();
-    setIsloaed(false);
-    dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
-    getCalenderData();
-    return () => {
-      dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
+  // Fetch marketing calendar data
+  const fetchCalendarData = async (year = selectYear) => {
+    setIsLoaded(false);
+    try {
+      const user = await GetAuthData();
+      const productRes = await dataStore.getPageData(
+        `/marketing-calendar${year}`,
+        () => getMarketingCalendar({ key: user.x_access_token, year })
+      );
+      processCalendarData(productRes);
+    } catch (err) {
+      console.error("Error fetching calendar data:", err);
     }
-  }, [])
-
-  const yearChangeHandle = (year)=>{
-    setSelectYear(year);
-    setIsloaed(false)
-    setProductList([]);
-    getCalenderData(year);
-  }
-
-
-  const HendleClear = () => {
-    const currentMonthIndex = new Date().getMonth();
-    yearChangeHandle(date.getFullYear());
-    setMonth(months[currentMonthIndex].value);
-    setBrand(null);
-    setSelectYear(date.getFullYear())
   };
 
+  // Process and format calendar data
+  const processCalendarData = (data) => {
+    const formattedData = data?.map((month) => {
+      month.content = month.content.map((item) => ({
+        ...item,
+        date: formatDate(item.Ship_Date__c),
+        OCDDate: formatDate(item.Launch_Date__c)
+      }));
+      return month;
+    });
+    setProductList(formattedData);
+    setIsLoaded(true);
+  };
 
+  // Format dates for display
+  const formatDate = (dateString) => {
+    if (!dateString) return "NA";
+    const [year, month, day] = dateString.split("-");
+    const formattedDay = day === "15" ? "TBD" : day;
+    return `${formattedDay}/${monthNames[parseInt(month) - 1].toUpperCase()}/${year}`;
+  };
+
+  // Handle year change
+  const handleYearChange = (year) => {
+    setSelectYear(year);
+    fetchCalendarData(year);
+  };
+
+  // Clear filters
+  const handleClear = () => {
+    setBrand(null);
+    setMonth(months[new Date().getMonth()].value);
+    handleYearChange(currentYear);
+  };
+
+  // Initial data fetch and subscription
   useEffect(() => {
-    const fetchData = async () => {
+    GetAuthData().then((user)=>{
+      
+      dataStore.getPageData(
+        `actBndRelated${user.Sales_Rep__c}`,
+        () => fetchAccountDetails()).then((res) => {
+          setAccountDetails(res.accountDetails);
+        }).catch((err) => console.error({ err })
+      );
+    }).catch((err) => console.error({ err }))
+    fetchCalendarData();
+    dataStore.subscribe(`/marketing-calendar${selectYear}`, processCalendarData);
+
+    return () => {
+      dataStore.unsubscribe(`/marketing-calendar${selectYear}`, processCalendarData);
+    };
+  }, [selectYear]);
+
+  // Check permissions on mount
+  useEffect(() => {
+    const checkPermissions = async () => {
       try {
-        const userPermissions = await getPermissions()
-        if (userPermissions?.modules?.newArrivals?.view === false) { PermissionDenied(); navigate('/dashboard'); }
+        const userPermissions = await getPermissions();
+        if (!userPermissions?.modules?.newArrivals?.view) {
+          PermissionDenied();
+          navigate("/dashboard");
+        }
+        setPermissions(userPermissions);
       } catch (error) {
-        console.log("Permission Error", error)
+        console.error("Error checking permissions:", error);
       }
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    async function fetchPermissions() {
-      try {
-        const user = await GetAuthData(); // Fetch user data
-        const userPermissions = await getPermissions(); // Fetch permissions
-        setPermissions(userPermissions); // Set permissions in state
-      } catch (err) {
-        console.error("Error fetching permissions", err);
-      }
-    }
-
-    fetchPermissions(); // Fetch permissions on mount
-  }, []);
+    };
+    checkPermissions();
+  }, [navigate]);
 
   return (
     <AppLayout
       filterNodes={
         <>
           <FilterItem
-            label="year"
+            label="Year"
             name="Year"
             value={selectYear}
             options={yearList}
-            onChange={yearChangeHandle}
+            onChange={handleYearChange}
           />
           <FilterItem
             minWidth="220px"
@@ -162,15 +154,13 @@ const NewArrivals = () => {
             name="All-Brand"
             value={brand}
             options={[
-              { label: "All Brands", value: null }, // Add the first option
+              { label: "All Brands", value: null },
               ...(manufacturers?.data?.map((manufacturer) => ({
                 label: manufacturer.Name,
-                value: manufacturer.Id,
-              })) || []), // Safely map if manufacturers.data exists, fallback to an empty array
+                value: manufacturer.Id
+              })) || [])
             ]}
-            onChange={(value) => {
-              setBrand(value);
-            }}
+            onChange={setBrand}
           />
           <FilterItem
             minWidth="220px"
@@ -178,23 +168,24 @@ const NewArrivals = () => {
             name="JAN-DEC"
             value={month}
             options={months}
-            onChange={(value) => {
-              setMonth(value);
-            }}
+            onChange={setMonth}
           />
-          <button className="border px-2 py-1 leading-tight d-grid" onClick={HendleClear}>
-            <CloseButton crossFill={'#fff'} height={20} width={20} />
-            <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
+          <button className="border px-2 py-1 leading-tight d-grid" onClick={handleClear}>
+            <CloseButton crossFill="#fff" height={20} width={20} />
+            <small style={{ fontSize: "6px", letterSpacing: "0.5px", textTransform: "uppercase" }}>Clear</small>
           </button>
-
-
         </>
       }
     >
       {!isLoaded ? (
-        <Loading height={"70vh"} />
+        <Loading height="70vh" />
       ) : (
-        <NewArrivalsPage brand={brand} month={month} productList={productList} accountDetails={accountDetails} />
+        <NewArrivalsPage
+          brand={brand}
+          month={month}
+          productList={productList}
+          accountDetails={accountDetails}
+        />
       )}
     </AppLayout>
   );
