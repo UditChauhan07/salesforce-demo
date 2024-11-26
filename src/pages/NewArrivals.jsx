@@ -83,29 +83,36 @@ const NewArrivals = () => {
     setProductList(data)
     setIsloaed(true)
   }
-useEffect(()=>{
-  if(selectYear != date.getFullYear()){
-    setIsloaed(false);
-  }
-},[selectYear])
-  useEffect(() => {
-    dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
+
+  const getCalenderData = (year=null)=>{
     GetAuthData().then((user) => {
-      dataStore.getPageData("/marketing-calendar" + selectYear, () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })).then((productRes) => {
+      dataStore.getPageData("/marketing-calendar" + selectYear, () => getMarketingCalendar({ key: user.x_access_token, year: year??selectYear??date.getFullYear()})).then((productRes) => {
         readyCalenderHandle(productRes)
       }).catch((err) => console.log({ err }))
     }).catch((e) => console.log({ e }))
-    return () => {
-      dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
-    }
-  }, [selectYear])
-  
+  }
 
   useEffect(() => {
     HendleClear();
-  }, []);
+    setIsloaed(false);
+    dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
+    getCalenderData();
+    return () => {
+      dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
+    }
+  }, [])
+
+  const yearChangeHandle = (year)=>{
+    setSelectYear(year);
+    setIsloaed(false)
+    setProductList([]);
+    getCalenderData(year);
+  }
+
+
   const HendleClear = () => {
     const currentMonthIndex = new Date().getMonth();
+    yearChangeHandle(date.getFullYear());
     setMonth(months[currentMonthIndex].value);
     setBrand(null);
     setSelectYear(date.getFullYear())
@@ -138,8 +145,6 @@ useEffect(()=>{
     fetchPermissions(); // Fetch permissions on mount
   }, []);
 
-  // Memoize permissions to avoid unnecessary re-calculations
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
   return (
     <AppLayout
       filterNodes={
@@ -149,7 +154,7 @@ useEffect(()=>{
             name="Year"
             value={selectYear}
             options={yearList}
-            onChange={(value) => setSelectYear(value)}
+            onChange={yearChangeHandle}
           />
           <FilterItem
             minWidth="220px"
@@ -157,7 +162,7 @@ useEffect(()=>{
             name="All-Brand"
             value={brand}
             options={[
-              { label: "All Brands", value: null}, // Add the first option
+              { label: "All Brands", value: null }, // Add the first option
               ...(manufacturers?.data?.map((manufacturer) => ({
                 label: manufacturer.Name,
                 value: manufacturer.Id,
