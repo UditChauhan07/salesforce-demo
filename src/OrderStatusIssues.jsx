@@ -11,6 +11,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPermissions } from "./lib/permission";
 import PermissionDenied from "./components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "./lib/dataStore";
 
 let PageSize = 5;
 const OrderStatusIssues = () => {
@@ -28,7 +29,7 @@ const OrderStatusIssues = () => {
         month: "",
         manufacturer: null,
         search: "",
-        
+
     });
 
     const handleFilterChange = (filterType, value) => {
@@ -48,27 +49,27 @@ const OrderStatusIssues = () => {
     }
 
     const navigate = useNavigate()
-    useEffect(()=>{
+    useEffect(() => {
 
     })
 
 
     useEffect(() => {
         const fetchData = async () => {
-          try {
-            const userPermissions = await getPermissions();
-            setPermissions(userPermissions);
-            if (userPermissions?.modules?.customerSupport?.childModules
-                ?.order_Status?.create === false) { PermissionDenied(); navigate('/dashboard'); }
-          } catch (error) {
-            console.log("Permission Error", error)
-          }
+            try {
+                const userPermissions = await getPermissions();
+                setPermissions(userPermissions);
+                if (userPermissions?.modules?.customerSupport?.childModules
+                    ?.order_Status?.create === false) { PermissionDenied(); navigate('/dashboard'); }
+            } catch (error) {
+                console.log("Permission Error", error)
+            }
         }
         fetchData()
-      }, [])
-    
-      // Memoize permissions to avoid unnecessary re-calculations
-      const memoizedPermissions = useMemo(() => permissions, [permissions]);
+    }, [])
+
+    // Memoize permissions to avoid unnecessary re-calculations
+    const memoizedPermissions = useMemo(() => permissions, [permissions]);
 
     const orderData = useMemo(() => {
         return (
@@ -141,12 +142,12 @@ const OrderStatusIssues = () => {
     }, [searchShipBy]);
 
     const getOrderlIsthandler = ({ key, Sales_Rep__c }) => {
-        getOrderCustomerSupport({
+        dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
             user: {
                 key,
                 Sales_Rep__c,
             }
-        })
+        }))
             .then((order) => {
                 let sorting = sortingList(order);
                 setOrders(sorting);
@@ -162,13 +163,13 @@ const OrderStatusIssues = () => {
         setOrders([])
         getOrderlIsthandler({ key: userData.x_access_token, Sales_Rep__c: value })
     }
-            
+
     return (<CustomerSupportLayout
         permissions={permissions}
         filterNodes={
             <>
-               {memoizedPermissions?.modules?.godLevel  ? <>
-                <FilterItem
+                {memoizedPermissions?.modules?.godLevel ? <>
+                    <FilterItem
                         minWidth="220px"
                         label="salesRep"
                         name="salesRep"
@@ -179,7 +180,7 @@ const OrderStatusIssues = () => {
                         }))}
                         onChange={(value) => orderListBasedOnRepHandler(value)}
                     />
-                   </> : null}
+                </> : null}
                 <Filters
                     onChange={handleFilterChange}
                     value={filterValue}
@@ -195,8 +196,8 @@ const OrderStatusIssues = () => {
                         getOrderlIsthandler({ key: userData.x_access_token, Sales_Rep__c: userData.Sales_Rep__c })
                     }}
                 />
-             
-                    
+
+
             </>
         }
     >
@@ -241,7 +242,7 @@ const OrderStatusIssues = () => {
                                     hideDetailedShow
                                     setSearchShipBy={setSearchShipBy}
                                     searchShipBy={searchShipBy}
-                                    memoizedPermissions = {memoizedPermissions}
+                                    memoizedPermissions={memoizedPermissions}
                                 />
                             </div>
                             <Pagination
