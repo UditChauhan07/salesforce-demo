@@ -1559,7 +1559,7 @@ export const hexabrand = {
   a0O3b00000fQrZyEAK: "#9EC1DA",
   a0O1O00000XYBvQUAX: "#f6b6ad",
   a0O3b00000pY2vqEAC: "#ffe3d5",
-  a0O3b00000p80IJEAY: "#fff9ed",
+  a0O3b00000p80IJEAY: "#fdeec8",
   a0O3b00000lCFmREAW: "#a6a0d4",
   a0ORb000000BQ0nMAG: "#206BA1",
   a0O3b00000p7zqKEAQ: "#BEE6DC",
@@ -1572,7 +1572,10 @@ export const hexabrand = {
   a0O1O00000XYBvkUAH: "#6D243E",
   a0O1O00000XYBvaUAH: "#4B95DD",
   a0ORb000000nDfFMAU: "#073763",
-  a0ORb000000nDIiMAM: "#7f6000"
+  a0ORb000000nDIiMAM: "#7f6000",
+  a0ORb000001KCNpMAO:"#F7E8D5",
+  a0ORb000001XtrZMAS:"#B8D8BA",
+  a0ORb000001EbK5MAK:"#D0E2EC"
 };
 
 export const hexabrandText = {
