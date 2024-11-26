@@ -4,7 +4,7 @@ import Styles from "./Styles.module.css";
 import axios from "axios";
 import Loading from "../../Loading";
 import { Link, useNavigate } from "react-router-dom";
-import { DestoryAuth, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
+import { DestoryAuth, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
 import { MdOutlineDownload } from "react-icons/md";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
@@ -44,39 +44,36 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     if (!data) {
       data = {};
     }
-    const response = await dataStore.getPageData('/orderDetails' + OrderId, () => axios.post(
-      `${originAPi}/beauty/BKpeLbweyZPXmwe`,
-      BodyContent,
-      headersList
-    ));
+    const response = await dataStore.getPageData('/orderDetails' + OrderId, () => getOrderIdDetails({ rawData: { key: Key.data.access_token, id: OrderId } }));
+
     if (Object.values(data).length > 0) {
-      if (response.data.data?.ManufacturerId__c) {
-        if (data[response.data.data?.ManufacturerId__c]) {
-          if (!data[response.data.data?.ManufacturerId__c]) {
-            data[response.data.data?.ManufacturerId__c] = {};
+      if (response?.ManufacturerId__c) {
+        if (data[response?.ManufacturerId__c]) {
+          if (!data[response?.ManufacturerId__c]) {
+            data[response?.ManufacturerId__c] = {};
           }
         }
       }
-      if (data[response.data.data?.ManufacturerId__c]) {
-        if (Object.values(data[response.data.data?.ManufacturerId__c]).length > 0) {
-          setProductImage({ isLoaded: true, images: data[response.data.data?.ManufacturerId__c] })
+      if (data[response?.ManufacturerId__c]) {
+        if (Object.values(data[response?.ManufacturerId__c]).length > 0) {
+          setProductImage({ isLoaded: true, images: data[response?.ManufacturerId__c] })
         } else {
           setProductImage({ isLoaded: false, images: {} })
         }
       }
     }
-    if (response.data.data.OpportunityLineItems.length > 0) {
+    if (response.OpportunityLineItems.length > 0) {
       let productCode = "";
-      response.data.data.OpportunityLineItems?.map((element, index) => {
+      response.OpportunityLineItems?.map((element, index) => {
         productCode += `'${element?.ProductCode}'`
-        if (response.data.data.OpportunityLineItems.length - 1 != index) productCode += ', ';
+        if (response.OpportunityLineItems.length - 1 != index) productCode += ', ';
       })
       getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
         if (res) {
-          if (data[response.data.data?.ManufacturerId__c]) {
-            data[response.data.data?.ManufacturerId__c] = { ...data[response.data.data?.ManufacturerId__c], ...res }
+          if (data[response?.ManufacturerId__c]) {
+            data[response?.ManufacturerId__c] = { ...data[response?.ManufacturerId__c], ...res }
           } else {
-            data[response.data.data?.ManufacturerId__c] = res
+            data[response?.ManufacturerId__c] = res
           }
           ShareDrive(data)
           setProductImage({ isLoaded: true, images: res });
@@ -87,9 +84,9 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         console.log({ err });
       })
     }
-    if (response.data.data?.support?.length) {
+    if (response?.support?.length) {
       let cases = {}
-      response.data.data?.support.map((support) => {
+      response?.support.map((support) => {
         if (!cases[support.RecordTypeId]) {
           cases[support.RecordTypeId] = {}
         }
@@ -100,8 +97,8 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       })
       setOldSupport(cases)
     }
-    setOrderData(response.data.data);
-    setOrderDetail(response.data.data)
+    setOrderData(response);
+    setOrderDetail(response)
     setIsLoading(true);
     dataStore.getPageData('/orderDetails' + OrderId + "/invoice", () => getOrderDetailsInvoice({ rawData: { key: Key.data.access_token, id: OrderId } })).then((response) => {
       setInvoice(response.data)
@@ -122,15 +119,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     getOrderDetails();
   }, []);
   useBackgroundUpdater(getOrderDetails, defaultLoadTime);
-
-  let headersList = {
-    Accept: "*/*",
-    "Content-Type": "application/json;charset=UTF-8",
-  };
-
-  let BodyContent = new FormData();
-  BodyContent.append("key", Key.data.access_token);
-  BodyContent.append("opportunity_id", OrderId);
 
   function downloadFiles(invoices) {
     invoices.forEach(file => {
