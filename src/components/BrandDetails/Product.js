@@ -266,7 +266,6 @@ function Product() {
     })
   }, []);
 
-  console.log({ productCartSchema });
 
   const redirecting = () => {
     setTimeout(() => {

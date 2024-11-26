@@ -61,9 +61,7 @@ function App() {
   return (
     <AnimatePresence>
       <UserProvider>
-
         <CartProvider>
-
           <BrowserRouter>
             <CartHover />
             <Routes>

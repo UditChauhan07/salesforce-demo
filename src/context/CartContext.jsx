@@ -416,20 +416,20 @@ const CartProvider = ({ children }) => {
 
     // Remove a product from the cart by productId
     const removeProduct = async (productId) => {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you want to remove this product from the cart?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#000', // Black
-            cancelButtonColor: '#000', // Red for cancel
-            confirmButtonText: 'Yes, remove it!',
-            cancelButtonText: 'No, keep it',
-            background: '#f9f9f9',
-            color: '#333',
-        });
+        // const result = await Swal.fire({
+        //     title: 'Are you sure?',
+        //     text: 'Do you want to remove this product from the cart?',
+        //     icon: 'warning',
+        //     showCancelButton: true,
+        //     confirmButtonColor: '#000', // Black
+        //     cancelButtonColor: '#000', // Red for cancel
+        //     confirmButtonText: 'Yes, remove it!',
+        //     cancelButtonText: 'No, keep it',
+        //     background: '#f9f9f9',
+        //     color: '#333',
+        // });
 
-        if (result.isConfirmed) {
+        if (isProductCarted(productId)) {
             setOrder((prevOrder) => {
                 const updatedItems = prevOrder.items?.filter(item => item.Id !== productId);
                 const removedItem = prevOrder.items?.find(item => item.Id === productId);
