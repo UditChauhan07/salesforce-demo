@@ -15,10 +15,10 @@ import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , accountDetails={}}) {
-  console.log({accountDetails})
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
-  const [products, setProducts] = useState(productList);
+  useEffect(()=>{},[productList])
+  const [products, setProducts] = useState([]);
   const [modalShow, setModalShow] = useState(false);
   const [productDetailId, setProductDetailId] = useState();
   const [productBrandId, setProductBrandId] = useState();
@@ -64,7 +64,9 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
     });
     setIsEmpty(temp);
   }, [brand, products]);
-
+useEffect(()=>{
+  setProducts(productList);
+},[productList])
   useEffect(() => {
     if (loadEffect) setLoaded(true);
     let newFilterData;
@@ -92,7 +94,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
     setTimeout(() => {
       setLoaded(false);
     }, 500);
-  }, [month, brand, products]);
+  }, [month, brand,products]);
 
   const [imageLoading, setImageLoading] = useState({});
   const handleImageLoad = (imageId) => {

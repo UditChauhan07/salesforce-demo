@@ -115,6 +115,8 @@ const SalesReport = () => {
         };
       });
     }
+    // Remove parent accounts with no orders after filtering
+    filtered = filtered.filter((ele) => ele.Orders.length > 0);
     return filtered;
   }, [manufacturerFilter, salesReportData, highestOrders, searchBy, searchBySalesRep, activeAccounts]);
 
@@ -339,6 +341,7 @@ const SalesReport = () => {
   }, []);
 
 
+  console.log({ filteredSalesReportData });
 
   return (
     <AppLayout
