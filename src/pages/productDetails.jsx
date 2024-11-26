@@ -13,7 +13,7 @@ import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true }) => {
-   
+   console.log({AccountId})
 
     const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
     const [product, setProduct] = useState({ isLoaded: false, data: [], discount: {} });
@@ -85,8 +85,11 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
         const selectProductDealWith = product?.discount || {};
         const listOfAccounts = Object.keys(selectProductDealWith);
         let addProductToAccount = null;
-
-        if (listOfAccounts.length) {
+    
+        // If AccountId is passed as a prop, use it directly
+        if (AccountId) {
+            addProductToAccount = AccountId;
+        } else if (listOfAccounts.length) {
             if (listOfAccounts.length === 1) {
                 addProductToAccount = listOfAccounts[0];
             } else if (selectAccount?.value) {
@@ -100,43 +103,48 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                 setAccountList(accounts);
                 return;
             }
-
-            if (addProductToAccount) {
-                const accountDetails = selectProductDealWith[addProductToAccount];
-                const account = {
-                    name: accountDetails?.Name,
-                    id: addProductToAccount,
-                    ...accountDetails,
-                };
-                const manufacturer = {
-                    name: element.ManufacturerName__c,
-                    id: element.ManufacturerId__c,
-                };
-
-                let orderType = "wholesale";
-                if (
-                    element?.Category__c?.toUpperCase() === "PREORDER" ||
-                    element?.Category__c?.toUpperCase().includes("EVENT")
-                ) {
-                    orderType = "pre-order";
-                }
-                element.orderType = orderType;
-
-                const discount =
-                    element?.Category__c === "TESTER"
-                        ? accountDetails?.Discount?.testerMargin || 0
-                        : element?.Category__c === "Samples"
-                            ? accountDetails?.Discount?.sample || 0
-                            : accountDetails?.Discount?.margin || 0;
-
-                const salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
-                element.price = salesPrice;
-                element.qty = element.Min_Order_QTY__c;
-
-                addOrder(element, account, manufacturer);
+        }
+    console.log({accountDetails} )
+        if (addProductToAccount) {
+            const accountDetails = selectProductDealWith[addProductToAccount] || {};
+            const account = {
+                shippingMethod : accountDetails?.ShippingMethod , 
+                name: accountDetails?.Name,
+                id: addProductToAccount,
+                
+                address : accountDetails?.ShippingAddress 
+              
+                
+            };
+            const manufacturer = {
+                name: element.ManufacturerName__c,
+                id: element.ManufacturerId__c,
+            };
+    
+            let orderType = "wholesale";
+            if (
+                element?.Category__c?.toUpperCase() === "PREORDER" ||
+                element?.Category__c?.toUpperCase().includes("EVENT")
+            ) {
+                orderType = "pre-order";
             }
+            element.orderType = orderType;
+    
+            const discount =
+                element?.Category__c === "TESTER"
+                    ? accountDetails?.Discount?.testerMargin || 0
+                    : element?.Category__c === "Samples"
+                        ? accountDetails?.Discount?.sample || 0
+                        : accountDetails?.Discount?.margin || 0;
+    
+            const salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
+            element.price = salesPrice;
+            element.qty = element.Min_Order_QTY__c;
+    
+            addOrder(element, account, manufacturer);
         }
     };
+    
 
     const accountSelectionHandler = () => {
         onQuantityChange(replaceCartProduct.product, replaceCartProduct.quantity);

@@ -498,7 +498,7 @@ function MyBagFinal({ showOrderFor }) {
                       <div className={Styles.ShipAdress}>
                           {buttonActive ? (
                             <p>
-                              {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
+                            {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
                               {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
                               <br />
                               {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
