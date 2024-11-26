@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as XLSX from "xlsx";
-import { GetAuthData, POGenerator } from "../../../lib/store";
-import { useBag } from "../../../context/BagContext";
 import { useNavigate } from "react-router-dom";
 import ModalPage from "../../Modal UI";
 import Styles from "../../Modal UI/Styles.module.css";
+import { useCart } from "../../../context/CartContext";
 
 const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, orderData = {}, btnClassName = null }) => {
-  const { orders, setOrders, setOrderQuantity, addOrder } = useBag();
+  const { contentApiFunction } = useCart();
   const productList = rawData?.data || [];
   const discount = rawData?.discount || {};
   const [data, setData] = useState([]);
@@ -15,6 +14,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
   const fileInputRef = useRef(null);
   const [errorOnlist, setErrorOnList] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const navigate = useNavigate();
   const [alert, setAlert] = useState('-');
   const [orderType, setorderType] = useState("wholesale")
   const [limitCheck, setLimitCheck] = useState(false)
@@ -23,29 +23,28 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
     { value: "wholesale", label: "Whole Sales" },
     { value: "preorder", label: "Pre-Order" },
   ]
-  const navigate = useNavigate();
+
   const CheckError = (data) => {
     let totalQty = 0;
     let checkLimit = 0;
     let errorCount = data.reduce((accumulator, item) => {
       let productDetails = getProductData(item["Product Code"] || item["ProductCode"] || null);
+
       if (item?.Quantity) {
         let error = !item?.Quantity || !Number.isInteger(item?.Quantity) || item?.Quantity < (productDetails.Min_Order_QTY__c || 0) || !productDetails?.Name || (productDetails.Min_Order_QTY__c > 0 && item?.Quantity % productDetails.Min_Order_QTY__c !== 0);
-
-        // orderType == "preorder" ? (error == false) ? error = productDetails?.Category__c?.toLowerCase() != orderType.toLowerCase() : error = error : (error == false) ? error = productDetails?.Category__c?.toLowerCase() == "preorder" : error = error
-        if (orderType == "preorder") {
-          if (error == false) {
-            if(!productDetails?.Category__c?.toLowerCase()?.match("event")){
-              error = productDetails?.Category__c?.toLowerCase() != orderType.toLowerCase();
+        if (orderType === "preorder") {
+          if (error === false) {
+            if (!productDetails?.Category__c?.toLowerCase()?.match("event")) {
+              error = productDetails?.Category__c?.toLowerCase() !== orderType.toLowerCase();
             }
           }
         } else {
-          if (error == false) {
-            error = productDetails?.Category__c?.toLowerCase() == "preorder" ||productDetails?.Category__c?.toLowerCase()?.match("event").length>0 ?true:false;
+          if (error === false) {
+            error = productDetails?.Category__c?.toLowerCase() === "preorder";
           }
         }
 
-        if (orderType == "wholesale" && (productDetails?.Category__c?.toLowerCase() == "preorder"||productDetails?.Category__c?.toLowerCase()?.match("event"))) {
+        if (orderType == "wholesale" && (productDetails?.Category__c?.toLowerCase() == "preorder" || productDetails?.Category__c?.toLowerCase()?.match("event"))) {
           error = true;
         }
         checkLimit++;
@@ -55,7 +54,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
       }
       return accumulator;
     }, 0);
-    if (checkLimit > 500) {
+    if (checkLimit > 100) {
       setLimitCheck(true)
       setIsLimitPass(true)
     } else {
@@ -104,50 +103,51 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
     if (!productCode) return {};
     let found = productList.find((item) => item.ProductCode == productCode);
     if (!found) return {};
-    let retailerPirce = found.usdRetail__c.trim().replace('$', '').replace(',', '')
+    let retailerPirce = found.usdRetail__c?.trim()?.replace('$', '')?.replace(',', '');
+    if (!/^\d*\.?\d+$/.test(retailerPirce)) {
+      retailerPirce = 0;
+    }
+
     if (found?.Category__c === "TESTER") {
-      let salesPrice = retailerPirce.includes("$")
-        ? (+retailerPirce.substring(1) - (discount?.testerMargin / 100) * +retailerPirce.substring(1)).toFixed(2)
-        : (+retailerPirce - (discount?.testerMargin / 100) * +retailerPirce).toFixed(2);
+      let salesPrice = (+retailerPirce - (discount?.testerMargin / 100) * +retailerPirce).toFixed(2);
       found.salesPrice = salesPrice;
       // found.discount = discount?.testerMargin;
     } else if (found.Category__c === "Samples") {
-      let salesPrice = retailerPirce.includes("$")
-        ? (+retailerPirce.substring(1) - (discount?.sample / 100) * +retailerPirce.substring(1)).toFixed(2)
-        : (+retailerPirce - (discount?.sample / 100) * +retailerPirce).toFixed(2);
+      let salesPrice = (+retailerPirce - (discount?.sample / 100) * +retailerPirce).toFixed(2);
       found.salesPrice = salesPrice;
       // found.discount = discount?.sample;
     } else {
-      let salesPrice = retailerPirce.includes("$")
-        ? (+retailerPirce.substring(1) - (discount?.margin / 100) * +retailerPirce.substring(1)).toFixed(2)
-        : (+retailerPirce - (discount?.margin / 100) * +retailerPirce).toFixed(2);
+      let salesPrice = (+retailerPirce - (discount?.margin / 100) * +retailerPirce).toFixed(2);
       found.salesPrice = salesPrice;
       // found.discount = discount?.margin;
     }
     return found;
   };
   const submitForm = () => {
-    setOrders({});
     let bagPrice = 0;
     data.map((element) => {
       if (element.Quantity && Number.isInteger(element?.Quantity)) {
         let product = getProductData(element["Product Code"] || element["ProductCode"]);
-        
+
         const category = product?.Category__c?.toLowerCase();
         if (orderType == "preorder" ? (category === "preorder" || (category?.match("event")?.length > 0)) : (category !== "preorder" && !category?.match("event"))) {
           if (product?.Id && element?.Quantity >= (product.Min_Order_QTY__c || 0) && (!product.Min_Order_QTY__c || element?.Quantity % product.Min_Order_QTY__c === 0)) {
             let salesPrice = null;
+            let listPrice = product.usdRetail__c.substring(1);
+            if (listPrice == 'NaN') {
+              listPrice = 0;
+            }
             if (product.Category__c === "TESTER") {
               salesPrice = product.usdRetail__c.includes("$")
-                ? (+product.usdRetail__c.substring(1) - (discount?.testerMargin / 100) * +product.usdRetail__c.substring(1)).toFixed(2)
+                ? (+listPrice - (discount?.testerMargin / 100) * +listPrice).toFixed(2)
                 : (+product.usdRetail__c - (discount?.testerMargin / 100) * +product.usdRetail__c).toFixed(2);
             } else if (product.Category__c === "Samples") {
               salesPrice = product.usdRetail__c.includes("$")
-                ? (+product.usdRetail__c.substring(1) - (discount?.sample / 100) * +product.usdRetail__c.substring(1)).toFixed(2)
+                ? (+listPrice - (discount?.sample / 100) * +listPrice).toFixed(2)
                 : (+product.usdRetail__c - (discount?.sample / 100) * +product.usdRetail__c).toFixed(2);
             } else {
               salesPrice = product.usdRetail__c.includes("$")
-                ? (+product.usdRetail__c.substring(1) - (discount?.margin / 100) * +product.usdRetail__c.substring(1)).toFixed(2)
+                ? (+listPrice - (discount?.margin / 100) * +listPrice).toFixed(2)
                 : (+product.usdRetail__c - (discount?.margin / 100) * +product.usdRetail__c).toFixed(2);
             }
             bagPrice += salesPrice * element["Quantity"];
@@ -161,6 +161,24 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
     } else {
       setAlert('-');
       let productCount = 0;
+      let createOrderList = [];
+      let address = null;
+      if (localStorage.getItem("address")) {
+        address = JSON.parse(localStorage.getItem("address"));
+      }
+      let account = {
+        name: localStorage.getItem("Account"),
+        id: localStorage.getItem("AccountId__c"),
+        address,
+        shippingMethod: JSON.parse(localStorage.getItem("shippingMethod")),
+        discount: rawData.discount,
+        SalesRepId: localStorage.getItem("Sales_Rep__c"),
+      }
+
+      let manufacturer = {
+        name: null,
+        id: null,
+      }
       data.map((element) => {
         if (element.Quantity && Number.isInteger(element?.Quantity)) {
           let product = getProductData(element["Product Code"] || element["ProductCode"]);
@@ -169,40 +187,55 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
             if (product?.Id && element?.Quantity >= (product.Min_Order_QTY__c || 0) && (!product.Min_Order_QTY__c || element?.Quantity % product.Min_Order_QTY__c === 0)) {
               productCount++;
               let item = {};
-
-              let discountAmount = discount?.margin;
+              let discountAmount = 0;
+              let listPrice = product.usdRetail__c;
+              if (product.usdRetail__c.includes("$")) {
+                listPrice = product.usdRetail__c.substring(1);
+              }
+              if (listPrice == 'NaN') {
+                listPrice = 0;
+              }
               if (product.Category__c === "TESTER") {
-                let salesPrice = product.usdRetail__c.includes("$")
-                  ? (+product.usdRetail__c.substring(1) - (discount?.testerMargin / 100) * +product.usdRetail__c.substring(1)).toFixed(2)
-                  : (+product.usdRetail__c - (discount?.testerMargin / 100) * +product.usdRetail__c).toFixed(2);
-                item.price = salesPrice;
                 item.discount = discount?.testerMargin;
                 discountAmount = discount?.testerMargin;
               } else if (product.Category__c === "Samples") {
-                let salesPrice = product.usdRetail__c.includes("$")
-                  ? (+product.usdRetail__c.substring(1) - (discount?.sample / 100) * +product.usdRetail__c.substring(1)).toFixed(2)
-                  : (+product.usdRetail__c - (discount?.sample / 100) * +product.usdRetail__c).toFixed(2);
-                item.price = salesPrice;
                 item.discount = discount?.sample;
                 discountAmount = discount?.sample;
               } else {
-                let salesPrice = product.usdRetail__c.includes("$")
-                  ? (+product.usdRetail__c.substring(1) - (discount?.margin / 100) * +product.usdRetail__c.substring(1)).toFixed(2)
-                  : (+product.usdRetail__c - (discount?.margin / 100) * +product.usdRetail__c).toFixed(2);
-                item.price = salesPrice;
                 item.discount = discount?.margin;
+                discountAmount = discount?.margin;
               }
+              let salesPrice = (+listPrice - (discountAmount / 100) * +listPrice).toFixed(2);
+              item.price = salesPrice;
               item.ProductCode = element["Product Code"] || element["ProductCode"];
               item.qty = element["Quantity"];
-              addOrder(product, element["Quantity"], discount);
+              let orderType = 'wholesale';
+              if (product?.Category__c?.toUpperCase() === "PREORDER" || product?.Category__c?.toUpperCase()?.match("EVENT")) {
+                orderType = 'pre-order'
+              }
+              product.price = salesPrice;
+              product.qty = element["Quantity"];
+              product.orderType = orderType;
+
+              manufacturer.name = product.ManufacturerName__c
+              manufacturer.id = product.ManufacturerId__c
+
+              createOrderList.push(product)
+
             }
           }
         }
       });
       if (productCount) {
-        let currentUrl = window.location.origin;
-        let url = currentUrl + "/my-bag";
-        window.location.href = url
+        let uploadedType = "wholesale"
+        if (orderType == "preorder") {
+          uploadedType = "pre-order"
+        }
+        contentApiFunction(createOrderList, account, manufacturer, uploadedType).then((result) => {
+          let currentUrl = window.location.origin;
+          // let url = currentUrl + "/my-bag";
+          navigate('/my-bag')
+        }).catch(e => console.error({ e }))
       } else {
         alert("Product list not found");
       }
@@ -237,13 +270,14 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
             onClose={() => setAlert('-')}
           />
         )}
+        {/* <input type="file" ref={fileInputRef} accept=".xlsx,.xls" onChange={handleFileChange} /> */}
         <ModalPage
           open={limitCheck || false}
           content={
             <>
               <div style={{ maxWidth: "309px" }}>
                 <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
-                <p className={` ${Styles.ModalContent}`}>Please upload file with less than 500 products</p>
+                <p className={` ${Styles.ModalContent}`}>Please upload file with less than 100 products</p>
                 <div className="d-flex justify-content-center">
                   <button className={`${Styles.modalButton}`} onClick={() => setLimitCheck(false)}>
                     OK
@@ -254,7 +288,6 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
           }
           onClose={() => setLimitCheck(false)}
         />
-        {/* <input type="file" ref={fileInputRef} accept=".xlsx,.xls" onChange={handleFileChange} /> */}
         <form className="d-flex justify-content-between">
           <div className="d-flex">
             <div className="d-flex flex-column">
@@ -276,12 +309,10 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
               setData([]);
               setIsLoading(false);
               setErrorOnList(0);
-              setIsLimitPass(false)
             }}
           />
         </form>
         <div>{errorOnlist > 0 && errorOnlist !== data.length && <p className="text-start mt-2 text-danger">Highlighted rows have issues in their given quantity. Upload Again or Move further with correct rows.</p>}</div>
-        
         <div>{errorOnlist > 0 && errorOnlist === data.length && <p className="text-start mt-2 text-danger">No Data Found.</p>}</div>
         <div>
           {openModal && errorOnlist === data.length ? (
@@ -313,7 +344,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
               <>
                 <div style={{ maxWidth: "309px" }}>
                   <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
-                  <p className={` ${Styles.ModalContent} tracking-[1.2px] leading-[20px]`}>Highlighted rows have issues in their given quantity. </p>
+                  <p className={` ${Styles.ModalContent} tracking-[1.2px] leading-[20px]`}>Highlighted rows have issues in their given quantity.</p>
                   <p className={` ${Styles.ModalContent} tracking-[1.2px] leading-[20px]`}>Upload Again or Move further with correct rows.</p>
                   <div className="d-flex justify-content-center">
                     <button className={`${Styles.modalButton}`} onClick={() => setOpenModal(false)}>
@@ -348,7 +379,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
                   let productDetails = getProductData(item["Product Code"] || item['ProductCode'] || null);
                   if (item?.Quantity) {
                     let error = !item?.Quantity || !Number.isInteger(item?.Quantity) || item?.Quantity < (productDetails.Min_Order_QTY__c || 0) || !productDetails?.Name || productDetails.Min_Order_QTY__c ? item?.Quantity % productDetails.Min_Order_QTY__c !== 0 : false;
-                    orderType == "preorder" ? (error == false) ? !productDetails?.Category__c?.toLowerCase()?.match("event") ? error = productDetails?.Category__c?.toLowerCase() != orderType.toLowerCase():error = error : error = error : (error == false) ? error = (productDetails?.Category__c?.toLowerCase() == "preorder"||productDetails?.Category__c?.toLowerCase()?.match("event")) : error = error
+                    orderType == "preorder" ? (error == false) ? !productDetails?.Category__c?.toLowerCase()?.match("event") ? error = productDetails?.Category__c?.toLowerCase() != orderType.toLowerCase() : error = error : error = error : (error == false) ? error = (productDetails?.Category__c?.toLowerCase() == "preorder" || productDetails?.Category__c?.toLowerCase()?.match("event")) : error = error
                     return (
                       <tr key={index}>
                         <td style={error ? { background: "red", color: "#fff" } : {}}>{productDetails?.Name || "---"}</td>
@@ -373,7 +404,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
                 <div className="mt-3">No Data Found.</div>
               </div>
             ) : null}
-            <div className="d-flex justify-content-center" style={{ position: 'sticky', bottom: '-120px',background:'#fff',padding:'1rem 0' }}>
+            <div className="d-flex justify-content-center" >
               <button className={btnClassName} onClick={() => { !isLimitPass ? submitForm() : setLimitCheck(true) }}>
                 Submit
               </button>
