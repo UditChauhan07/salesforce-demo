@@ -10,6 +10,7 @@ import Select from "react-select";
 import { BiUpload } from "react-icons/bi";
 import ModalPage from "../Modal UI";
 import Loading from "../Loading";
+import dataStore from "../../lib/dataStore";
 
 const OrderStatusFormSection = ({ setSubmitLoad }) => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const OrderStatusFormSection = ({ setSubmitLoad }) => {
             setPrioritiesList(raw.Priority);
             setContactList(raw.ContactList);
             if (data.orderStatusForm.opportunityId) {
-              getOrderIdDetails({ rawData: { key: user.x_access_token, id: data.orderStatusForm.opportunityId } }).then((orderDetails) => {
+              dataStore.getPageData("/orderDetails"+data.orderStatusForm.opportunityId,()=>getOrderIdDetails({ rawData: { key: user.x_access_token, id: data.orderStatusForm.opportunityId } })).then((orderDetails) => {
                 setOrderDetail(orderDetails);
               }).catch((orderErr) => {
                 console.log({ orderErr });
