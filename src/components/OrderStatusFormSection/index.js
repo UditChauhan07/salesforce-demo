@@ -38,6 +38,7 @@ const OrderStatusFormSection = ({ setSubmitLoad }) => {
             setContactList(raw.ContactList);
             if (data.orderStatusForm.opportunityId) {
               dataStore.getPageData("/orderDetails"+data.orderStatusForm.opportunityId,()=>getOrderIdDetails({ rawData: { key: user.x_access_token, id: data.orderStatusForm.opportunityId } })).then((orderDetails) => {
+                
                 setOrderDetail(orderDetails);
               }).catch((orderErr) => {
                 console.log({ orderErr });
@@ -164,6 +165,9 @@ const OrderStatusFormSection = ({ setSubmitLoad }) => {
   const formentAcmount = (amount) => {
     return `${Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}`
   }
+
+  useEffect(()=>{},[orderDetails])
+
   if (supportTicketData?.orderStatusForm?.opportunityId) {
     if (!orderDetails?.Id) {
       return <Loading />
