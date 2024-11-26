@@ -164,7 +164,7 @@ useEffect(()=>{
         } else {
           discount = selectAccount?.Discount?.margin || 0;
         }
-        let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
+        let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice)?.toFixed(2);
         element.price = salesPrice;
         element.qty = element.Min_Order_QTY__c;
         let cartStatus = addOrder(element, account, manufacturer);
@@ -381,9 +381,9 @@ useEffect(()=>{
                           </p>
                           {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> :ProductInCart?<small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
                           <p className={Styles.priceHolder}> 
-                          {(!isNaN(salesPrice)&&!isNaN(listPrice)) ?salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice.toFixed(2)}</div>:ProductInCart?<div className={Styles.priceCrossed}>${listPrice.toFixed(2)}</div>:null:null}
+                          {(!isNaN(salesPrice)&&!isNaN(listPrice)) ?salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div>:ProductInCart?<div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div>:null:null}
                           &nbsp;
-                            <div>${ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price).toFixed(2)}</Link> : !isNaN(salesPrice)?salesPrice.toFixed(2):listPrice ?? "-- . --"}</div>
+                            <div>${ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price)?.toFixed(2)}</Link> : !isNaN(salesPrice)?salesPrice?.toFixed(2):listPrice ?? "-- . --"}</div>
                             </p>
                             <div className={Styles.linkHolder}>
                               {ProductInCart ? (

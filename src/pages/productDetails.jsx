@@ -13,6 +13,8 @@ import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true }) => {
+   
+
     const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
     const [product, setProduct] = useState({ isLoaded: false, data: [], discount: {} });
     const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -24,7 +26,7 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     const [accountDetails, setAccountDetails] = useState();
     const [manufacturerId, setManufacturerId] = useState();
     const [clickedProduct, setClickedProduct] = useState(null);
-
+   
     const fetchAccountDetails = async () => {
         const data = await GetAuthData();
         const { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;

@@ -46,7 +46,6 @@
 .owl-carousel .owl-item img {
   display: block;
   width: 100%;
-  mix-blend-mode: multiply;
 }
 .BnadLogo img {
   border-radius: 15px;
@@ -60,9 +59,6 @@
   text-align: left;
   text-transform: uppercase;
 }
-.brandLogoHolder{
-  max-height: 100px;
-}
 .borderRight {
   border-right: 2px solid #6b6b6b;
 }
@@ -74,6 +70,14 @@ p.seti {
   line-height: 40px;
   margin-top: 25px;
   margin-bottom: 1rem;
+}
+.brandTitleHolder{
+  color: #000;
+  font-family: Montserrat;
+  line-height: 32px;
+  font-size: 32px;
+  text-transform: uppercase;
+  font-weight: bold;
 }
 .ArriavalsInnerContent h4,
 .NewArriavalsList h3 {

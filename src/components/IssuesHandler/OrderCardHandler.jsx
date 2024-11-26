@@ -261,17 +261,17 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                         confimationStatus = false;
                         const myElement = document.getElementById(`oP${id}`);
                         if (myElement) {
-                            console.warn({ myElement });
+                            console.log( myElement.max );
                             myElement.scrollIntoView({ behavior: "smooth", block: "center" });
                             myElement.style.borderBottom = "1px solid red";
                             shakeHandler(`oP${id}`)
-                            Swal.fire({
-                                title: `${reason}!`,
-                                text: `You have entered more than the allowed quantity`,
-                                icon: 'error',
-                                confirmButtonText: 'Ok',
-                                confirmButtonColor: '#000'
-                            });
+                            // Swal.fire({
+                            //     title: `${reason}!`,
+                            //     text: `You have entered more than the allowed quantity`,
+                            //     icon: 'error',
+                            //     confirmButtonText: 'Ok',
+                            //     confirmButtonColor: '#000'
+                            // });
                         }
                     } else {
                         const myElement = document.getElementById(`oP${id}`);
@@ -374,8 +374,8 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                                     <thead>
                                         <tr>
                                             <th style={{ width: '225px' }}>Name</th>
-                                            <th style={{ width: '75px' }}>Code</th>
-                                            <th style={{ width: '75px' }}>Qty</th>
+                                            <th style={{ width: '120px' }}>Code</th>
+                                            <th style={{ width: '85px' }}>Qty</th>
                                             <th style={{ width: '75px' }}>Price</th>
                                         </tr>
                                     </thead>
