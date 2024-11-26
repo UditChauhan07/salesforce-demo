@@ -37,7 +37,8 @@ function MyBagFinal({ showOrderFor }) {
   const fetchBag = fetchBeg({});
   const handleNameChange = (event) => {
     const limit = 11;
-    setLimitInput(event.target.value.slice(0, limit));
+    const value = event.target.value.slice(0, limit); // Restrict to 11 characters
+    setPONumber(value);
   };
   useEffect(() => {
     setTotal(getOrderTotal() ?? 0)
@@ -364,21 +365,19 @@ function MyBagFinal({ showOrderFor }) {
                         </b>
                       ) : (
                         <input
-                          type="text"
-                          defaultValue={PONumber}
-                          onKeyUp={(e) => setPONumber(e.target.value)}
-                          placeholder=" Enter PO Number"
-                          style={{ borderBottom: "1px solid black" }}
-                          id="limit_input"
-                          name="limit_input"
-                          value={limitInput}
-                          onChange={handleNameChange}
-                          onKeyPress={(e) => {
-                            if (e.key === " ") {
-                              e.preventDefault(); // Prevent space character from being entered
-                            }
-                          }}
-                        />
+                        type="text"
+                        value={PONumber}
+                        onChange={handleNameChange} // Correctly handles input changes
+                        placeholder="Enter PO Number"
+                        style={{ borderBottom: "1px solid black" }}
+                        id="limit_input"
+                        name="limit_input"
+                        onKeyPress={(e) => {
+                          if (e.key === " ") {
+                            e.preventDefault(); // Prevent space character from being entered
+                          }
+                        }}
+                      />
                       )}
                     </h5>
 

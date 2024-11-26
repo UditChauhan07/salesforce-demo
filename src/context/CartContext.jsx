@@ -201,7 +201,6 @@ const CartProvider = ({ children }) => {
         };
     };
 
-    console.log({ order });
 
     const addOrder = async (product, account, manufacturer) => {
         // let status = await fetchCart();
@@ -371,7 +370,54 @@ const CartProvider = ({ children }) => {
         }
     };
 
-
+    const updateProductPrice = (productId, price) => {
+        // Ensure price is a valid number (0 or positive)
+        if (isNaN(price) || price < 0) {
+            Swal.fire({
+                title: "Invalid Price!",
+                text: "Price cannot be negative. Please provide a valid amount.",
+                icon: "warning",
+                button: "OK",
+            });
+            return; // Don't update if price is invalid
+        }
+    
+        setOrder((prevOrder) => {
+            const product = prevOrder.items.find(item => item.Id === productId);
+            if (!product) {
+                Swal.fire({
+                    title: "Product Not Found!",
+                    text: `No product found with ID: ${productId}`,
+                    icon: "error",
+                    button: "OK",
+                });
+                return prevOrder; // No product found
+            }
+    
+            const updatedItems = prevOrder.items.map(item =>
+                item.Id === productId
+                    ? { ...item, price } // Update the product price
+                    : item
+            );
+    
+            // Directly update the total price
+            const updatedTotal = prevOrder.total - (product.price * product.qty) + (price * product.qty);
+    
+            return {
+                ...prevOrder,
+                items: updatedItems,
+                total: updatedTotal,
+            };
+        });
+    
+        // Swal.fire({
+        //     title: "Price Updated!",
+        //     text: `The price for the product with ID: ${productId} has been successfully updated.`,
+        //     icon: "success",
+        //     button: "OK",
+        // });
+    };
+    
 
     // Update product quantity
     const updateProductQty = (productId, qty) => {
@@ -587,7 +633,8 @@ const CartProvider = ({ children }) => {
         contentApiFunction,
         keyBasedUpdateCart,
         fetchCart,
-        deleteCartForever
+        deleteCartForever,
+        updateProductPrice
     };
 
     return <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>;
