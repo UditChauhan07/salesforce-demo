@@ -35,7 +35,6 @@ function MyBagFinal({ showOrderFor }) {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const fetchBag = fetchBeg({});
-  const productLists = Object.values(fetchBag.orderList ?? {});
   const handleNameChange = (event) => {
     const limit = 11;
     setLimitInput(event.target.value.slice(0, limit));
@@ -48,7 +47,8 @@ function MyBagFinal({ showOrderFor }) {
       try {
         const res = await POGenerator();
         if (res) {
-          let isPreOrder = productLists.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
+          
+          let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
           let poInit = res;
           if (isPreOrder) {
             poInit = `PRE-${poInit}`
@@ -516,7 +516,7 @@ function MyBagFinal({ showOrderFor }) {
                       </>}
                       <div className={Styles.ShipAdress2}>
                         {/* <label>NOTE</label> */}
-                        <textarea onKeyUp={(e) => setOrderDesc(e.target.value)} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " />
+                        <textarea onKeyUp={(e) =>  keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
                       </div>
                       {!PONumberFilled ? (
                         <ModalPage
