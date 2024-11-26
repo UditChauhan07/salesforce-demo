@@ -19,8 +19,8 @@ import dataStore from "../../lib/dataStore";
 import Pagination from "../../components/Pagination/Pagination";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
-let PageSize = 100;
 const TargetReport = () => {
+    const[PageSize,setPageSize] = useState(100);
     const location = useLocation();
     const { state } = location || {};
     const { data: manufacturers } = useManufacturer();
@@ -110,7 +110,6 @@ const TargetReport = () => {
             dataStore.unsubscribe("/Target-Report", handleTargetReady)
         }
     }, []);
-    console.log({ filteredTargetData });
 
 
     const resetFilter = () => {
@@ -466,6 +465,23 @@ const TargetReport = () => {
                 <>
 
                     <div className="d-flex justify-content-center gap-3" style={{ width: "99%" }}>
+                    <FilterItem
+                minWidth="220px"
+                label="Pagination"
+                name="Pagination"
+                value={PageSize?PageSize:false}
+                options={[
+                  {
+                    label: "Paginated",
+                    value: 100,
+                  },
+                  {
+                    label: "Full Report",
+                    value: filteredTargetData.length,
+                  },
+                ]}
+                onChange={(value) => setPageSize(value)}
+              />
                         {target.ownerPermission && (
                             <FilterItem
                                 minWidth="220px"

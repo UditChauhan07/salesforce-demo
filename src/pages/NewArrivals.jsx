@@ -83,22 +83,22 @@ const NewArrivals = () => {
     setProductList(data)
     setIsloaed(true)
   }
-
+useEffect(()=>{
+  if(selectYear != date.getFullYear()){
+    setIsloaed(false);
+  }
+},[selectYear])
   useEffect(() => {
     dataStore.subscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
     GetAuthData().then((user) => {
       dataStore.getPageData("/marketing-calendar" + selectYear, () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })).then((productRes) => {
-        console.log({productRes,selectYear});
-        
         readyCalenderHandle(productRes)
       }).catch((err) => console.log({ err }))
     }).catch((e) => console.log({ e }))
     return () => {
       dataStore.unsubscribe("/marketing-calendar" + selectYear, readyCalenderHandle)
     }
-  }, [isLoaded,selectYear])
-
-  console.log({productList});
+  }, [selectYear])
   
 
   useEffect(() => {

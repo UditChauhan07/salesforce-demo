@@ -5,14 +5,12 @@ import { FilterItem } from '../../components/FilterItem';
 import Loading from '../../components/Loading';
 import styles from "../../components/newness report table/table.module.css"; // Preserving your table styles
 import * as XLSX from 'xlsx';
-
 import { MdOutlineDownload } from "react-icons/md";
 import { getPermissions } from "../../lib/permission";
 import FilterSearch from '../../components/FilterSearch';
 import PermissionDenied from '../../components/PermissionDeniedPopUp/PermissionDenied';
 import { useNavigate } from 'react-router-dom';
 import { fetchAccountDetails } from '../../lib/contactReport';
-import { useManufacturer } from "../../api/useManufacturer";
 import { CloseButton, SearchIcon } from "../../lib/svg";
 function ContactDetailedReport() {
     const navigate = useNavigate();

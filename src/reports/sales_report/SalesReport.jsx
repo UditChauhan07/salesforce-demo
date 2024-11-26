@@ -21,9 +21,9 @@ import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 import Pagination from "../../components/Pagination/Pagination";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
-let PageSize = 3;
 
 const SalesReport = () => {
+  const[PageSize,setPageSize] = useState(3);
   const [manufacturers, setManufacturers] = useState([]);
   const [yearFor, setYearFor] = useState(2024);
   const salesReportApi = useSalesReport();
@@ -349,7 +349,7 @@ const SalesReport = () => {
         <>
 
           <div className="d-flex justify-content-between m-auto" style={{ width: '99%' }}>
-            <div className="d-flex justify-content-start gap-4 col-4">
+            <div className="d-flex justify-content-start gap-4 col-3">
               <FilterItem
                 label="year"
                 name="Year"
@@ -370,7 +370,24 @@ const SalesReport = () => {
             </div>
 
             <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
-            <div className="d-flex justify-content-end gap-4 col-7">
+            <div className="d-flex justify-content-end gap-4 col-8">
+            <FilterItem
+                minWidth="220px"
+                label="Pagination"
+                name="Pagination"
+                value={PageSize?PageSize:false}
+                options={[
+                  {
+                    label: "Paginated",
+                    value: 3,
+                  },
+                  {
+                    label: "Full Report",
+                    value: filteredSalesReportData.length,
+                  },
+                ]}
+                onChange={(value) => setPageSize(value)}
+              />
               {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={salesRepList} onChange={(value) => setSearchBySalesRep(value)} />}
               <FilterItem
                 minWidth="220px"
