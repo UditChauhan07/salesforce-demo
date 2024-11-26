@@ -35,10 +35,10 @@ function MyBagFinal({ showOrderFor }) {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const fetchBag = fetchBeg({});
-  const productLists = Object.values(fetchBag.orderList ?? {});
   const handleNameChange = (event) => {
     const limit = 11;
-    setLimitInput(event.target.value.slice(0, limit));
+    const value = event.target.value.slice(0, limit); // Restrict to 11 characters
+    setPONumber(value);
   };
   useEffect(() => {
     setTotal(getOrderTotal() ?? 0)
@@ -48,7 +48,8 @@ function MyBagFinal({ showOrderFor }) {
       try {
         const res = await POGenerator();
         if (res) {
-          let isPreOrder = productLists.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
+          
+          let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
           let poInit = res;
           if (isPreOrder) {
             poInit = `PRE-${poInit}`
@@ -364,21 +365,19 @@ function MyBagFinal({ showOrderFor }) {
                         </b>
                       ) : (
                         <input
-                          type="text"
-                          defaultValue={PONumber}
-                          onKeyUp={(e) => setPONumber(e.target.value)}
-                          placeholder=" Enter PO Number"
-                          style={{ borderBottom: "1px solid black" }}
-                          id="limit_input"
-                          name="limit_input"
-                          value={limitInput}
-                          onChange={handleNameChange}
-                          onKeyPress={(e) => {
-                            if (e.key === " ") {
-                              e.preventDefault(); // Prevent space character from being entered
-                            }
-                          }}
-                        />
+                        type="text"
+                        value={PONumber}
+                        onChange={handleNameChange} // Correctly handles input changes
+                        placeholder="Enter PO Number"
+                        style={{ borderBottom: "1px solid black" }}
+                        id="limit_input"
+                        name="limit_input"
+                        onKeyPress={(e) => {
+                          if (e.key === " ") {
+                            e.preventDefault(); // Prevent space character from being entered
+                          }
+                        }}
+                      />
                       )}
                     </h5>
 
@@ -516,7 +515,7 @@ function MyBagFinal({ showOrderFor }) {
                       </>}
                       <div className={Styles.ShipAdress2}>
                         {/* <label>NOTE</label> */}
-                        <textarea onKeyUp={(e) => setOrderDesc(e.target.value)} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " />
+                        <textarea onKeyUp={(e) =>  keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
                       </div>
                       {!PONumberFilled ? (
                         <ModalPage

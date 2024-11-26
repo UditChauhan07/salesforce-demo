@@ -11,7 +11,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
   const { testerInclude, sampleInclude } = productCartSchema || true;
 
   let Img1 = "/assets/images/dummy.png";
-  const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted } = useCart();
+  const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted,updateProductPrice } = useCart();
   const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
   // console.log(productCartSchema)
   const [replaceCartProduct, setReplaceCartProduct] = useState({});
@@ -83,6 +83,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
     // navigate('/product/'+productName.replaceAll(" ","-").replaceAll("=","-"), { state: { productId } });
     setProductDetailId(productId)
   }
+
   return (
     <>
       {replaceCartModalOpen ? (
@@ -135,7 +136,10 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                     return (
                       <CollapsibleRow title={key != "null" ? key : "No Category"} quantity={categoryOrderQuantity} key={index} index={index} >
                         {Object.values(formattedData)[index]?.map((value, indexed) => {
-                          let cartProduct = isProductCarted(value.Id);
+                          let cartProduct ={};
+                          if (order?.Account?.id === localStorage.getItem("AccountId__c")&&isProductCarted(value.Id)) {
+                            cartProduct= isProductCarted(value.Id);
+                          }
 
                           let listPrice = Number(value?.usdRetail__c?.replace('$', '').replace(',', ''));
                           if (isNaN(listPrice)) {
@@ -177,7 +181,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                               <td>{value?.usdRetail__c?.includes("$") ? `$${listPrice}` : `$${Number(value.usdRetail__c).toFixed(2)}`}</td>
                               <td>
                                 <div className="d-flex">
-                                  ${salesPrice}
+                                  ${inputPrice?<input type="text" value={inputPrice} onChange={(e)=>updateProductPrice(value.Id,e.target.value||null)}/>:salesPrice}
                                 </div>
                               </td>
                               <td>{value.Min_Order_QTY__c || 0}</td>
