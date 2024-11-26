@@ -13,10 +13,10 @@ import dataStore from "../../lib/dataStore";
 
 const BrandDetailCard = ({ brandId }) => {
     const brand = brandDetails[brandId];
-    console.log(brand , "brand")
     const [topProducts, setTopProduct] = useState({ isLoaded: false, data: [] })
     const [productImages, setProductImages] = useState({ isLoaded: false, images: {} });
     const [productId, setProductId] = useState()
+    const [errorImage, setErrorImg] = useState(false);
     const d = new Date();
     let monthIndex = d.getMonth();
     useEffect(() => {
@@ -106,8 +106,9 @@ const BrandDetailCard = ({ brandId }) => {
                     </div>
                     <div className="col-xl-8 col-lg-8 col-md-12 col-sm-12 m-auto ">
                         <div className="row">
-                            <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
-                                <img className={`img-fluid ${Styles.brandLogoHolder}`} src={`${originAPi}/brandImage/${brandId}.png`} />
+                        <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
+                                {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0].ManufacturerName__c : null}</p> :
+                                    <img className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
                             </div>
                             {brand?.tagLine ?
                                 <div className="col-xl-5 col-lg-6 col-md-12 col-sm-12 m-auto ">

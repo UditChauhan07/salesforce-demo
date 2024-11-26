@@ -261,7 +261,6 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                         confimationStatus = false;
                         const myElement = document.getElementById(`oP${id}`);
                         if (myElement) {
-                            let msg
                             if(errorList[id].issue == 0){
                                 msg = `Please enter issue quantity`;
                             }else{
