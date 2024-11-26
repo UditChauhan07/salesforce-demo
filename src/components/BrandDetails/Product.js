@@ -450,6 +450,7 @@ function Product() {
                         orderData={{ accountName: localStorage.getItem("Account"), accountId: localStorage.getItem("AccountId__c"), brandId: localStorage.getItem("ManufacturerId__c") }}
                         btnClassName={Styles.modalButton}
                         setOrderFromModal={setOrderFromModal}
+                        salesRepId = {salesRepId}
                       />
                     </div>
                     <div className="d-flex justify-content-center">

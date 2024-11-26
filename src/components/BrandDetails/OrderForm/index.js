@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import ModalPage from "../../Modal UI";
 import Styles from "../../Modal UI/Styles.module.css";
 import { useCart } from "../../../context/CartContext";
-
-const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, orderData = {}, btnClassName = null }) => {
+import { GetAuthData } from "../../../lib/store";
+const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, orderData = {}, btnClassName = null , salesRepId }) => {
   const { contentApiFunction } = useCart();
   const productList = rawData?.data || [];
   const discount = rawData?.discount || {};
@@ -167,17 +167,18 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
         address = JSON.parse(localStorage.getItem("address"));
       }
       let account = {
+        
         name: localStorage.getItem("Account"),
         id: localStorage.getItem("AccountId__c"),
         address,
         shippingMethod: JSON.parse(localStorage.getItem("shippingMethod")),
         discount: rawData.discount,
-        SalesRepId: localStorage.getItem("Sales_Rep__c"),
+        SalesRepId: salesRepId,
       }
 
       let manufacturer = {
-        name: null,
-        id: null,
+        name: localStorage.getItem("manufacturer"),
+        id: localStorage.getItem("ManufacturerId__c")
       }
       data.map((element) => {
         if (element.Quantity && Number.isInteger(element?.Quantity)) {
@@ -216,9 +217,9 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
               product.price = salesPrice;
               product.qty = element["Quantity"];
               product.orderType = orderType;
-
+              console.log(product , "product")
               manufacturer.name = product.ManufacturerName__c
-              manufacturer.id = product.ManufacturerId__c
+              manufacturer.id = product.Id
 
               createOrderList.push(product)
 
