@@ -115,7 +115,7 @@ const CustomerService = () => {
 
         if (admins.includes(user.Sales_Rep__c)) {
           try {
-            const repRes = await getSalesRepList({ key: user.x_access_token });
+            const repRes = await dataStore.getPageData("getSalesRepList", () =>getSalesRepList({ key: user.x_access_token }));
             setSalesRepList(repRes.data);
           } catch (repErr) {
             console.log('SalesRepList Error:', repErr);
