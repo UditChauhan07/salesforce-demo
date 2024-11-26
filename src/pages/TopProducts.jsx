@@ -112,9 +112,9 @@ const TopProducts = () => {
     let helperArray = [];
     months.map((month, i) => {
       if (i <= monthIndex) {
-        helperArray.push({ label: `${month}, 2024`, value: i + 1 })
+        helperArray.push({ label: `${month.slice(0,3)}, 2024`, value: i + 1 })
       } else {
-        indexMonth.push({ label: `${month}, 2023`, value: i + 1 })
+        indexMonth.push({ label: `${month.slice(0,3)}, 2023`, value: i + 1 })
       }
     })
     let finalArray = indexMonth.concat(helperArray)
@@ -180,10 +180,13 @@ const TopProducts = () => {
           label="All Brands"
           name="Manufacturer1"
           value={manufacturerFilter}
-          options={manufacturers?.data?.map((manufacturer) => ({
-            label: manufacturer.Name,
-            value: manufacturer.Id,
-          }))}
+          options={[
+            { label: "All Brands", value: null }, // Add the first option
+            ...(manufacturers?.data?.map((manufacturer) => ({
+              label: manufacturer.Name,
+              value: manufacturer.Id,
+            })) || []), // Safely map if manufacturers.data exists, fallback to an empty array
+          ]}
           onChange={(value) => btnHandler({ manufacturerId: value, month: selectedMonth })}
         />
 

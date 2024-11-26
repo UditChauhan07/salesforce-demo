@@ -322,7 +322,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                 <div className="col-lg-7 col-md-8 col-sm-12">
                   <div className={Styles.MainBag}>
                     <h3>
-                      Order Details ({OrderData?.OpportunityLineItems?.length})
+                      Order Details ({OrderData?.OpportunityLineItems?.reduce((sum, item) => sum + (item.Quantity || 0), 0)})
                     </h3>
                     <div className={Styles.scrollP}>
                       <div className={`${Styles.MainInner} MainInnerPrint`}>
