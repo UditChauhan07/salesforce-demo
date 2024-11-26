@@ -24,11 +24,12 @@ const CustomerService = () => {
     SalesRepId = state?.SalesRepId
     PONumber = state?.PONumber
   }
+
   const navigate = useNavigate();
   const [reason, setReason] = useState();
   const [accountList, setAccountList] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [orderId, setOrderId] = useState();
+  const [orderId, setOrderId] = useState(state?.OrderId);
   const [orderConfirmed, setOrderConfirmed] = useState(false)
   const [sendEmail, setSendEmail] = useState(false)
   const [files, setFile] = useState([]);
@@ -60,7 +61,7 @@ const CustomerService = () => {
     setContactId(null)
     setManufacturerId(null)
     setActual_Amount__c(null)
-    setErrorList({})
+    setErrorList({});
   }
 
   const reasons = [
@@ -70,6 +71,14 @@ const CustomerService = () => {
     { name: "Product Damage", icon: '/assets/damage.svg', desc: "Got damaged product in order?" },
     { name: "Update Account Info", icon: '/assets/account.svg', desc: "Change shipping or billing details" }
   ];
+  useEffect(() => {
+    if (Reason) {
+      setReason(Reason)
+    }
+    if (OrderId) {
+      setOrderId(OrderId)
+    }
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -92,13 +101,21 @@ const CustomerService = () => {
           navigate("/dashboard");
           return; // Ensure no further code execution
         }
-
+        dataStore.subscribe("/orderList" + SalesRepId, (data) => {
+          if (Reason) {
+            setReason(null)
+          }
+          setOrders(data);
+          resetHandler()
+          setLoaded(true)
+        })
+        
         // Continue with data fetching if permission is granted
         orderListBasedOnRepHandler(user.x_access_token, Reason ? SalesRepId : user.Sales_Rep__c, Reason ? false : true, OrderId);
 
         if (admins.includes(user.Sales_Rep__c)) {
           try {
-            const repRes = await getSalesRepList({ key: user.x_access_token });
+            const repRes = await dataStore.getPageData("getSalesRepList", () =>getSalesRepList({ key: user.x_access_token }));
             setSalesRepList(repRes.data);
           } catch (repErr) {
             console.log('SalesRepList Error:', repErr);
@@ -111,87 +128,45 @@ const CustomerService = () => {
 
     fetchData();
   }, [Reason, SalesRepId, OrderId]);
-  useEffect(() => {
-    if (Reason) {
-      setReason(Reason)
-    }
-    if (OrderId) {
-      setOrderId(OrderId)
-    }
-    GetAuthData()
-      .then((response) => {
-        setUserData(response)
-        dataStore.subscribe("/orderList" + SalesRepId, (data) => {
-          if (Reason) {
-            setReason(null)
-          }
-          setOrders(data);
-          resetHandler()
-          setLoaded(true)
-        })
-        orderListBasedOnRepHandler(response.x_access_token, Reason ? SalesRepId : response.Sales_Rep__c, Reason ? false : true, OrderId)
-        if (admins.includes(response.Sales_Rep__c)) {
-          getSalesRepList({ key: response.x_access_token }).then((repRes) => {
-            setSalesRepList(repRes.data)
-          }).catch((repErr) => {
-            console.log({ repErr });
-          })
-        }
-      })
-      .catch((err) => {
-        console.log({ err });
-      });
-    return () => {
-      dataStore.unsubscribe("/orderList" + SalesRepId, (data) => {
-        if (Reason) {
-          setReason(null)
-        }
-        setOrders(data);
-        resetHandler()
-        setLoaded(true)
-      })
-    }
-  }, []);
 
-  // useEffect(()=>{
-  //   if(orderConfirmed == false&&OrderId){
-  //     setOrderId()
-  //     GetAuthData()
-  //     .then((response) => {
-  //       setUserData(response)
-  //       orderListBasedOnRepHandler(response.x_access_token, SalesRepId,Reason?false:true,)
-  //       if (admins.includes(response.Sales_Rep__c)) {
-  //         getSalesRepList({ key: response.x_access_token }).then((repRes) => {
-  //           setSalesRepList(repRes.data)
-  //         }).catch((repErr) => {
-  //           console.log({ repErr });
-  //         })
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log({ err });
-  //     });
-  //   }
-  // },[orderConfirmed])
+
+
 
   const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
     setLoaded(false)
     setSelectedSalesRepId(Sales_Rep__c)
-    dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
-      user: { key, Sales_Rep__c },
-      PONumber: searchPo, searchId
-    }))
-      .then((order) => {
-        if (ReasonNull) {
-          setReason(null)
-        }
-        setOrders(order);
-        resetHandler()
-        setLoaded(true)
+    if (searchId) {
+      getOrderCustomerSupport({
+        user: { key, Sales_Rep__c },
+        PONumber: searchPo, searchId
       })
-      .catch((error) => {
-        console.log({ error });
-      });
+        .then((order) => {
+          if (ReasonNull) {
+            setReason(null)
+          }
+          setOrders(order);
+          setLoaded(true)
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    } else {
+      dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
+        user: { key, Sales_Rep__c },
+        PONumber: searchPo, searchId
+      }))
+        .then((order) => {
+          if (ReasonNull) {
+            setReason(null)
+          }
+          setOrders(order);
+          resetHandler()
+          setLoaded(true)
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    }
     dataStore.getPageData("/getAllAccount" + Sales_Rep__c, () => getAllAccount({ user: { x_access_token: key, Sales_Rep__c } }))
       .then((accounts) => {
         setAccountList(accounts);
