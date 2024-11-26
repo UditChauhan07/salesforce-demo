@@ -7,7 +7,7 @@ import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
 import { useCart } from "../../../context/CartContext";
 
-const Accordion = ({salesRepId ,  data, formattedData, productImage = [], productCartSchema = {} }) => {
+const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
 
   let Img1 = "/assets/images/dummy.png";
@@ -18,56 +18,53 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
   const [showName, setShowName] = useState(false);
   const [productDetailId, setProductDetailId] = useState(null)
   const [msg, setMsg] = useState('');
-  
 
 
-  const onQuantityChange =  (element, quantity) => {
-    console.log(element , "element")
+
+  const onQuantityChange = (element, quantity) => {
     if (!quantity) {
       quantity = element.Min_Order_QTY__c;
     }
     let checkProduct = isProductCarted(element.Id);
     if (checkProduct) {
-      let cartStatus = updateProductQty(element.Id, quantity);
       if (order?.Account?.id === localStorage.getItem("AccountId__c")) {
-        updateProductQty(element.Id, quantity);
+        let cartStatus = updateProductQty(element.Id, quantity);
         return;
-      } 
-    } else {
-      let listPrice = Number(element?.usdRetail__c?.replace("$", "")?.replace(",", ""));
-      let account = {
-        name: localStorage.getItem("Account"),
-        id: localStorage.getItem("AccountId__c"),
-        address: JSON.parse(localStorage.getItem("address")), 
-        shippingMethod: JSON.parse(localStorage.getItem("shippingMethod")),
-        discount: data.discount,
-        SalesRepId: salesRepId,
-        
       }
-
-      let manufacturer = {
-        name: element.ManufacturerName__c,
-        id: localStorage.getItem('ManufacturerId__c'),
-      }
-      let orderType = 'wholesale';
-      if (element?.Category__c?.toUpperCase() === "PREORDER" || element?.Category__c?.toUpperCase()?.match("EVENT")) {
-        orderType = 'pre-order'
-      }
-      element.orderType = orderType;
-      let discount = 0;
-      if (element?.Category__c === "TESTER") {
-        discount = data.discount?.testerMargin || 0;
-      } else if (element?.Category__c === "Samples") {
-        discount = data.discount?.sample || 0;
-      } else {
-        discount = data.discount?.margin || 0;
-      }
-      let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
-      element.price = salesPrice;
-      element.qty = quantity;
-      // element.discount = discount;
-      let cartStatus = addOrder(element, account, manufacturer);
     }
+    let listPrice = Number(element?.usdRetail__c?.replace("$", "")?.replace(",", ""));
+    let account = {
+      name: localStorage.getItem("Account"),
+      id: localStorage.getItem("AccountId__c"),
+      address: JSON.parse(localStorage.getItem("address")),
+      shippingMethod: JSON.parse(localStorage.getItem("shippingMethod")),
+      discount: data.discount,
+      SalesRepId: salesRepId,
+
+    }
+
+    let manufacturer = {
+      name: element.ManufacturerName__c,
+      id: localStorage.getItem('ManufacturerId__c'),
+    }
+    let orderType = 'wholesale';
+    if (element?.Category__c?.toUpperCase() === "PREORDER" || element?.Category__c?.toUpperCase()?.match("EVENT")) {
+      orderType = 'pre-order'
+    }
+    element.orderType = orderType;
+    let discount = 0;
+    if (element?.Category__c === "TESTER") {
+      discount = data.discount?.testerMargin || 0;
+    } else if (element?.Category__c === "Samples") {
+      discount = data.discount?.sample || 0;
+    } else {
+      discount = data.discount?.margin || 0;
+    }
+    let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
+    element.price = salesPrice;
+    element.qty = quantity;
+    // element.discount = discount;
+    let cartStatus = addOrder(element, account, manufacturer);
   }
 
   const orderSetting = (product, quantity) => {
@@ -86,7 +83,6 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
     // navigate('/product/'+productName.replaceAll(" ","-").replaceAll("=","-"), { state: { productId } });
     setProductDetailId(productId)
   }
-  console.log(order , "order")
   return (
     <>
       {replaceCartModalOpen ? (
@@ -132,9 +128,9 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
               <>
                 <tbody>
                   {Object.keys(formattedData)?.map((key, index) => {
-                    let categoryOrderQuantity  = false;
-                    if(order?.Account?.id == localStorage.getItem("AccountId__c")&&order?.Manufacturer?.id==localStorage.getItem("ManufacturerId__c")){
-                    categoryOrderQuantity = isCategoryCarted(key);
+                    let categoryOrderQuantity = false;
+                    if (order?.Account?.id == localStorage.getItem("AccountId__c") && order?.Manufacturer?.id == localStorage.getItem("ManufacturerId__c")) {
+                      categoryOrderQuantity = isCategoryCarted(key);
                     }
                     return (
                       <CollapsibleRow title={key != "null" ? key : "No Category"} quantity={categoryOrderQuantity} key={index} index={index} >
@@ -149,7 +145,7 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
                           let discount = 0;
                           let inputPrice = cartProduct?.items?.price;
                           let qtyofItem = cartProduct?.items?.qty || 0;
-                          
+
                           if (value?.Category__c === "TESTER") {
                             discount = data?.discount?.testerMargin
                           } else if (value?.Category__c === "Samples") {
@@ -192,25 +188,27 @@ const Accordion = ({salesRepId ,  data, formattedData, productImage = [], produc
                                     if (quantity) {
                                       onQuantityChange(value, quantity);
                                     } else {
-                                      removeProduct(value.Id);
+                                      if (order?.Account?.id === localStorage.getItem("AccountId__c")&&isProductCarted(value.Id)) {
+                                        removeProduct(value.Id);
+                                      }
                                     }
                                   }}
-                                  value={ order?.Account?.id ===
+                                  value={order?.Account?.id ===
                                     localStorage.getItem("AccountId__c")
                                     ? qtyofItem
                                     : 0}
                                 />
                               </td>
                               <td>
-                                  {" "}
-                                  {order?.Account?.id ===
-                                    localStorage.getItem("AccountId__c")
-                                    ? qtyofItem > 0
-                                      ? "$" +
-                                      (inputPrice * qtyofItem).toFixed(2)
-                                      : "----"
-                                    : "----"}
-                                </td>
+                                {" "}
+                                {order?.Account?.id ===
+                                  localStorage.getItem("AccountId__c")
+                                  ? qtyofItem > 0
+                                    ? "$" +
+                                    (inputPrice * qtyofItem).toFixed(2)
+                                    : "----"
+                                  : "----"}
+                              </td>
                             </tr>
                           );
                         })}

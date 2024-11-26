@@ -1,7 +1,7 @@
-import React, { useState , useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Detail from './Detail.module.css'
 import { BackArrow, SupportStatusGreen, SupportStatusRed, SupportStatusYellow, UserChecked } from '../../lib/svg'
-import { DateConvert, GetAuthData, getStrCode, postSupportComment ,  DownloadAttachment} from '../../lib/store'
+import { DateConvert, GetAuthData, getStrCode, postSupportComment, DownloadAttachment } from '../../lib/store'
 
 import { Link } from 'react-router-dom';
 import ModalPage from '../Modal UI';
@@ -9,12 +9,13 @@ import Loading from '../Loading';
 const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 ];
-function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
+function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
     const [orderStatus, setorderStatus] = useState({ status: false, message: "" })
     const date = new Date(data.Date_Opened__c);
     const [comment, setComment] = useState('');
     const [btnAct, setBtnAct] = useState(true)
     const [token, setUsertoken] = useState(null);
+    const [showFullUserDesc, setShowFullUserDesc] = useState(false);
     function formatAMPM(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
@@ -30,7 +31,7 @@ function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
         if (comment.trim() != '') {
             setBtnAct(false)
             GetAuthData().then((user) => {
-              
+
 
                 let rawData = {
                     key: user.x_access_token,
@@ -60,39 +61,57 @@ function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
         }
     }
     useEffect(() => {
-      GetAuthData()
-        .then((user) => {
-       
-          setUsertoken(user?.x_access_token);
-        })
-        .catch((error) => {
-          console.error({ error });
-        });
+        GetAuthData()
+            .then((user) => {
+
+                setUsertoken(user?.x_access_token);
+            })
+            .catch((error) => {
+                console.error({ error });
+            });
     }, [comment])
     const downloadFile = async (attachmentId, attachmentName) => {
-      try {
-        const response = await DownloadAttachment(token, attachmentId);
-  
-        if (!response) {
-          throw new Error("Failed to download file");
+        try {
+            const response = await DownloadAttachment(token, attachmentId);
+
+            if (!response) {
+                throw new Error("Failed to download file");
+            }
+            const blob = await response.blob();
+            const fileURL = window.URL.createObjectURL(blob);
+            const isJFIF = attachmentName.toLowerCase().endsWith(".jfif");
+            const fileName = isJFIF
+                ? attachmentName.replace(/\.jfif$/i, ".jpg")
+                : attachmentName;
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = fileURL;
+            downloadLink.download = fileName;
+            downloadLink.click();
+            setTimeout(() => {
+                window.URL.revokeObjectURL(fileURL);
+            }, 1000);
+        } catch (error) {
+            console.error("Error downloading file:", error);
         }
-        const blob = await response.blob();
-        const fileURL = window.URL.createObjectURL(blob);
-        const isJFIF = attachmentName.toLowerCase().endsWith(".jfif");
-        const fileName = isJFIF
-          ? attachmentName.replace(/\.jfif$/i, ".jpg")
-          : attachmentName;
-  
-        const downloadLink = document.createElement("a");
-        downloadLink.href = fileURL;
-        downloadLink.download = fileName;
-        downloadLink.click();
-        setTimeout(() => {
-          window.URL.revokeObjectURL(fileURL);
-        }, 1000);
-      } catch (error) {
-        console.error("Error downloading file:", error);
-      }
+    };
+    const handleMouseEnter = () => {
+        setShowFullUserDesc(true);
+    };
+
+    const handleMouseLeave = () => {
+        setShowFullUserDesc(false);
+    };
+
+    const truncateAtLastWord = (text, limit) => {
+        if (text.length <= limit) return text;
+
+        const truncated = text.slice(0, limit);
+        const lastSpaceIndex = truncated.lastIndexOf(" ");
+
+        return lastSpaceIndex === -1
+            ? truncated
+            : truncated.slice(0, lastSpaceIndex) + ".....";
     };
     return (
         <div>
@@ -120,7 +139,7 @@ function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
             <div className={Detail.FullQuearyDetailMain}>
                 <h2 className={Detail.FullQuearyDetailH2}>
                     <Link to={'/customer-support'}>
-                        <BackArrow/>
+                        <BackArrow />
                     </Link>
                     <span>CUSTOMER Support </span> - My Support Tickets Status detail</h2>
                 <h4 className={Detail.FullQuearyDetailH4}>{data.RecordType?.Name} for Case Reason <span>- {data.Reason}</span> </h4>
@@ -133,7 +152,20 @@ function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
                                     <span>{data.Account?.Name}</span>&nbsp; raised this on {DateConvert(data.Date_Opened__c)}
                                 </p>
                             </div>
-                            <p style={{ marginTop: "1rem" }}>{data.Description}</p>
+                            <div
+                                className={`${Detail.UserDescWrapper} ${showFullUserDesc ? Detail.ShowFullDesc : ""
+                                    }`}
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                <span className={Detail.UserDescContent}>
+                                    {data.Description
+                                        ? showFullUserDesc
+                                            ? data.Description
+                                            : truncateAtLastWord(data.Description, 180)
+                                        : "No user description provided."}
+                                </span>
+                            </div>
 
                             <h6>Activity</h6>
                             <div className={Detail.HeightGiven}>
@@ -221,7 +253,7 @@ function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
                                 <h3>PO Number</h3>
                                 {data.Opportunity__c ?
                                     <Link to={'/orderDetails'}>
-                                        <p onClick={() => localStorage.setItem("OpportunityId", JSON.stringify(data.Opportunity__c))} style={{textDecoration:'underline'}}>#{data.Associated_PO_Number__c}</p>
+                                        <p onClick={() => localStorage.setItem("OpportunityId", JSON.stringify(data.Opportunity__c))} style={{ textDecoration: 'underline' }}>#{data.Associated_PO_Number__c}</p>
                                     </Link> :
                                     <p>#{data.Associated_PO_Number__c}</p>}
                             </div>}
@@ -230,42 +262,42 @@ function FullQuearyDetail({ data, setRest ,  attachmentUrls=[] }) {
                                 <p>{data.RecordType.Name}</p>
                             </div>
                             {attachmentUrls && attachmentUrls?.length > 0 && (
-                <div className={Detail.RecordType}>
-                  <h3>Attachments</h3>
+                                <div className={Detail.RecordType}>
+                                    <h3>Attachments</h3>
 
-                  <ul
-                    style={{
-                      listStyleType: "disc",
-                      paddingLeft: "20px",
-                      maxHeight: "280px",
-                      overflowY:
-                        attachmentUrls && attachmentUrls.length > 8
-                          ? "auto"
-                          : "visible",
-                      overflowX: "hidden",
-                    }}
-                  >
-                    {attachmentUrls.map((attachment, index) => (
-                      <li key={index}>
-                        <a
-                          style={{
-                            color: "black",
-                            textDecoration: "none",
-                            fontSize: "14px",
-                            wordWrap: "break-word",
-                          }}
-                          className={Detail.DownloadLink}
-                          onClick={() =>
-                            downloadFile(attachment.id, attachment.name)
-                          }
-                        >
-                          {attachment.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                                    <ul
+                                        style={{
+                                            listStyleType: "disc",
+                                            paddingLeft: "20px",
+                                            maxHeight: "280px",
+                                            overflowY:
+                                                attachmentUrls && attachmentUrls.length > 8
+                                                    ? "auto"
+                                                    : "visible",
+                                            overflowX: "hidden",
+                                        }}
+                                    >
+                                        {attachmentUrls.map((attachment, index) => (
+                                            <li key={index}>
+                                                <a
+                                                    style={{
+                                                        color: "black",
+                                                        textDecoration: "none",
+                                                        fontSize: "14px",
+                                                        wordWrap: "break-word",
+                                                    }}
+                                                    className={Detail.DownloadLink}
+                                                    onClick={() =>
+                                                        downloadFile(attachment.id, attachment.name)
+                                                    }
+                                                >
+                                                    {attachment.name}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

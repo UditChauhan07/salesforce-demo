@@ -49,7 +49,33 @@
 .FullQuearyDetailH4 span {
   font-weight: 700;
 }
+.UserDescWrapper {
+  white-space: normal; /* Allows text to wrap and break onto the next line when needed */
+  word-wrap: break-word; /* Ensures long words break correctly and don't overflow the container */
+  word-break: break-all; /* Breaks words that are too long to fit */
+  overflow-wrap: break-word; /* Same as word-wrap, adds a fallback */
+  hyphens: auto; /* Hyphenates the content when necessary */
+}
 
+.UserDescContent {
+  white-space: normal; /* Ensures wrapping of the description */
+  overflow-wrap: break-word; /* Handles word breaking to avoid overflow */
+  word-break: break-word; /* Ensures breaking at natural break points */
+  /* cursor: pointer; */
+}
+
+.ShowFullDesc {
+  max-height: none; /* Removes any restrictions on height if showing full description */
+}
+
+.UserDescWrapper {
+  max-width: 100%; /* Ensure the description wrapper doesn't exceed container's width */
+  display: block;
+  margin-top: 10px; /* Ensures that the description takes up a new line when needed */
+}
+.descriptionMarginTop {
+  margin-top: 10px;  /* Adjust the value as per your requirement */
+}
 .LeftMainTopBox p {
   display: flex;
   color: #000;
