@@ -65,8 +65,8 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
     setIsEmpty(temp);
   }, [brand, products]);
 useEffect(()=>{
-  setProducts(productList);
-},[productList])
+     setProducts(productList);
+},[])
   useEffect(() => {
     if (loadEffect) setLoaded(true);
     let newFilterData;
@@ -433,6 +433,14 @@ useEffect(()=>{
                       );
                     }
                   });
+                }else{
+                //   return <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]">
+                //   <div className="col-4">
+                //     <p className="m-0 fs-2 text-center font-[Montserrat-400] text-[14px] tracking-[2.20px] text-center">
+                //       No data found
+                //     </p>
+                //   </div>
+                // </div>
                 }
               })
             ) : (
