@@ -6,7 +6,7 @@ import { MdImage } from "react-icons/md";
 import { FaFileExcel } from "react-icons/fa";
 import { AiOutlineFilePdf, AiOutlineVideoCamera } from "react-icons/ai";
 
-const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler }) => {
+const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,desc=null }) => {
     const [confirm, setConfirm] = useState(false);
     function handleChange(e) {
         let tempFile = [...files];
@@ -160,7 +160,11 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler }
                 <div className={Styles.dFlex}>
                     <div className={Styles.descholder}>
                         <p className={Styles.subTitle}>Describe you Problem</p>
-                        <textarea name="desc" id="" className={Styles.textAreaPut} onKeyUp={(e) => setDesc(e.target.value)}></textarea>
+                        <textarea name="desc" id="" className={Styles.textAreaPut} 
+                                     value={desc}
+                                     onChange={(e) => setDesc(e.target.value)} 
+                                     onKeyUp={(e) => setDesc(e.target.value)}
+                        ></textarea>
                     </div>
                     <div className={Styles.attachHolder}>
                         <p className={Styles.subTitle}>upload some Attachements</p>

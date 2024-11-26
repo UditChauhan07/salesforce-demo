@@ -260,6 +260,9 @@ const MarketingCalendar = () => {
     }
     fetchData()
   }, [])
+  useEffect(() => {
+  }, [productList]);
+  
   return (
     <AppLayout
       filterNodes={
