@@ -28,36 +28,8 @@ const TopProducts = () => {
   const [productImages, setProductImages] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [accountDetails, setAccountDetails] = useState()
-  const [accountDetails2, setAccountDetails2] = useState()
 
   const navigate = useNavigate()
-  const fetchAccountDetails = async () => {
-    let data = await GetAuthData(); // Fetch authentication data
-    let salesRepId = data.Sales_Rep__c;
-    let accessToken = data.x_access_token;
-
-    dataStore.subscribe("actBndRelated" + salesRepId, (data) => setAccountDetails(data));
-    try {
-      // Await the axios.post call to resolve the Promise
-      let res = await dataStore.getPageData("actBndRelated" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
-        salesRepId,
-        accessToken,
-      }));
-
-
-      setAccountDetails2(res.data.accountDetails);
-      return () => {
-        dataStore.unsubscribe("actBndRelated" + salesRepId, (data) => setAccountDetails(data));
-      }
-    } catch (error) {
-      console.error("Error", error); // Log error details
-    }
-  };
-
-
-  useEffect(() => {
-    fetchAccountDetails()
-  }, [])
 
 
   const readyTopProducthandle = (products) => {
@@ -109,6 +81,15 @@ const TopProducts = () => {
 
   useEffect(() => {
     dataStore.subscribe("/top-productsnull" + monthIndex + 1, readyTopProducthandle);
+    GetAuthData().then((user)=>{
+      
+      dataStore.getPageData(
+        `actBndRelated${user.Sales_Rep__c}`,
+        () => fetchAccountDetails()).then((res) => {
+          setAccountDetails(res.accountDetails);
+        }).catch((err) => console.error({ err })
+      );
+    }).catch((err) => console.error({ err }))
     btnHandler({ manufacturerId: null, month: monthIndex + 1 });
     let indexMonth = [];
     let helperArray = [];
@@ -173,6 +154,8 @@ const TopProducts = () => {
     fetchData()
   }, [])
 
+  useEffect(()=>{},[accountDetails])
+
   return (
     <AppLayout filterNodes={<>
 
@@ -223,7 +206,7 @@ const TopProducts = () => {
           </div>
         </div>
         :
-        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages} accountDetails={accountDetails2} />}
+        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages} accountDetails={accountDetails} />}
     </AppLayout>
   );
 };

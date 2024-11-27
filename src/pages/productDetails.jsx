@@ -107,7 +107,7 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                 return;
             }
         }
-    console.log({accountDetails} )
+    // console.log({accountDetails} )
         if (addProductToAccount) {
             const accountDetails = selectProductDealWith[addProductToAccount] || {};
             const account = {
@@ -231,9 +231,8 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                         <div className="d-flex flex-column gap-3">
                             <h2>Attention!</h2>
                             <p>
-                                Please select store you want to order for
-                            </p>
-                            <div></div>
+              You have multi store with deal with this Brand.<br /> can you please select you create order for
+            </p>
                             <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
                             <div className="d-flex justify-content-around ">
                                 <button style={styles.btn} onClick={accountSelectionHandler}>

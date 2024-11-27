@@ -146,6 +146,8 @@ const NewArrivals = () => {
     checkPermissions();
   }, [navigate]);
 
+  useEffect(()=>{},[accountDetails])
+
   return (
     <AppLayout
     filterNodes={
