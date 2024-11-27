@@ -19,14 +19,10 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
   const [productDetailId, setProductDetailId] = useState(null);
   const [priceInputs, setPriceInputs] = useState({});
   const [msg, setMsg] = useState("");
-  const onPriceChangeHander = (product, price = '0') => {
-    const sanitizedPrice = price.replace(/^0+/, '') || '0';
-    setPriceInputs((prev) => ({
-      ...prev,
-      [product.Id]: sanitizedPrice,
-    }));
-    updateProductQty(product.Id, { ...product, total: sanitizedPrice });
-  };
+  const onPriceChangeHander = (productId, price = '0') => {
+    if (price == '') price = 0;
+    updateProductPrice(productId, price || 0)
+  }
 
   const onQuantityChange = (element, quantity) => {
     if (!quantity) {
@@ -214,7 +210,9 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                               <td>{value?.usdRetail__c?.includes("$") ? `$${listPrice}` : `$${Number(value.usdRetail__c).toFixed(2)}`}</td>
                               <td>
                                 <div className="d-flex">
-                                  ${(inputPrice || inputPrice == 0) ? <input type="text" value={inputPrice} onChange={(e) => updateProductPrice(value.Id, e.target.value || 0)} /> : salesPrice}
+                                  ${(inputPrice || inputPrice == 0) ? <input type="number" value={inputPrice} placeholder={Number(inputPrice).toFixed(2)} className={`${styles.customPriceInput} ms-1`}
+                                  onChange={(e) => { onPriceChangeHander(value.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
+                                  name="limit_input" /> : salesPrice}
                                 </div>
                               </td>
                               <td>{value.Min_Order_QTY__c || 0}</td>
