@@ -19,16 +19,24 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
     const [userDesc, setUserDesc] = useState("");
     const [issueDesc, setIssueDesc] = useState("");
     useEffect(() => {
-      const description = data.Description || "";
-      const userDescMatch = description
-        .split("User Desc:")[1]
-        ?.split("Issue Desc:")[0]
-        ?.trim();
-      const issueDescMatch = description.split("Issue Desc:")[1]?.trim();
-  
-      setUserDesc(userDescMatch || "");
-      setIssueDesc(issueDescMatch || "");
-    }, [data.Description]);
+        const description = data.Description || "";
+      
+        // Attempt to extract User Desc if "User Desc:" is present
+        const userDescMatch = description.includes("User Desc:")
+          ? description.split("User Desc:")[1]?.split("Issue Desc:")[0]?.trim()
+          : description;
+      
+        // Attempt to extract Issue Desc if "Issue Desc:" is present
+        const issueDescMatch = description.includes("Issue Desc:")
+          ? description.split("Issue Desc:")[1]?.trim()
+          : "";
+      
+        // Set the extracted descriptions or empty strings if not found
+        setUserDesc(userDescMatch || "");
+        setIssueDesc(issueDescMatch || "");
+      }, [data.Description]);
+      
+      
     function formatAMPM(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
