@@ -370,57 +370,65 @@ const CartProvider = ({ children }) => {
         }
     };
 
-    const updateProductPrice = (productId, price=0) => {
-        // Ensure price is a valid number (0 or positive)
-        if (isNaN(price) || price < 0) {
+    const updateProductPrice = (productId, price = 0) => {
+        // Convert price to a number and validate
+        const numericPrice = parseFloat(price);
+    
+        if (isNaN(numericPrice) || numericPrice < 0) {
             Swal.fire({
                 title: "Invalid Price!",
-                text: "Price cannot be negative. Please provide a valid amount.",
+                text: "Please provide a valid non-negative number for the price.",
                 icon: "warning",
-                button: "OK",
-                confirmButtonColor: '#000',  // Black
+                confirmButtonColor: "#000", // Black
             });
-            return; // Don't update if price is invalid
+            return; // Stop further execution for invalid input
         }
-        price = parseFloat(price);
+    
+        // Format the price to 2 decimal places
+        const formattedPrice = parseFloat(numericPrice.toFixed(2));
+        
     
         setOrder((prevOrder) => {
-            const product = prevOrder.items.find(item => item.Id === productId);
+            const product = prevOrder.items.find((item) => item.Id === productId);
             if (!product) {
                 Swal.fire({
                     title: "Product Not Found!",
                     text: `No product found with ID: ${productId}`,
                     icon: "error",
-                    button: "OK",
-                    confirmButtonColor: '#000',
-                    color: '#333',
+                    confirmButtonColor: "#000", // Black
                 });
                 return prevOrder; // No product found
             }
     
-            const updatedItems = prevOrder.items.map(item =>
+            // Calculate the updated total
+            const updatedItems = prevOrder.items.map((item) =>
                 item.Id === productId
-                    ? { ...item, price } // Update the product price
+                    ? { ...item, price: formattedPrice } // Update price for matching product
                     : item
             );
+            
+            const updatedTotal =
+                prevOrder.total -
+                product.price * product.qty +
+                formattedPrice * product.qty;
     
-            // Directly update the total price
-            const updatedTotal = prevOrder.total - (product.price * product.qty) + (price * product.qty);
-    
+            // Return the updated order state
             return {
                 ...prevOrder,
                 items: updatedItems,
-                total: parseFloat(updatedTotal),
+                total: parseFloat(updatedTotal.toFixed(2)), // Ensure total is also formatted
             };
         });
     
+        // Optional success message (uncomment if needed)
         // Swal.fire({
         //     title: "Price Updated!",
         //     text: `The price for the product with ID: ${productId} has been successfully updated.`,
         //     icon: "success",
-        //     button: "OK",
+        //     confirmButtonColor: "#000", // Black
         // });
     };
+    
     
 
     // Update product quantity
