@@ -61,6 +61,7 @@ const TargetReport = () => {
         setSearchSaleBy(data.ownerPermission ? state?.salesRepId : null);
     }
     const filteredTargetData = useMemo(() => {
+        setCurrentPage(1);
         let filtered = target.list.filter((ele) => {
             if (!manufacturerFilter || !ele.ManufacturerId.localeCompare(manufacturerFilter)) {
                 return ele;
