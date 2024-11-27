@@ -54,6 +54,14 @@ const NewArrivals = () => {
   // Fetch marketing calendar data
   const fetchCalendarData = async (year = selectYear) => {
     setIsLoaded(false);
+  
+    // Handle no data for 2025 explicitly
+    if (year === 2025) {
+      setProductList([]); // Clear product list
+      setIsLoaded(true); // Mark as loaded to skip the loading spinner
+      return; // Exit early as no API call is needed
+    }
+  
     try {
       const user = await GetAuthData();
       const productRes = await dataStore.getPageData(
@@ -65,6 +73,7 @@ const NewArrivals = () => {
       console.error("Error fetching calendar data:", err);
     }
   };
+  
 
   // Process and format calendar data
   const processCalendarData = (data) => {
@@ -139,55 +148,61 @@ const NewArrivals = () => {
 
   return (
     <AppLayout
-      filterNodes={
-        <>
-          <FilterItem
-            label="Year"
-            name="Year"
-            value={selectYear}
-            options={yearList}
-            onChange={handleYearChange}
-          />
-          <FilterItem
-            minWidth="220px"
-            label="All Brands"
-            name="All-Brand"
-            value={brand}
-            options={[
-              { label: "All Brands", value: null },
-              ...(manufacturers?.data?.map((manufacturer) => ({
-                label: manufacturer.Name,
-                value: manufacturer.Id
-              })) || [])
-            ]}
-            onChange={setBrand}
-          />
-          <FilterItem
-            minWidth="220px"
-            label="JAN-DEC"
-            name="JAN-DEC"
-            value={month}
-            options={months}
-            onChange={setMonth}
-          />
-          <button className="border px-2 py-1 leading-tight d-grid" onClick={handleClear}>
-            <CloseButton crossFill="#fff" height={20} width={20} />
-            <small style={{ fontSize: "6px", letterSpacing: "0.5px", textTransform: "uppercase" }}>Clear</small>
-          </button>
-        </>
-      }
-    >
-      {!isLoaded ? (
-        <Loading height="70vh" />
-      ) : (
-        <NewArrivalsPage
-          brand={brand}
-          month={month}
-          productList={productList}
-          accountDetails={accountDetails}
+    filterNodes={
+      <>
+        <FilterItem
+          label="Year"
+          name="Year"
+          value={selectYear}
+          options={yearList}
+          onChange={handleYearChange}
         />
-      )}
-    </AppLayout>
+        <FilterItem
+          minWidth="220px"
+          label="All Brands"
+          name="All-Brand"
+          value={brand}
+          options={[
+            { label: "All Brands", value: null },
+            ...(manufacturers?.data?.map((manufacturer) => ({
+              label: manufacturer.Name,
+              value: manufacturer.Id
+            })) || [])
+          ]}
+          onChange={setBrand}
+        />
+        <FilterItem
+          minWidth="220px"
+          label="JAN-DEC"
+          name="JAN-DEC"
+          value={month}
+          options={months}
+          onChange={setMonth}
+        />
+        <button className="border px-2 py-1 leading-tight d-grid" onClick={handleClear}>
+          <CloseButton crossFill="#fff" height={20} width={20} />
+          <small style={{ fontSize: "6px", letterSpacing: "0.5px", textTransform: "uppercase" }}>Clear</small>
+        </button>
+      </>
+    }
+  >
+    {!isLoaded ? (
+      <Loading height="70vh" />
+    ) : productList.length === 0 ? (
+      <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]">
+      <p className="m-0 fs-2 font-[Montserrat-400] text-center text-[14px] tracking-[2.20px]">
+        No Data Found
+      </p>
+  </div>
+    ) : (
+      <NewArrivalsPage
+        brand={brand}
+        month={month}
+        productList={productList}
+        accountDetails={accountDetails}
+      />
+    )}
+  </AppLayout>
   );
 };
 
