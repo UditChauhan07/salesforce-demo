@@ -1,5 +1,5 @@
 
-import { GetAuthData } from "./store";
+import { DestoryAuth, GetAuthData } from "./store";
 let userType = "saleRep";
 export const permissionsArray = [
   {
@@ -379,6 +379,7 @@ export async function getPermissions() {
 
   if (!authData) {
     console.log("No auth data found, or session expired.");
+    DestoryAuth();
     return null;
   }
 
