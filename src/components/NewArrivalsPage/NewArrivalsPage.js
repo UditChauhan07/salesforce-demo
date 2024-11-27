@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accountDetails = {} }) {
-  console.log({productList})
+
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
   useEffect(() => { }, [productList])
@@ -378,10 +378,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
                           </p>
                           {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> : ProductInCart ? <small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
                           <p className={Styles.priceHolder}>
-                            {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <div className={Styles.priceCrossed}>
-                              {/* $ */}
-                              
-                              {listPrice?.toFixed(2)}</div> : ProductInCart ? <div className={Styles.priceCrossed}>{listPrice ? '$' + listPrice?.toFixed(2) : null}</div> : null : null}
+                            {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div> : ProductInCart ? <div className={Styles.priceCrossed}>{listPrice ? '$' + listPrice?.toFixed(2) : null}</div> : null : null}
                             &nbsp;
                             <div>${ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price)?.toFixed(2)}</Link> : !isNaN(salesPrice) ? salesPrice?.toFixed(2) : listPrice ?? "-- . --"}</div>
                           </p>
@@ -434,13 +431,13 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
                     }
                   });
                 } else {
-                  //   return <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]">
-                  //   <div className="col-4">
-                  //     <p className="m-0 fs-2 text-center font-[Montserrat-400] text-[14px] tracking-[2.20px] text-center">
-                  //       No data found
-                  //     </p>
-                  //   </div>
-                  // </div>
+                    return <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]" style={{width : '100vw'}}>
+                    <div className="col-4">
+                      <p className="m-0 fs-2 text-center font-[Montserrat-400] text-[14px] tracking-[2.20px] text-center">
+                        No data found
+                      </p>
+                    </div>
+                  </div>
                 }
               })
             ) : (

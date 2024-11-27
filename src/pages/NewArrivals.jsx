@@ -56,13 +56,7 @@ const NewArrivals = () => {
   const fetchCalendarData = async (year = selectYear) => {
     setIsLoaded(false);
   
-    // Handle no data for 2025 explicitly
-    if (year === 2025) {
-      setProductList([]); // Clear product list
-      setIsLoaded(true); // Mark as loaded to skip the loading spinner
-      return; // Exit early as no API call is needed
-    }
-  
+   
     try {
       const user = await GetAuthData();
       const productRes = await dataStore.getPageData(
@@ -191,22 +185,14 @@ const NewArrivals = () => {
       </>
     }
   >
-    {!isLoaded ? (
-      <Loading height="70vh" />
-    ) : productList.length === 0 ? (
-      <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]">
-      <p className="m-0 fs-2 font-[Montserrat-400] text-center text-[14px] tracking-[2.20px]">
-        No Data Found
-      </p>
-  </div>
-    ) : (
+    
       <NewArrivalsPage
         brand={brand}
         month={month}
         productList={productList}
         accountDetails={accountDetails}
       />
-    )}
+
   </AppLayout>
   );
 };
