@@ -86,14 +86,17 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
         const listOfAccounts = Object.keys(selectProductDealWith);
         let addProductToAccount = null;
     
-        // If AccountId is passed as a prop, use it directly
         if (AccountId) {
-            addProductToAccount = AccountId;
+            // If AccountId is an array, extract the first element
+            addProductToAccount = Array.isArray(AccountId) ? AccountId[0] : AccountId;
+            console.log(addProductToAccount, "add product to account");
         } else if (listOfAccounts.length) {
             if (listOfAccounts.length === 1) {
                 addProductToAccount = listOfAccounts[0];
+                console.log(addProductToAccount , "add product to account")
             } else if (selectAccount?.value) {
                 addProductToAccount = selectAccount.value;
+                console.log(addProductToAccount , "add product to account")
             } else {
                 const accounts = listOfAccounts.map((actId) => ({
                     value: actId,
