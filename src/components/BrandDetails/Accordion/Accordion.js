@@ -11,7 +11,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
   const { testerInclude, sampleInclude } = productCartSchema || true;
 
   let Img1 = "/assets/images/dummy.png";
-  const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted,updateProductPrice } = useCart();
+  const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted, updateProductPrice } = useCart();
   const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
   // console.log(productCartSchema)
   const [replaceCartProduct, setReplaceCartProduct] = useState({});
@@ -66,15 +66,15 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
     } else {
       discount = data.discount?.margin || 0;
     }
-    let salesPrice =  (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
+    let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
     element.price = salesPrice;
     element.qty = quantity;
-    console.log(salesPrice , "salesprice")
+    console.log(salesPrice, "salesprice")
     // element.discount = discount;
     let cartStatus = addOrder(element, account, manufacturer);
-    
+
   };
-   
+
   const orderSetting = (product, quantity) => {
     setReplaceCartModalOpen(false);
     addOrder(product, quantity, data.discount);
@@ -142,9 +142,9 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                     return (
                       <CollapsibleRow title={key != "null" ? key : "No Category"} quantity={categoryOrderQuantity} key={index} index={index}>
                         {Object.values(formattedData)[index]?.map((value, indexed) => {
-                          let cartProduct ={};
-                          if (order?.Account?.id === localStorage.getItem("AccountId__c")&&isProductCarted(value.Id)) {
-                            cartProduct= isProductCarted(value.Id);
+                          let cartProduct = {};
+                          if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
+                            cartProduct = isProductCarted(value.Id);
                           }
 
                           let listPrice = Number(value?.usdRetail__c?.replace("$", "").replace(",", ""));
@@ -214,7 +214,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                               <td>{value?.usdRetail__c?.includes("$") ? `$${listPrice}` : `$${Number(value.usdRetail__c).toFixed(2)}`}</td>
                               <td>
                                 <div className="d-flex">
-                                  ${inputPrice?<input type="text" value={inputPrice} onChange={(e)=>updateProductPrice(value.Id,e.target.value||null)}/>:salesPrice}
+                                  ${(inputPrice || inputPrice == 0) ? <input type="text" value={inputPrice} onChange={(e) => updateProductPrice(value.Id, e.target.value || 0)} /> : salesPrice}
                                 </div>
                               </td>
                               <td>{value.Min_Order_QTY__c || 0}</td>
@@ -233,17 +233,20 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                   value={order?.Account?.id === localStorage.getItem("AccountId__c") ? qtyofItem : 0}
                                 />
                               </td>
+                              {console.log({ priceInputs })
+                              }
                               <td>
-  {order?.Account?.id === localStorage.getItem("AccountId__c") ? (
-    qtyofItem > 0 ? (
-      `$${(priceInputs[value.Id] || inputPrice || salesPrice) * qtyofItem}`
-    ) : (
-      "----"
-    )
-  ) : (
-    "----"
-  )}
-</td>
+                                {order?.Account?.id === localStorage.getItem("AccountId__c") ? (
+                                  qtyofItem > 0 ? (
+                                    `$${((priceInputs[value.Id] ?? inputPrice ?? salesPrice) * qtyofItem)
+                                      .toFixed(2)}`
+                                  ) : (
+                                    "----"
+                                  )
+                                ) : (
+                                  "----"
+                                )}
+                              </td>
                             </tr>
                           );
                         })}
