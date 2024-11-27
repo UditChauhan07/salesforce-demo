@@ -8,6 +8,7 @@ import { getPermissions } from "../lib/permission";
 import { Navigate, useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
+import AppLayout from "../components/AppLayout";
 const BMAIssues = () => {
     const [sumitForm, setSubmitForm] = useState(false)
     const [accountList, setAccountList] = useState([]);
@@ -63,7 +64,7 @@ const BMAIssues = () => {
     }, []);
     const memoizedPermissions = useMemo(() => permissions, [permissions]);
 
-    if (sumitForm) return <Loading height={'80vh'} />;
+    if (sumitForm) return <AppLayout><Loading height={'80vh'} /></AppLayout>;
     return (
         <CustomerSupportLayout
             permissions={permissions}
