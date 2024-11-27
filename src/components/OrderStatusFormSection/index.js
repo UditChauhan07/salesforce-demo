@@ -31,9 +31,7 @@ const OrderStatusFormSection = ({ setSubmitLoad }) => {
           AccountId: data.orderStatusForm.accountId,
         };
         getSupportFormRaw({ rawData })
-          .then((raw) => {
-            console.log({raw});
-            
+          .then((raw) => {            
             setPrioritiesList(raw.Priority);
             setContactList(raw.ContactList);
             if (data.orderStatusForm.opportunityId) {

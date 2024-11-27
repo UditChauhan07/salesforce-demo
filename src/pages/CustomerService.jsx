@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import BMAIHandler from "../components/IssuesHandler/BMAIHandler.jsx";
-import { GetAuthData, admins, getAllAccount, getOrderCustomerSupport, getOrderList, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
+import { GetAuthData, admins, defaultLoadTime, getAllAccount, getOrderCustomerSupport, getOrderList, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
 import OrderCardHandler from "../components/IssuesHandler/OrderCardHandler.jsx";
 import Attachements from "../components/IssuesHandler/Attachements.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ import AppLayout from "../components/AppLayout.jsx";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied.jsx";
 import dataStore from "../lib/dataStore.js";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater.js";
 const CustomerService = () => {
   const { state } = useLocation();
   let Reason = null;
@@ -79,6 +80,51 @@ const CustomerService = () => {
       setOrderId(OrderId)
     }
   }, []);
+
+  const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
+    setLoaded(false)
+    setSelectedSalesRepId(Sales_Rep__c)
+    if (searchId) {
+      getOrderCustomerSupport({
+        user: { key, Sales_Rep__c },
+        PONumber: searchPo, searchId
+      })
+        .then((order) => {
+          if (ReasonNull) {
+            setReason(null)
+          }
+          setOrders(order);
+          setLoaded(true)
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    } else {
+      dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
+        user: { key, Sales_Rep__c },
+        PONumber: searchPo, searchId
+      }))
+        .then((order) => {
+          if (ReasonNull) {
+            setReason(null)
+          }
+          setOrders(order);
+          resetHandler()
+          setLoaded(true)
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    }
+    dataStore.getPageData("/getAllAccount" + Sales_Rep__c, () => getAllAccount({ user: { x_access_token: key, Sales_Rep__c } }))
+      .then((accounts) => {
+        setAccountList(accounts);
+      })
+      .catch((actError) => {
+        console.error({ actError });
+      });
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -131,50 +177,8 @@ const CustomerService = () => {
 
 
 
-
-  const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
-    setLoaded(false)
-    setSelectedSalesRepId(Sales_Rep__c)
-    if (searchId) {
-      getOrderCustomerSupport({
-        user: { key, Sales_Rep__c },
-        PONumber: searchPo, searchId
-      })
-        .then((order) => {
-          if (ReasonNull) {
-            setReason(null)
-          }
-          setOrders(order);
-          setLoaded(true)
-        })
-        .catch((error) => {
-          console.log({ error });
-        });
-    } else {
-      dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
-        user: { key, Sales_Rep__c },
-        PONumber: searchPo, searchId
-      }))
-        .then((order) => {
-          if (ReasonNull) {
-            setReason(null)
-          }
-          setOrders(order);
-          resetHandler()
-          setLoaded(true)
-        })
-        .catch((error) => {
-          console.log({ error });
-        });
-    }
-    dataStore.getPageData("/getAllAccount" + Sales_Rep__c, () => getAllAccount({ user: { x_access_token: key, Sales_Rep__c } }))
-      .then((accounts) => {
-        setAccountList(accounts);
-      })
-      .catch((actError) => {
-        console.error({ actError });
-      });
-  }
+useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Reason ? SalesRepId : userData.Sales_Rep__c, Reason ? false : true, OrderId),defaultLoadTime);
+ 
 
   const SubmitHandler = () => {
     setSubmitForm(true)

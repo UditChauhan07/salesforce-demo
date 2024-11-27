@@ -7,7 +7,7 @@ import img3 from "./Images/Group.png";
 import img4 from "./Images/Group1.png";
 import { PieChart, Pie, Cell } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthCheck, GetAuthData, admins, formatNumber, getDashboardata, hexabrand, refreshTargetRollOver } from "../../lib/store";
+import { AuthCheck, GetAuthData, admins, defaultLoadTime, formatNumber, getDashboardata, hexabrand, refreshTargetRollOver } from "../../lib/store";
 import { getRandomColors } from "../../lib/color";
 import ContentLoader from "react-content-loader";
 import SelectBrandModel from "../My Retailers/SelectBrandModel/SelectBrandModel";
@@ -20,6 +20,7 @@ import { getPermissions } from "../../lib/permission";
 import { salesRepIdKey } from "../../lib/store";
 import { useSearchParams } from "react-router-dom";
 import dataStore from "../../lib/dataStore";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const monthList = [
   {
@@ -512,7 +513,7 @@ function Dashboard() {
 
   let lowPerformanceArray = accountPerformance?.data?.slice(0)?.reverse()?.map((ele) => ele);
 
-
+  useBackgroundUpdater(()=>getDataHandler({month:selectMonth,year:selectYear}),defaultLoadTime);
   const changeMonthHandler = (value) => {
     setIsLoading(false);
     setleadsbtbrand({ isLoaded: false, data: [] })

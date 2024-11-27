@@ -199,9 +199,7 @@ function MyBagFinal({ showOrderFor }) {
               ShippingZip: order?.Account?.address?.postalCode,
               list,
               key: user.x_access_token,
-              shippingMethod: order.Account.shippingMethod , 
-           
-              
+              shippingMethod: order.Account.shippingMethod,
             };
             OrderPlaced({ order: begToOrder, cartId: order.id  })
               .then((response) => {

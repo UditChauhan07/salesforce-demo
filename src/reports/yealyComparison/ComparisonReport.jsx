@@ -9,7 +9,7 @@ import ModalPage from "../../components/Modal UI";
 import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
 import YearlyComparisonReportTable from "../../components/comparison report table/YearlyComparisonReport";
-import { getYearlyComparison, sortArrayHandler } from "../../lib/store";
+import { defaultLoadTime, getYearlyComparison, sortArrayHandler } from "../../lib/store";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
 import { GetAuthData } from "../../lib/store";
@@ -17,6 +17,7 @@ import { getPermissions } from "../../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const date = new Date();
@@ -38,10 +39,22 @@ const YearlyComparisonReport = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
   const navigate = useNavigate()
+  const sendApiCall = async () => {
+    setIsLoading(true);
+    const result = await dataStore.getPageData("/comparison" + JSON.stringify({
+      year: filter.year,
+      manufacturerId: filter.ManufacturerId__c,
+    }), () => getYearlyComparison({ ...filter }));
+    sortArrayHandler(result || [], g => g?.AccountName)
+    setApiData(result);
+    setIsLoading(false);
+  };
   useEffect(() => {
     // Update API data when filter or status changes
     sendApiCall();
   }, []); // Update when filter or status changes
+
+  useBackgroundUpdater(sendApiCall,defaultLoadTime);
 
   const handleExportToExcel = () => {
     setExportToExcelState(true);
@@ -256,16 +269,7 @@ const YearlyComparisonReport = () => {
     setIsLoading(false);
     setStatus(1); // Reset status to active accounts
   };
-  const sendApiCall = async () => {
-    setIsLoading(true);
-    const result = await dataStore.getPageData("/comparison" + JSON.stringify({
-      year: filter.year,
-      manufacturerId: filter.ManufacturerId__c,
-    }), () => getYearlyComparison({ ...filter }));
-    sortArrayHandler(result || [], g => g?.AccountName)
-    setApiData(result);
-    setIsLoading(false);
-  };
+
 
 
   // Fetch user data and permissions

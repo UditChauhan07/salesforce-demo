@@ -1,11 +1,12 @@
 import FullQuearyDetail from "../components/CustomerSupportPage/FullQuearyDetail";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { GetAuthData, getSupportDetails, getAttachment } from "../lib/store";
+import { GetAuthData, getSupportDetails, getAttachment, defaultLoadTime } from "../lib/store";
 import { useLocation } from "react-router";
 import AppLayout from "../components/AppLayout";
 import LoaderV3 from "../components/loader/v3";
 import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const CustomerSupportDetails = () => {
   const navigate = useNavigate();
@@ -62,6 +63,8 @@ const CustomerSupportDetails = () => {
       );
     };
   }, [detailsId, reset]);
+
+  useBackgroundUpdater(fetchDetails,defaultLoadTime);
 
   useEffect(() => {
     const fetchAttachmentsWithTimeout = async () => {

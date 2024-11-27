@@ -6,7 +6,7 @@ import { MdOutlineDownload } from "react-icons/md";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
 import { CloseButton } from "../lib/svg";
-import { GetAuthData, getMarketingCalendar, getMarketingCalendarPDF, getMarketingCalendarPDFV2, getMarketingCalendarPDFV3, originAPi } from "../lib/store";
+import { defaultLoadTime, GetAuthData, getMarketingCalendar, getMarketingCalendarPDF, getMarketingCalendarPDFV2, getMarketingCalendarPDFV3, originAPi } from "../lib/store";
 import Loading from "../components/Loading";
 import { useManufacturer } from "../api/useManufacturer";
 import { getPermissions } from "../lib/permission";
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import ModalPage from "../components/Modal UI";
 import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const fileExtension = ".xlsx";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -52,35 +53,37 @@ const MarketingCalendar = () => {
     setIsloaed(true)
   }
 
+  const readyCalendarHandle = (data) => {
+    setProductList(data);
+    setIsloaed(true);
+  };
+  const fetchData = async () => {
+    setIsloaed(false);
+    try {
+      const user = await GetAuthData();
+      dataStore.subscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+      let res =await dataStore.getPageData(
+        `/marketing-calendar${selectYear}`,
+        () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })
+      );
+      // if(res){
+      //   setProductList([]);
+      //   readyCalendarHandle(res);
+      // }
+      
+    } catch (error) {
+      console.error("Data Fetch Error", error);
+    }
+  };
   useEffect(() => {
-    const readyCalendarHandle = (data) => {
-      setProductList(data);
-      setIsloaed(true);
-    };
 
-    const fetchData = async () => {
-      setIsloaed(false);
-      try {
-        const user = await GetAuthData();
-        dataStore.subscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
-        let res =await dataStore.getPageData(
-          `/marketing-calendar${selectYear}`,
-          () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })
-        );
-        // if(res){
-        //   setProductList([]);
-        //   readyCalendarHandle(res);
-        // }
-        
-      } catch (error) {
-        console.error("Data Fetch Error", error);
-      }
-    };
 
     fetchData();
     return () => dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
   }, [selectYear]);
   const [month, setMonth] = useState("");
+
+  useBackgroundUpdater(fetchData,defaultLoadTime);
 
 
   const generatePdfServerSide = (version = 0) => {

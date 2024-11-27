@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppLayout from "../../components/AppLayout";
 import Styles from "./index.module.css";
-import { DateConvert, GetAuthData, getRollOver } from "../../lib/store";
+import { DateConvert, defaultLoadTime, GetAuthData, getRollOver } from "../../lib/store";
 import Loading from "../../components/Loading";
 import { useManufacturer } from "../../api/useManufacturer";
 import { FilterItem } from "../../components/FilterItem";
@@ -17,6 +17,7 @@ import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
 import Pagination from "../../components/Pagination/Pagination";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const TargetReport = () => {
@@ -93,8 +94,8 @@ const TargetReport = () => {
         })
         return filtered;
     }, [manufacturerFilter, searchBy, searchSaleBy, activeAccounts, isLoaded]);
-    useEffect(() => {
-        dataStore.subscribe("/Target-Report", handleTargetReady)
+
+    const GetTargetData = ()=>{
         GetAuthData()
             .then((user) => {
                 dataStore.getPageData("/Target-Report", () => getRollOver({ user, year, preOrder }))
@@ -109,10 +110,16 @@ const TargetReport = () => {
             .catch((userErr) => {
                 console.error({ userErr });
             });
+    }
+    useEffect(() => {
+        dataStore.subscribe("/Target-Report", handleTargetReady)
+        GetTargetData();
         return () => {
             dataStore.unsubscribe("/Target-Report", handleTargetReady)
         }
     }, []);
+
+    useBackgroundUpdater(GetTargetData,defaultLoadTime);
 
 
     const resetFilter = () => {

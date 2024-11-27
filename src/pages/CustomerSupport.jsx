@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import CustomerSupportPage from "../components/CustomerSupportPage/CustomerSupportPage";
 import { FilterItem } from "../components/FilterItem";
 import FilterSearch from "../components/FilterSearch";
-import { DestoryAuth, GetAuthData, admins, getBrandList, getRetailerList, getSalesRepList, getSupportList, sortArrayHandler } from "../lib/store";
+import { DestoryAuth, GetAuthData, admins, defaultLoadTime, getBrandList, getRetailerList, getSalesRepList, getSupportList, sortArrayHandler } from "../lib/store";
 import Loading from "../components/Loading";
 import Pagination from "../components/Pagination/Pagination";
 import AppLayout from "../components/AppLayout";
@@ -11,6 +11,7 @@ import { getPermissions } from "../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 let PageSize = 10;
 const CustomerSupport = () => {
   const [supportList, setSupportList] = useState([]);
@@ -98,6 +99,9 @@ const CustomerSupport = () => {
         console.error({ error });
       });
   }
+  useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
+  useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
+  useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
   const supportBasedOnSalesRep = (value) => {
     setSelectedSalesRepId(value)
     setSupportList([])
