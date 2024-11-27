@@ -248,8 +248,8 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
             <h2>Alert!</h2>
             <p>
               You have multi store with deal with this Brand.<br /> can you please select you create order for
-              <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
             </p>
+              <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
             <div className="d-flex justify-content-around ">
               <button className={`${StylesModal.modalButton}`} onClick={accountSelectionHandler}>
                 OK

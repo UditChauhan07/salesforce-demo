@@ -30,15 +30,10 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
   const [accountNumber, setAccountNumber] = useState();
 
   const onQuantityChange = (element, quantity) => {
-    console.log("onQuantityChange called with:", { element, quantity });
-
     let listPrice = Number(element?.usdRetail__c?.replace("$", "")?.replace(",", ""));
     let selectProductDealWith = accountDetails[element.ManufacturerId__c] || [];
-    console.log("selectProductDealWith:",selectProductDealWith);
-    console.log("manufacturer id " , element.ManufacturerId__c)
 
     let listOfAccounts = Object.keys(selectProductDealWith);
-    console.log("listOfAccounts:", listOfAccounts);
 
     let addProductToAccount = null;
     if (listOfAccounts.length) {
@@ -199,7 +194,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
           <div className="d-flex flex-column" style={{width:'400px'}}>
             <h2>Attention!</h2>
             <p>
-              Please select store you want to order for
+            You have multi store with deal with this Brand.<br /> can you please select you create order for
             </p>
               <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
             <div className="d-flex justify-content-around ">
