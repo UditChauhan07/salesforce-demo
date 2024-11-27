@@ -370,7 +370,7 @@ const CartProvider = ({ children }) => {
         }
     };
 
-    const updateProductPrice = (productId, price) => {
+    const updateProductPrice = (productId, price=0) => {
         // Ensure price is a valid number (0 or positive)
         if (isNaN(price) || price < 0) {
             Swal.fire({
@@ -378,9 +378,11 @@ const CartProvider = ({ children }) => {
                 text: "Price cannot be negative. Please provide a valid amount.",
                 icon: "warning",
                 button: "OK",
+                confirmButtonColor: '#000',  // Black
             });
             return; // Don't update if price is invalid
         }
+        price = parseFloat(price);
     
         setOrder((prevOrder) => {
             const product = prevOrder.items.find(item => item.Id === productId);
@@ -390,6 +392,8 @@ const CartProvider = ({ children }) => {
                     text: `No product found with ID: ${productId}`,
                     icon: "error",
                     button: "OK",
+                    confirmButtonColor: '#000',
+                    color: '#333',
                 });
                 return prevOrder; // No product found
             }
@@ -406,7 +410,7 @@ const CartProvider = ({ children }) => {
             return {
                 ...prevOrder,
                 items: updatedItems,
-                total: updatedTotal,
+                total: parseFloat(updatedTotal),
             };
         });
     
