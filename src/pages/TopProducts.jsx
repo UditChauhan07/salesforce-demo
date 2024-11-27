@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppLayout from "../components/AppLayout";
-import { ShareDrive, getProductImageAll, topProduct } from "../lib/store";
+import { ShareDrive, defaultLoadTime, getProductImageAll, topProduct } from "../lib/store";
 import Loading from "../components/Loading";
 import TopProductCard from "../components/TopProductCard";
 import { FilterItem } from "../components/FilterItem";
@@ -14,6 +14,7 @@ import axios from "axios";
 import { originAPi } from "../lib/store";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 const TopProducts = () => {
@@ -141,6 +142,8 @@ const TopProducts = () => {
     setSelectedMonth(month);
     SearchData({ selectedMonth: month, manufacturerFilter: manufacturerId })
   }
+
+  useBackgroundUpdater(()=>SearchData({selectedMonth, manufacturerFilter}),defaultLoadTime)
 
   useEffect(() => {
     const fetchData = async () => {

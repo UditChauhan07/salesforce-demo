@@ -118,6 +118,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     // })
     getOrderDetails();
   }, []);
+  
   useBackgroundUpdater(getOrderDetails, defaultLoadTime);
 
   function downloadFiles(invoices) {

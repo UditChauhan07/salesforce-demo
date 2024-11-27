@@ -5,11 +5,12 @@ import { useManufacturer } from "../api/useManufacturer";
 import FilterSearch from "../components/FilterSearch";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import AppLayout from "../components/AppLayout";
-import { DestoryAuth, GetAuthData, admins, getRetailerList, getSalesRepList } from "../lib/store";
+import { DestoryAuth, GetAuthData, admins, defaultLoadTime, getRetailerList, getSalesRepList } from "../lib/store";
 import { CloseButton } from "../lib/svg";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 const MyRetailersPage = () => {
   const { data: manufacturers } = useManufacturer();
   const [searchParams] = useSearchParams();
@@ -60,6 +61,8 @@ const MyRetailersPage = () => {
       dataStore.unsubscribe("/my-retailers" + selectedSalesRepId ?? userData.Sales_Rep__c, (data) => setRetailerList({ data: data?.data.length ? data?.data : [], isLoading: false }))
     }
   }, [selectedSalesRepId]);
+
+  useBackgroundUpdater(fetchData,defaultLoadTime);
 
 
 

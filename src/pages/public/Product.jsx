@@ -7,28 +7,33 @@ import Loading from "../../components/Loading";
 import ModalPage from "../../components/Modal UI";
 import HelpSection from "../../components/Footer/HelpSection";
 import Footer from "../../components/Footer/Footer";
+import dataStore from "../../lib/dataStore";
 
 const PublicProduct = () => {
     const { id, token } = useParams();
     const navigate = useNavigate();
     const [product, setProduct] = useState({ isloaded: false, data: {} });
     const [alert, setAlert] = useState(false);
+    const productResponseReady = (data) => {
+        if (!data?.data?.Id && data.message != "") {
+            if (product.message?.message) {
+                setAlert(data?.message?.code)
+            } else {
+                setAlert(data.message)
+            }
+        } else {
+            setProduct({ isloaded: true, data: data.data });
+        }
+    }
     useEffect(() => {
         if (id && token) {
-            publicProductDetails({ id, token }).then((productRes) => {
-                console.log({ productRes });
-                if (!productRes?.data?.Id && productRes.message != "") {
-                    if (product.message?.message) {
-                        setAlert(productRes?.message?.code)
-                    } else {
-                        setAlert(productRes.message)
-                    }
-                } else {
-                    setProduct({ isloaded: true, data: productRes.data });
-                }
+            dataStore.subscribe("/productPage/" + id, productResponseReady);
+            dataStore.getPageData("/productPage/" + id, () => publicProductDetails({ id, token })).then((productRes) => {
+                productResponseReady(productRes)
             }).catch((productErr) => {
                 console.log({ productErr });
             })
+            return () => dataStore.unsubscribe("/productPage/" + id, productResponseReady);
         }
     }, [])
     if (!id && !token) return navigate("/");
@@ -63,12 +68,12 @@ const PublicProduct = () => {
                 }}
             /> :
                 product.isloaded ?
-                    <div className="productDetailContainer" style={{margin:'1rem auto 4rem'}}>
+                    <div className="productDetailContainer" style={{ margin: '1rem auto 4rem' }}>
                         {product.data?.Id ?
                             <ProductDetailCard product={product} orders={{}} isAddtoCart={false} /> : null}
                     </div> : <Loading height={'70vh'} />}
-                    <HelpSection />
-                    <Footer  readOnly/>
+            <HelpSection />
+            <Footer readOnly />
         </section>
     )
 }

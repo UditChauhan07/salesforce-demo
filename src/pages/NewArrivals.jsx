@@ -4,7 +4,7 @@ import Loading from "../components/Loading";
 import NewArrivalsPage from "../components/NewArrivalsPage/NewArrivalsPage";
 import { FilterItem } from "../components/FilterItem";
 import { CloseButton } from "../lib/svg";
-import { fetchAccountDetails, GetAuthData, getMarketingCalendar } from "../lib/store";
+import { defaultLoadTime, fetchAccountDetails, GetAuthData, getMarketingCalendar } from "../lib/store";
 import { useNavigate } from "react-router-dom";
 import { getPermissions } from "../lib/permission";
 import { originAPi } from "../lib/store";
@@ -12,6 +12,7 @@ import axios from "axios";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
 import { useManufacturer } from "../api/useManufacturer";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const currentYear = new Date().getFullYear();
@@ -128,6 +129,8 @@ const NewArrivals = () => {
       dataStore.unsubscribe(`/marketing-calendar${selectYear}`, processCalendarData);
     };
   }, [selectYear]);
+
+  useBackgroundUpdater(fetchCalendarData,defaultLoadTime);
 
   // Check permissions on mount
   useEffect(() => {

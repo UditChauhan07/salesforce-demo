@@ -10,7 +10,6 @@ import ModalPage from "../Modal UI";
 
 const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
   const { updateProductQty, removeProduct } = useCart();
-  console.log({product})
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState();
   const [modalShow,setModalShow]= useState(false);
   if (!product) {
@@ -111,7 +110,7 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
           </div>
           <p className={`${Styles.priceHolder} d-flex mt-2`}>
             {salesPrice != listPrice ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : orders ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : null}
-            <b>${orders ? <Link to={"/my-bag"}>{Number(orders?.items?.price).toFixed(2)}</Link> : salesPrice}</b>
+            <b>${orders ? <Link to={"/my-bag"}>{Number(orders?.items?.price).toFixed(2)}</Link> : !isNaN(listPrice)?salesPrice:product.data.ProductUPC__c??"NA"}</b>
           </p>
           {!product.data.ProductUPC__c || !product.data.ProductCode || !product.data.IsActive || (!product.data?.PricebookEntries?.length || !product?.data?.PricebookEntries?.[0]?.IsActive && (!isNaN(salesPrice) && !isNaN(listPrice)) || !isDateEqualOrGreaterThanToday(product.data.Launch_Date__c)) ? <button
             className={`${Styles.button}`}

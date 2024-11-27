@@ -12,12 +12,13 @@ import ModalPage from "../../components/Modal UI";
 import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
 import Styles from "./index.module.css";
-import { sortArrayHandler } from "../../lib/store";
+import { defaultLoadTime, sortArrayHandler } from "../../lib/store";
 import { GetAuthData } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const date = new Date();
@@ -81,6 +82,11 @@ const ComparisonReport = () => {
 
     setIsLoading(false);
   }
+  const sendApiCall = async () => {
+    setIsLoading(true);
+    const result = await dataStore.getPageData("/comparison-report"+JSON.stringify(filter),()=> originalApiData.fetchComparisonReportAPI(filter));
+    readyComparisonReady(result)
+  };
   useEffect(() => {
     dataStore.subscribe("/comparison-report"+JSON.stringify(filter),readyComparisonReady);
     sendApiCall();
@@ -109,6 +115,7 @@ const ComparisonReport = () => {
     setIsLoading(false);
     setstatus(1);
   };
+  useBackgroundUpdater(sendApiCall,defaultLoadTime);
   // const sendApiCall = async () => {
   //   setIsLoading(true);
   //   const result = await originalApiData.fetchComparisonReportAPI(filter);
@@ -116,11 +123,7 @@ const ComparisonReport = () => {
   //   setIsLoading(false);
   // };
   // ..........
-  const sendApiCall = async () => {
-    setIsLoading(true);
-    const result = await dataStore.getPageData("/comparison-report"+JSON.stringify(filter),()=> originalApiData.fetchComparisonReportAPI(filter));
-    readyComparisonReady(result)
-  };
+
 
   // Fetch user data and permissions
   useEffect(() => {

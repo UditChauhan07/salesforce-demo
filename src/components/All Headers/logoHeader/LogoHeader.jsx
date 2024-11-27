@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData } from "../../../lib/store";
+import { defaultLoadTime, GetAuthData } from "../../../lib/store";
 import { getPermissions } from "../../../lib/permission";
 import PermissionDenied from "../../PermissionDeniedPopUp/PermissionDenied";
 import styles from "../topNav/index.module.css";
@@ -12,6 +12,7 @@ import { FaStore } from "react-icons/fa";
 import { CustomerServiceIcon, OrderIcon } from "../../../lib/svg";
 import Loading from "../../Loading";
 import "./style.css";
+import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
 const LogoHeader = () => {
   const navigate = useNavigate();
   const [permissions, setPermissions] = useState(null);
@@ -20,7 +21,7 @@ const LogoHeader = () => {
   const [key, setKey] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef(null);
-  const { getOrderQuantity } = useCart();
+  const { getOrderQuantity,fetchCart } = useCart();
   const [cartQty, setCartQty] = useState(0);
   useEffect(() => {
     setCartQty(getOrderQuantity() ?? 0)
@@ -48,7 +49,7 @@ const LogoHeader = () => {
     PermissionDenied();
   };
 
-
+useBackgroundUpdater(fetchCart,defaultLoadTime);
 
   const searchAccounts = async (term) => {
     if (term.length <= 2) return setSuggestions([]);
