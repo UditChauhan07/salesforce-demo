@@ -44,6 +44,8 @@ const TargetReport = () => {
     // let brandcount = {}
     // let sum = 0;
     const handleTargetReady = (data) => {
+        console.log({data});
+        
         if (data) {
             setIsLoaded(true);
         }
