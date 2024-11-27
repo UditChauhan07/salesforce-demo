@@ -202,9 +202,6 @@ function MyBagFinal({ showOrderFor }) {
             OrderPlaced({ order: begToOrder, cartId: order.id })
               .then((response) => {
                 if (response) {
-                  console.log({ response });
-                  return;
-
                   // console.log("response" , response.length)
                   if (response.error) {
 
