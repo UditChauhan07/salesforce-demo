@@ -185,13 +185,16 @@ const NewArrivals = () => {
       </>
     }
   >
+    {isLoaded ? 
     
-      <NewArrivalsPage
-        brand={brand}
-        month={month}
-        productList={productList}
-        accountDetails={accountDetails}
-      />
+    <NewArrivalsPage
+    brand={brand}
+    month={month}
+    productList={productList}
+    accountDetails={accountDetails}
+  />
+    : <Loading/>}
+    
 
   </AppLayout>
   );

@@ -15,6 +15,9 @@ import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accountDetails = {} }) {
+  const [productData , setProductData] = useState(productList)
+  console.log(productList ? 'true' : 'false')
+  
 
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
@@ -238,7 +241,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
     );
   };
 
-
+ if (isLoaded) return <Loading height={"70vh"} />
   return (
     <>
       <ModalPage
