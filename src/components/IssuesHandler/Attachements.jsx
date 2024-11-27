@@ -22,7 +22,7 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,d
                 })
             }
         }
-        setFile(tempFile);
+        setFile?.(tempFile);
     }
     const handleFileChange = (event) => {
         const files = event.target.files;
@@ -52,7 +52,7 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,d
     const fileRemoveHandler = (index) => {
         let tempFile = [...files];
         tempFile.splice(index, 1)
-        setFile(tempFile);
+        setFile?.(tempFile);
     }
     const UploadFileCards = () => {
         return files.map((file, index) => {

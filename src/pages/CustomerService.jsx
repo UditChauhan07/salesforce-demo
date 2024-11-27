@@ -1,4 +1,4 @@
-import { useEffect, useState , useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import BMAIHandler from "../components/IssuesHandler/BMAIHandler.jsx";
 import { GetAuthData, admins, getAllAccount, getOrderCustomerSupport, getOrderList, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
 import OrderCardHandler from "../components/IssuesHandler/OrderCardHandler.jsx";
@@ -17,7 +17,7 @@ const CustomerService = () => {
   let OrderId = null;
   let SalesRepId = null;
   let PONumber = null;
-  if(state){
+  if (state) {
     Reason = state?.Reason
     OrderId = state?.OrderId
     SalesRepId = state?.SalesRepId
@@ -46,7 +46,7 @@ const CustomerService = () => {
 
 
   const [loaded, setLoaded] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null); 
+  const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
 
   const resetHandler = () => {
@@ -75,26 +75,26 @@ const CustomerService = () => {
         // Get the authenticated user data
         const user = await GetAuthData();
         setUserData(user);
-  
+
         // Fetch permissions for the user
         const permissions = await getPermissions();
         setPermissions(permissions);
-  
+
         // Check for customer_service permission
         const customerServicePermission = permissions?.modules?.customerSupport?.childModules
-        ?.customer_service?.create;
-  
+          ?.customer_service?.create;
+
         // Redirect based on permission
         if (!customerServicePermission) {
-          console.log('Redirecting to Dashboard...');
+          // console.log('Redirecting to Dashboard...');
           PermissionDenied()
           navigate("/dashboard");
           return; // Ensure no further code execution
         }
-  
+
         // Continue with data fetching if permission is granted
         orderListBasedOnRepHandler(user.x_access_token, Reason ? SalesRepId : user.Sales_Rep__c, Reason ? false : true, OrderId);
-  
+
         if (admins.includes(user.Sales_Rep__c)) {
           try {
             const repRes = await getSalesRepList({ key: user.x_access_token });
@@ -107,7 +107,7 @@ const CustomerService = () => {
         console.log('Fetch Data Error:', err);
       }
     };
-  
+
     fetchData();
   }, [Reason, SalesRepId, OrderId]);
   useEffect(() => {
@@ -120,7 +120,7 @@ const CustomerService = () => {
     GetAuthData()
       .then((response) => {
         setUserData(response)
-        orderListBasedOnRepHandler(response.x_access_token, Reason?SalesRepId:response.Sales_Rep__c,Reason?false:true,OrderId)
+        orderListBasedOnRepHandler(response.x_access_token, Reason ? SalesRepId : response.Sales_Rep__c, Reason ? false : true, OrderId)
         if (admins.includes(response.Sales_Rep__c)) {
           getSalesRepList({ key: response.x_access_token }).then((repRes) => {
             setSalesRepList(repRes.data)
@@ -134,37 +134,18 @@ const CustomerService = () => {
       });
   }, []);
 
-  // useEffect(()=>{
-  //   if(orderConfirmed == false&&OrderId){
-  //     setOrderId()
-  //     GetAuthData()
-  //     .then((response) => {
-  //       setUserData(response)
-  //       orderListBasedOnRepHandler(response.x_access_token, SalesRepId,Reason?false:true,)
-  //       if (admins.includes(response.Sales_Rep__c)) {
-  //         getSalesRepList({ key: response.x_access_token }).then((repRes) => {
-  //           setSalesRepList(repRes.data)
-  //         }).catch((repErr) => {
-  //           console.log({ repErr });
-  //         })
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log({ err });
-  //     });
-  //   }
-  // },[orderConfirmed])
 
-  const orderListBasedOnRepHandler = (key, Sales_Rep__c,ReasonNull=true,searchId=null) => {
+
+  const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
     setLoaded(false)
     setSelectedSalesRepId(Sales_Rep__c)
     getOrderCustomerSupport({
       user: { key, Sales_Rep__c },
-      PONumber: searchPo,searchId
+      PONumber: searchPo, searchId
     })
       .then((order) => {
-        console.log({order});
-        if(ReasonNull){
+        console.log({ order });
+        if (ReasonNull) {
           setReason(null)
         }
         setOrders(order);
@@ -190,10 +171,10 @@ const CustomerService = () => {
         if (user) {
           let errorlistObj = Object.keys(errorList);
           let systemStr = "";
-          
+
           if (errorlistObj.length) {
             errorlistObj.map((id) => {
-              systemStr += `${errorList[id].Name}(${errorList[id].ProductCode}) having ${reason} for ${errorList[id].issue} ${errorList[id]?.Quantity ? 'out of '+errorList[id].Quantity+' Qty':''} .\n`
+              systemStr += `${errorList[id].Name}(${errorList[id].ProductCode}) having ${reason} for ${errorList[id].issue} ${errorList[id]?.Quantity ? 'out of ' + errorList[id].Quantity + ' Qty' : ''} .\n`
             })
           }
           let newDesc = "";
@@ -203,13 +184,13 @@ const CustomerService = () => {
           } else {
             newDesc = desc
           }
-          
+
 
           let rawData = {
             orderStatusForm: {
               typeId: "0123b0000007z9pAAA",
               reason: reason,
-              salesRepId: selectedSalesRepId??user.Sales_Rep__c,
+              salesRepId: selectedSalesRepId ?? user.Sales_Rep__c,
               contactId,
               accountId,
               opportunityId: orderId,
@@ -251,7 +232,7 @@ const CustomerService = () => {
       });
   }
 
-  
+
 
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
 
@@ -260,20 +241,20 @@ const CustomerService = () => {
     permissions={permissions}
     filterNodes={
       <>
-      {memoizedPermissions?.modules?.godLevel  ? <>
-        <FilterItem
-        minWidth="220px"
-        label="salesRep"
-        name="salesRep"
-        value={selectedSalesRepId}
-        options={salesRepList.map((salesRep) => ({
-          label: salesRep.Id == userData.Sales_Rep__c ? 'My Orders (' + salesRep.Name + ')' : salesRep.Name,
-          value: salesRep.Id,
-        }))}
-        onChange={(value) => orderListBasedOnRepHandler(userData.x_access_token, value)}
-      />
-       </> : null}
-      
+        {memoizedPermissions?.modules?.godLevel ? <>
+          <FilterItem
+            minWidth="220px"
+            label="salesRep"
+            name="salesRep"
+            value={selectedSalesRepId}
+            options={salesRepList.map((salesRep) => ({
+              label: salesRep.Id == userData.Sales_Rep__c ? 'My Orders (' + salesRep.Name + ')' : salesRep.Name,
+              value: salesRep.Id,
+            }))}
+            onChange={(value) => orderListBasedOnRepHandler(userData.x_access_token, value)}
+          />
+        </> : null}
+
       </>
     }
   >
