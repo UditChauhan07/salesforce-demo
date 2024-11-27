@@ -72,7 +72,7 @@ const monthList = [
   },
 ];
 
-function Dashboard({ dashboardData }) {
+function Dashboard() {
 
   const bgColors = {
     "Kevyn Aucoin Cosmetics": "KevynAucoinCosmeticsBg",
