@@ -280,7 +280,7 @@ const StoreDetailCard = ({ account, brandList,memoizedPermissions={} }) => {
                             </div>
                             <div className={Styles.detailBox}>
                                 <p className={Styles.labelHolder}>Address:</p>
-                                <p className={Styles.valueHolder}>{account.ShippingAddress?.street},{account.ShippingAddress.city},<br />{account.ShippingAddress.state} {account.ShippingAddress.postalCode}<br /> {account.ShippingAddress.country}</p>
+                                <p className={Styles.valueHolder}>{account.ShippingAddress?.street},{account.ShippingAddress?.city},<br />{account.ShippingAddress?.state} {account.ShippingAddress?.postalCode}<br /> {account.ShippingAddress?.country}</p>
                             </div>
                         </div>
                     </div>
@@ -293,11 +293,11 @@ const StoreDetailCard = ({ account, brandList,memoizedPermissions={} }) => {
                             <div className="d-flex mt-3">
                                 <div className="w-[50%]">
                                     <p className={Styles.subTitleHolder}>Shipping Address</p>
-                                    <p className={Styles.addressLabelHolder} style={{ color: '#3296ED' }}>{account.ShippingAddress?.street}{account.ShippingAddress?.street ? ',' : ""}{account.ShippingAddress.city}{account.ShippingAddress?.city ? <>,<br /></> : ""}{account.ShippingAddress.state},{account.ShippingAddress.postalCode}<br /> {account.ShippingAddress.country}</p>
+                                    <p className={Styles.addressLabelHolder} style={{ color: '#3296ED' }}>{account.ShippingAddress?.street}{account.ShippingAddress?.street ? ',' : ""}{account.ShippingAddress?.city}{account.ShippingAddress?.city ? <>,<br /></> : ""}{account.ShippingAddress?.state},{account.ShippingAddress?.postalCode}<br /> {account.ShippingAddress?.country}</p>
                                 </div>
                                 <div className="w-[50%]">
                                     <p className={Styles.subTitleHolder}>Billing Address</p>
-                                    <p className={Styles.addressLabelHolder} style={{ color: '#3296ED' }}>{account.BillingAddress?.street},{account.BillingAddress.city},<br />{account.BillingAddress.state},{account.BillingAddress.postalCode}<br /> {account.BillingAddress.country}</p>
+                                    <p className={Styles.addressLabelHolder} style={{ color: '#3296ED' }}>{account.BillingAddress?.street},{account.BillingAddress?.city},<br />{account.BillingAddress?.state},{account.BillingAddress?.postalCode}<br /> {account.BillingAddress?.country}</p>
                                 </div>
                             </div>
                         </div>

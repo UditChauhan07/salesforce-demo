@@ -251,7 +251,7 @@ function MyBagFinal({ showOrderFor }) {
 
  
  
-  if (isOrderPlaced === 1) return <OrderLoader />;
+  if (isOrderPlaced === 1) return <div style={{height: "300px"}}><OrderLoader /> </div>;
   return (
     <div className="mt-4">
       {isLoading ? (
