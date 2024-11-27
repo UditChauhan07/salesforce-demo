@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState , useMemo } from "react";
 import BMAIHandler from "../components/IssuesHandler/BMAIHandler.jsx";
-import { GetAuthData, admins, defaultLoadTime, getAllAccount, getOrderCustomerSupport, getOrderList, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
+import { GetAuthData, admins, getAllAccount, getOrderCustomerSupport, getOrderList, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
 import OrderCardHandler from "../components/IssuesHandler/OrderCardHandler.jsx";
 import Attachements from "../components/IssuesHandler/Attachements.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,26 +11,23 @@ import { FilterItem } from "../components/FilterItem.jsx";
 import AppLayout from "../components/AppLayout.jsx";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied.jsx";
-import dataStore from "../lib/dataStore.js";
-import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater.js";
 const CustomerService = () => {
   const { state } = useLocation();
   let Reason = null;
   let OrderId = null;
   let SalesRepId = null;
   let PONumber = null;
-  if (state) {
+  if(state){
     Reason = state?.Reason
     OrderId = state?.OrderId
     SalesRepId = state?.SalesRepId
     PONumber = state?.PONumber
   }
-
   const navigate = useNavigate();
   const [reason, setReason] = useState();
   const [accountList, setAccountList] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [orderId, setOrderId] = useState(state?.OrderId);
+  const [orderId, setOrderId] = useState();
   const [orderConfirmed, setOrderConfirmed] = useState(false)
   const [sendEmail, setSendEmail] = useState(false)
   const [files, setFile] = useState([]);
@@ -49,7 +46,7 @@ const CustomerService = () => {
 
 
   const [loaded, setLoaded] = useState(false);
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState(null); 
   const [permissions, setPermissions] = useState(null);
 
   const resetHandler = () => {
@@ -62,7 +59,7 @@ const CustomerService = () => {
     setContactId(null)
     setManufacturerId(null)
     setActual_Amount__c(null)
-    setErrorList({});
+    setErrorList({})
   }
 
   const reasons = [
@@ -73,73 +70,20 @@ const CustomerService = () => {
     { name: "Update Account Info", icon: '/assets/account.svg', desc: "Change shipping or billing details" }
   ];
   useEffect(() => {
-    if (Reason) {
-      setReason(Reason)
-    }
-    if (OrderId) {
-      setOrderId(OrderId)
-    }
-  }, []);
-
-  const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
-    setLoaded(false)
-    setSelectedSalesRepId(Sales_Rep__c)
-    if (searchId) {
-      getOrderCustomerSupport({
-        user: { key, Sales_Rep__c },
-        PONumber: searchPo, searchId
-      })
-        .then((order) => {
-          if (ReasonNull) {
-            setReason(null)
-          }
-          setOrders(order);
-          setLoaded(true)
-        })
-        .catch((error) => {
-          console.log({ error });
-        });
-    } else {
-      dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
-        user: { key, Sales_Rep__c },
-        PONumber: searchPo, searchId
-      }))
-        .then((order) => {
-          if (ReasonNull) {
-            setReason(null)
-          }
-          setOrders(order);
-          resetHandler()
-          setLoaded(true)
-        })
-        .catch((error) => {
-          console.log({ error });
-        });
-    }
-    dataStore.getPageData("/getAllAccount" + Sales_Rep__c, () => getAllAccount({ user: { x_access_token: key, Sales_Rep__c } }))
-      .then((accounts) => {
-        setAccountList(accounts);
-      })
-      .catch((actError) => {
-        console.error({ actError });
-      });
-  }
-
-  useEffect(() => {
     const fetchData = async () => {
       try {
         // Get the authenticated user data
         const user = await GetAuthData();
         setUserData(user);
-
+  
         // Fetch permissions for the user
         const permissions = await getPermissions();
         setPermissions(permissions);
-
+  
         // Check for customer_service permission
         const customerServicePermission = permissions?.modules?.customerSupport?.childModules
-          ?.customer_service?.create;
-
+        ?.customer_service?.create;
+  
         // Redirect based on permission
         if (!customerServicePermission) {
           console.log('Redirecting to Dashboard...');
@@ -147,21 +91,13 @@ const CustomerService = () => {
           navigate("/dashboard");
           return; // Ensure no further code execution
         }
-        dataStore.subscribe("/orderList" + SalesRepId, (data) => {
-          if (Reason) {
-            setReason(null)
-          }
-          setOrders(data);
-          resetHandler()
-          setLoaded(true)
-        })
-        
+  
         // Continue with data fetching if permission is granted
         orderListBasedOnRepHandler(user.x_access_token, Reason ? SalesRepId : user.Sales_Rep__c, Reason ? false : true, OrderId);
-
+  
         if (admins.includes(user.Sales_Rep__c)) {
           try {
-            const repRes = await dataStore.getPageData("getSalesRepList", () =>getSalesRepList({ key: user.x_access_token }));
+            const repRes = await getSalesRepList({ key: user.x_access_token });
             setSalesRepList(repRes.data);
           } catch (repErr) {
             console.log('SalesRepList Error:', repErr);
@@ -171,14 +107,81 @@ const CustomerService = () => {
         console.log('Fetch Data Error:', err);
       }
     };
-
+  
     fetchData();
   }, [Reason, SalesRepId, OrderId]);
+  useEffect(() => {
+    if (Reason) {
+      setReason(Reason)
+    }
+    if (OrderId) {
+      setOrderId(OrderId)
+    }
+    GetAuthData()
+      .then((response) => {
+        setUserData(response)
+        orderListBasedOnRepHandler(response.x_access_token, Reason?SalesRepId:response.Sales_Rep__c,Reason?false:true,OrderId)
+        if (admins.includes(response.Sales_Rep__c)) {
+          getSalesRepList({ key: response.x_access_token }).then((repRes) => {
+            setSalesRepList(repRes.data)
+          }).catch((repErr) => {
+            console.log({ repErr });
+          })
+        }
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
+  }, []);
 
+  // useEffect(()=>{
+  //   if(orderConfirmed == false&&OrderId){
+  //     setOrderId()
+  //     GetAuthData()
+  //     .then((response) => {
+  //       setUserData(response)
+  //       orderListBasedOnRepHandler(response.x_access_token, SalesRepId,Reason?false:true,)
+  //       if (admins.includes(response.Sales_Rep__c)) {
+  //         getSalesRepList({ key: response.x_access_token }).then((repRes) => {
+  //           setSalesRepList(repRes.data)
+  //         }).catch((repErr) => {
+  //           console.log({ repErr });
+  //         })
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log({ err });
+  //     });
+  //   }
+  // },[orderConfirmed])
 
-
-useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Reason ? SalesRepId : userData.Sales_Rep__c, Reason ? false : true, OrderId),defaultLoadTime);
- 
+  const orderListBasedOnRepHandler = (key, Sales_Rep__c,ReasonNull=true,searchId=null) => {
+    setLoaded(false)
+    setSelectedSalesRepId(Sales_Rep__c)
+    getOrderCustomerSupport({
+      user: { key, Sales_Rep__c },
+      PONumber: searchPo,searchId
+    })
+      .then((order) => {
+        console.log({order});
+        if(ReasonNull){
+          setReason(null)
+        }
+        setOrders(order);
+        resetHandler()
+        setLoaded(true)
+      })
+      .catch((error) => {
+        console.log({ error });
+      });
+    getAllAccount({ user: { x_access_token: key, Sales_Rep__c } })
+      .then((accounts) => {
+        setAccountList(accounts);
+      })
+      .catch((actError) => {
+        console.error({ actError });
+      });
+  }
 
   const SubmitHandler = () => {
     setSubmitForm(true)
@@ -187,10 +190,10 @@ useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Rea
         if (user) {
           let errorlistObj = Object.keys(errorList);
           let systemStr = "";
-
+          
           if (errorlistObj.length) {
             errorlistObj.map((id) => {
-              systemStr += `${errorList[id].Name}(${errorList[id].ProductCode}) having ${reason} for ${errorList[id].issue} ${errorList[id]?.Quantity ? 'out of ' + errorList[id].Quantity + ' Qty' : ''} .\n`
+              systemStr += `${errorList[id].Name}(${errorList[id].ProductCode}) having ${reason} for ${errorList[id].issue} ${errorList[id]?.Quantity ? 'out of '+errorList[id].Quantity+' Qty':''} .\n`
             })
           }
           let newDesc = "";
@@ -200,13 +203,13 @@ useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Rea
           } else {
             newDesc = desc
           }
-
+          
 
           let rawData = {
             orderStatusForm: {
               typeId: "0123b0000007z9pAAA",
               reason: reason,
-              salesRepId: selectedSalesRepId ?? user.Sales_Rep__c,
+              salesRepId: selectedSalesRepId??user.Sales_Rep__c,
               contactId,
               accountId,
               opportunityId: orderId,
@@ -248,7 +251,7 @@ useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Rea
       });
   }
 
-
+  
 
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
 
@@ -257,20 +260,20 @@ useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Rea
     permissions={permissions}
     filterNodes={
       <>
-        {memoizedPermissions?.modules?.godLevel ? <>
-          <FilterItem
-            minWidth="220px"
-            label="salesRep"
-            name="salesRep"
-            value={selectedSalesRepId}
-            options={salesRepList.map((salesRep) => ({
-              label: salesRep.Id == userData.Sales_Rep__c ? 'My Orders (' + salesRep.Name + ')' : salesRep.Name,
-              value: salesRep.Id,
-            }))}
-            onChange={(value) => orderListBasedOnRepHandler(userData.x_access_token, value)}
-          />
-        </> : null}
-
+      {memoizedPermissions?.modules?.godLevel  ? <>
+        <FilterItem
+        minWidth="220px"
+        label="salesRep"
+        name="salesRep"
+        value={selectedSalesRepId}
+        options={salesRepList.map((salesRep) => ({
+          label: salesRep.Id == userData.Sales_Rep__c ? 'My Orders (' + salesRep.Name + ')' : salesRep.Name,
+          value: salesRep.Id,
+        }))}
+        onChange={(value) => orderListBasedOnRepHandler(userData.x_access_token, value)}
+      />
+       </> : null}
+      
       </>
     }
   >
@@ -279,7 +282,7 @@ useBackgroundUpdater(()=>orderListBasedOnRepHandler(userData.x_access_token, Rea
         <BMAIHandler reasons={reasons} setReason={setReason} reason={reason} resetHandler={resetHandler} />
         {reason != "Update Account Info" && <OrderCardHandler orders={orders} orderId={orderId} setOrderId={setOrderId} reason={reason} orderConfirmedStatus={{ setOrderConfirmed, orderConfirmed }} accountIdObj={{ accountId, setAccountId }} manufacturerIdObj={{ manufacturerId, setManufacturerId }} errorListObj={{ errorList, setErrorList }} contactIdObj={{ contactId, setContactId }} accountList={accountList} setSubject={setSubject} sendEmailObj={{ sendEmail, setSendEmail }} Actual_Amount__cObj={{ Actual_Amount__c, setActual_Amount__c }} searchPoOBJ={{ searchPo, setSearchPO }} autoSelect={OrderId} />}
         {/*  files={files} desc={desc} */}
-        {reason != "Update Account Info" && <Attachements setFile={setFile} files={files} setDesc={setDesc} orderConfirmed={orderConfirmed} SubmitHandler={SubmitHandler} desc={desc} />}
+        {reason != "Update Account Info" && <Attachements setFile={setFile} files={files} setDesc={setDesc} orderConfirmed={orderConfirmed} SubmitHandler={SubmitHandler} />}
         {reason == "Update Account Info" && <AccountInfo reason={reason} Accounts={accountList} postSupportAny={postSupportAny} GetAuthData={GetAuthData} setSubmitForm={setSubmitForm} typeId={"0123b0000007z9pAAA"} salesRepId={selectedSalesRepId} />}
       </section>}
   </CustomerSupportLayout>)
