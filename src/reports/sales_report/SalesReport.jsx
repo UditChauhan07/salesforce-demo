@@ -47,6 +47,7 @@ const SalesReport = () => {
 
 
   const filteredSalesReportData = useMemo(() => {
+    setCurrentPage(1);
     let filtered = salesReportData.filter((ele) => {
       return !manufacturerFilter || !ele.ManufacturerName__c.localeCompare(manufacturerFilter);
     });
@@ -272,7 +273,6 @@ const SalesReport = () => {
 
   // 
   const getSalesData = async (yearFor, dateFilter) => {
-    setIsLoading(true);
     setYearForTableSort(yearFor);
     const result = await dataStore.getPageData("/sales-report" + JSON.stringify({ yearFor, dateFilter }), () => salesReportApi.salesReportData({ yearFor, dateFilter }));
     setCurrentPage(1);
@@ -281,6 +281,7 @@ const SalesReport = () => {
     }
   };
   useEffect(() => {
+    setIsLoading(true);
     dataStore.subscribe("/sales-report" + JSON.stringify({ yearFor, dateFilter }), readyReportHandler);
     const userData = localStorage.getItem("Name");
     if (userData) {
@@ -340,8 +341,14 @@ const SalesReport = () => {
     fetchData();
   }, []);
 
-
-  console.log({ filteredSalesReportData });
+  
+  const paginatedData = useMemo(()=>{
+    return filteredSalesReportData?.slice(
+      (currentPage - 1) * PageSize,
+      currentPage * PageSize
+    )
+  },[filteredSalesReportData,PageSize,currentPage])
+  console.log({filteredSalesReportData,paginatedData,isLoading});
 
   return (
     <AppLayout
@@ -526,10 +533,7 @@ const SalesReport = () => {
 
       {filteredSalesReportData?.length && !isLoading ? (
         <>
-          <SalesReportTable salesData={filteredSalesReportData?.slice(
-            (currentPage - 1) * PageSize,
-            currentPage * PageSize
-          )} year={yearForTableSort} ownerPermission={ownerPermission} />
+          <SalesReportTable salesData={paginatedData} year={yearForTableSort} ownerPermission={ownerPermission} />
           <Pagination
             className="pagination-bar"
             currentPage={currentPage}

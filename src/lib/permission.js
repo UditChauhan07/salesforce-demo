@@ -4,7 +4,8 @@ let userType = "saleRep";
 export const permissionsArray = [
   {
     userType: "superadmin",
-    allows: ["00530000005AdvsAAC", "0051O00000CvAVTQA3", "0053b00000DgEVEAA3" , "0053b00000C75e8AAB" , "0053b00000DgEvqAAF"],
+    //0053b00000DgEVEAA3
+    allows: ["00530000005AdvsAAC", "0051O00000CvAVTQA3" , "0053b00000C75e8AAB" , "0053b00000DgEvqAAF"],
     permissions: {
       modules: {
         godLevel: true, //check

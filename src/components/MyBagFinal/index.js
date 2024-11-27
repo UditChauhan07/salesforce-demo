@@ -19,7 +19,7 @@ function MyBagFinal({ showOrderFor }) {
   const navigate = useNavigate();
   const [orderDesc, setOrderDesc] = useState(null);
   const [PONumber, setPONumber] = useState(null);
-  const [total , setTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [buttonActive, setButtonActive] = useState(false);
   const [bagValue, setBagValue] = useState(fetchBeg({}));
   const [isOrderPlaced, setIsOrderPlaced] = useState(0);
@@ -30,12 +30,10 @@ function MyBagFinal({ showOrderFor }) {
   const [productDetailId, setProductDetailId] = useState(null)
   const [userData, setUserData] = useState(null)
   const [salesRepData, setSalesRepData] = useState({ Name: null, Id: null })
-  const [limitInput, setLimitInput] = useState("");
   const [confirm, setConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const fetchBag = fetchBeg({});
   const handleNameChange = (event) => {
     const limit = 11;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -45,32 +43,40 @@ function MyBagFinal({ showOrderFor }) {
     setTotal(getOrderTotal() ?? 0)
   }, [order])
   const FetchPoNumber = async () => {
-    try {
-      const res = await POGenerator();
-      if (res) {
-        
-        let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
-        let poInit = res;
-        if (isPreOrder) {
-          poInit = `PRE-${poInit}`
-        }
-        keyBasedUpdateCart({ PoNumber: poInit });
-        setPONumber(poInit);
-      }
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching PO number:", error);
-      setIsLoading(false);
-    } finally {
+    if (order?.Account?.id && order?.Manufacturer?.id) {
+      try {
+        const res = await POGenerator();
+        if (res) {
 
+          let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
+          let poInit = res;
+          if (isPreOrder) {
+            poInit = `PRE-${poInit}`
+          }
+          keyBasedUpdateCart({ PoNumber: poInit });
+          setPONumber(poInit);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching PO number:", error);
+        setIsLoading(false);
+      } finally {
+
+      }
+    } else {
+      setPONumber(null)
     }
   };
   useEffect(() => {
-    FetchPoNumber();
-  }, []);
 
-  useBackgroundUpdater(FetchPoNumber,defaultLoadTime)
-  
+    FetchPoNumber();
+
+  }, [order?.Account?.id, order?.Manufacturer?.id]);
+
+
+
+  useBackgroundUpdater(FetchPoNumber, defaultLoadTime)
+
 
   const orderGenerationHandler = () => {
 
@@ -97,7 +103,7 @@ function MyBagFinal({ showOrderFor }) {
 
   const [productImage, setProductImage] = useState({ isLoaded: false, images: {} });
   // let total = 0;
-  
+
   useEffect(() => {
     let data = ShareDrive();
     if (!data) {
@@ -160,7 +166,7 @@ function MyBagFinal({ showOrderFor }) {
 
     if (order?.Account?.SalesRepId) {
       setIsOrderPlaced(1);
-   
+
       GetAuthData()
         .then((user) => {
           // let bagValue = fetchBeg()
@@ -204,16 +210,16 @@ function MyBagFinal({ showOrderFor }) {
               key: user.x_access_token,
               shippingMethod: order.Account.shippingMethod,
             };
-            OrderPlaced({ order: begToOrder, cartId: order.id  })
+            OrderPlaced({ order: begToOrder, cartId: order.id })
               .then((response) => {
                 if (response) {
                   // console.log("response" , response.length)
                   if (response.error) {
-                  
+
                     setIsOrderPlaced(0);
                     setorderStatus({ status: true, message: response[0].message });
                   } else {
-                    
+
                     let status = deleteOrder();
                     navigate("/order-list");
                     setIsOrderPlaced(2);
@@ -242,7 +248,7 @@ function MyBagFinal({ showOrderFor }) {
       }
     }).catch(err => console.error({ err }))
   }
-  
+
 
   const OrderQuantity = () => {
     const { getOrderQuantity } = useCart();
@@ -250,9 +256,9 @@ function MyBagFinal({ showOrderFor }) {
     return getOrderQuantity() || 0;
   }
 
- 
- 
-  if (isOrderPlaced === 1) return <div style={{height: "300px"}}><OrderLoader /> </div>;
+
+
+  if (isOrderPlaced === 1) return <div style={{ height: "300px" }}><OrderLoader /> </div>;
   return (
     <div className="mt-4">
       {isLoading ? (
@@ -342,30 +348,30 @@ function MyBagFinal({ showOrderFor }) {
                     </svg>
                   </button>
                   <h4>
-                      {buttonActive ? (
-                        <>
-                          <span> <Link style={{ color: '#000' }} to={`/Brand/${order?.Manufacturer?.id}`}>{order?.Manufacturer?.name}</Link> |</span>&nbsp;<Link style={{ color: '#000' }} to={`/store/${order?.Account?.id}`}>{order?.Account?.name}</Link>
-                        </>
-                      ) : (
-                        <span>Empty bag</span>
-                      )}
-                    </h4>
+                    {buttonActive ? (
+                      <>
+                        <span> <Link style={{ color: '#000' }} to={`/Brand/${order?.Manufacturer?.id}`}>{order?.Manufacturer?.name}</Link> |</span>&nbsp;<Link style={{ color: '#000' }} to={`/store/${order?.Account?.id}`}>{order?.Account?.name}</Link>
+                      </>
+                    ) : (
+                      <span>Empty bag</span>
+                    )}
+                  </h4>
                 </div>
 
                 <div className={Styles.MyBagFinalleft}>
-                    <h5>
-                      PO Number{" "}
-                      {!isPOEditable ? (
-                        <b>
-                          {buttonActive ? (
-                            // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
-                            PONumber
-                          ) : (
-                            "---"
-                          )}
-                        </b>
-                      ) : (
-                        <input
+                  <h5>
+                    PO Number{" "}
+                    {!isPOEditable ? (
+                      <b>
+                        {buttonActive ? (
+                          // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
+                          PONumber
+                        ) : (
+                          "---"
+                        )}
+                      </b>
+                    ) : (
+                      <input
                         type="text"
                         value={PONumber}
                         onChange={handleNameChange} // Correctly handles input changes
@@ -379,26 +385,26 @@ function MyBagFinal({ showOrderFor }) {
                           }
                         }}
                       />
-                      )}
-                    </h5>
-
-                    {!isPOEditable && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="21"
-                        height="20"
-                        viewBox="0 0 21 20"
-                        fill="none"
-                        onClick={() => setIsPOEditable(true)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        <path
-                          d="M19.3078 10.6932V19.2841C19.3078 19.6794 18.9753 20 18.5652 20H0.742642C0.332504 20 0 19.6794 0 19.2841V2.10217C0 1.70682 0.332504 1.38627 0.742642 1.38627H9.65389C10.064 1.38627 10.3965 1.70682 10.3965 2.10217C10.3965 2.49754 10.064 2.81809 9.65389 2.81809H1.48519V18.5682H17.8226V10.6932C17.8226 10.2979 18.1551 9.97731 18.5652 9.97731C18.9753 9.97731 19.3078 10.2979 19.3078 10.6932ZM17.9926 5.11422L15.6952 2.89943L7.72487 10.5832L7.09297 13.4072L10.0223 12.7981L17.9926 5.11422ZM21 2.2148L18.7027 0L16.8541 1.78215L19.1515 3.99692L21 2.2148Z"
-                          fill="black"
-                        />
-                      </svg>
                     )}
-                  </div>
+                  </h5>
+
+                  {!isPOEditable && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="21"
+                      height="20"
+                      viewBox="0 0 21 20"
+                      fill="none"
+                      onClick={() => setIsPOEditable(true)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <path
+                        d="M19.3078 10.6932V19.2841C19.3078 19.6794 18.9753 20 18.5652 20H0.742642C0.332504 20 0 19.6794 0 19.2841V2.10217C0 1.70682 0.332504 1.38627 0.742642 1.38627H9.65389C10.064 1.38627 10.3965 1.70682 10.3965 2.10217C10.3965 2.49754 10.064 2.81809 9.65389 2.81809H1.48519V18.5682H17.8226V10.6932C17.8226 10.2979 18.1551 9.97731 18.5652 9.97731C18.9753 9.97731 19.3078 10.2979 19.3078 10.6932ZM17.9926 5.11422L15.6952 2.89943L7.72487 10.5832L7.09297 13.4072L10.0223 12.7981L17.9926 5.11422ZM21 2.2148L18.7027 0L16.8541 1.78215L19.1515 3.99692L21 2.2148Z"
+                        fill="black"
+                      />
+                    </svg>
+                  )}
+                </div>
 
 
               </div>
@@ -406,90 +412,90 @@ function MyBagFinal({ showOrderFor }) {
               <div className={Styles.MyBagFinalMain}>
                 <div className="row">
                   <div className="col-lg-7 col-md-8 col-sm-12">
-                  <div className={Styles.MainBag}>
-                        <h3>SHOPPING BAG (<OrderQuantity />)</h3>
-                        <div className={Styles.scrollP}>
-                          <div className={`${Styles.MainInner} overflow-auto`} style={{ minHeight: "400px" }}>
-                            {order && order.items?.length > 0 ? (
-                              order.items?.map((ele) => {
+                    <div className={Styles.MainBag}>
+                      <h3>SHOPPING BAG (<OrderQuantity />)</h3>
+                      <div className={Styles.scrollP}>
+                        <div className={`${Styles.MainInner} overflow-auto`} style={{ minHeight: "400px" }}>
+                          {order && order.items?.length > 0 ? (
+                            order.items?.map((ele) => {
 
-                                let salesPrice = ele?.price;
-                                let listPrice = Number().toFixed(2);
-                                if (salesPrice == 'NaN') {
-                                  salesPrice = 0;
+                              let salesPrice = ele?.price;
+                              let listPrice = Number().toFixed(2);
+                              if (salesPrice == 'NaN') {
+                                salesPrice = 0;
+                              }
+                              listPrice = Number(ele?.usdRetail__c?.replace('$', '').replace(',', '')).toFixed(2);
+                              if (ele?.usdRetail__c.includes("$")) {
+                                if (listPrice == 'NaN') {
+                                  listPrice = 0;
                                 }
-                                listPrice = Number(ele?.usdRetail__c?.replace('$', '').replace(',', '')).toFixed(2);
-                                if (ele?.usdRetail__c.includes("$")) {
-                                  if (listPrice == 'NaN') {
-                                    listPrice = 0;
-                                  }
-                                }
+                              }
 
-                                return (
-                                  <div className={Styles.Mainbox}>
-                                    <div className={Styles.Mainbox1M}>
-                                      <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
-                                        {
-                                          ele?.ContentDownloadUrl ? <img src={ele?.ContentDownloadUrl} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : ele?.ProductImage ? <img src={ele?.ProductImage} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : !productImage.isLoaded ? <LoaderV2 /> :
-                                            productImage.images?.[ele?.ProductCode] ?
-                                              productImage.images[ele?.ProductCode]?.ContentDownloadUrl ?
-                                                <img src={productImage.images[ele?.ProductCode]?.ContentDownloadUrl} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
-                                                : <img src={productImage.images[ele?.ProductCode]} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
-                                              : <img src={Img1} alt="img" onClick={() => { setProductDetailId(ele?.Id) }} />
-                                        }
-                                      </div>
-                                      <div className={Styles.Mainbox3}>
-                                        <h2 onClick={() => { setProductDetailId(ele?.Id) }} style={{ cursor: 'pointer' }}>{ele?.Name}</h2>
-                                        <p>
-                                          <span className={Styles.Span1}>
-                                            {`$${listPrice}`}
-                                          </span>
-                                          <span className={Styles.Span2}>${Number(salesPrice).toFixed(2)}</span>
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    <div className={Styles.Mainbox2M}>
-                                      <div className={Styles.Mainbox4} onClick={() => {
-                                        if (order.items.length == 1) {
-                                          setClearConfim(true);
-                                        } else {
-                                        removeProduct(ele.Id)
+                              return (
+                                <div className={Styles.Mainbox}>
+                                  <div className={Styles.Mainbox1M}>
+                                    <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
+                                      {
+                                        ele?.ContentDownloadUrl ? <img src={ele?.ContentDownloadUrl} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : ele?.ProductImage ? <img src={ele?.ProductImage} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : !productImage.isLoaded ? <LoaderV2 /> :
+                                          productImage.images?.[ele?.ProductCode] ?
+                                            productImage.images[ele?.ProductCode]?.ContentDownloadUrl ?
+                                              <img src={productImage.images[ele?.ProductCode]?.ContentDownloadUrl} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
+                                              : <img src={productImage.images[ele?.ProductCode]} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
+                                            : <img src={Img1} alt="img" onClick={() => { setProductDetailId(ele?.Id) }} />
                                       }
-                                      }}>
-                                        <DeleteIcon fill="red" />
-                                      </div>
-                                      <div className={Styles.Mainbox5}>
-                                        <QuantitySelector
-                                          min={ele?.Min_Order_QTY__c || 0}
-                                          onChange={(quantity) => {
-                                            updateProductQty(ele.Id, quantity);
-                                          }}
-                                          value={ele.qty}
-                                        />
-                                      </div>
+                                    </div>
+                                    <div className={Styles.Mainbox3}>
+                                      <h2 onClick={() => { setProductDetailId(ele?.Id) }} style={{ cursor: 'pointer' }}>{ele?.Name}</h2>
+                                      <p>
+                                        <span className={Styles.Span1}>
+                                          {`$${listPrice}`}
+                                        </span>
+                                        <span className={Styles.Span2}>${Number(salesPrice).toFixed(2)}</span>
+                                      </p>
                                     </div>
                                   </div>
-                                );
-                              })
-                            ) : (
-                              <>
-                                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "35vh" }}>
-                                  No Products in Bag
+
+                                  <div className={Styles.Mainbox2M}>
+                                    <div className={Styles.Mainbox4} onClick={() => {
+                                      if (order.items.length == 1) {
+                                        setClearConfim(true);
+                                      } else {
+                                        removeProduct(ele.Id)
+                                      }
+                                    }}>
+                                      <DeleteIcon fill="red" />
+                                    </div>
+                                    <div className={Styles.Mainbox5}>
+                                      <QuantitySelector
+                                        min={ele?.Min_Order_QTY__c || 0}
+                                        onChange={(quantity) => {
+                                          updateProductQty(ele.Id, quantity);
+                                        }}
+                                        value={ele.qty}
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
-                              </>
-                            )}
+                              );
+                            })
+                          ) : (
+                            <>
+                              <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "35vh" }}>
+                                No Products in Bag
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <div className={Styles.TotalPricer}>
+                          <div>
+                            <h2>Total</h2>
                           </div>
-                          <div className={Styles.TotalPricer}>
-                            <div>
-                              <h2>Total</h2>
-                            </div>
-                            <div>
-                              <h2>${Number(total).toFixed(2)}</h2>
-                            </div>
+                          <div>
+                            <h2>${Number(total).toFixed(2)}</h2>
                           </div>
                         </div>
                       </div>
+                    </div>
                   </div>
 
                   <div className="col-lg-5 col-md-4 col-sm-12">
@@ -497,17 +503,17 @@ function MyBagFinal({ showOrderFor }) {
                       <h2>Shipping Address</h2>
 
                       <div className={Styles.ShipAdress}>
-                          {buttonActive ? (
-                            <p>
+                        {buttonActive ? (
+                          <p>
                             {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
-                              {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
-                              <br />
-                              {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
-                            </p>
-                          ) : (
-                            <p>No Shipping Address</p>
-                          )}
-                        </div>
+                            {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
+                            <br />
+                            {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
+                          </p>
+                        ) : (
+                          <p>No Shipping Address</p>
+                        )}
+                      </div>
                       {(showOrderFor && salesRepData?.Id && buttonActive) && <>
                         <h2>Order For</h2>
                         <div className={Styles.ShipAdress}>
@@ -516,7 +522,7 @@ function MyBagFinal({ showOrderFor }) {
                       </>}
                       <div className={Styles.ShipAdress2}>
                         {/* <label>NOTE</label> */}
-                        <textarea onKeyUp={(e) =>  keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
+                        <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
                       </div>
                       {!PONumberFilled ? (
                         <ModalPage
