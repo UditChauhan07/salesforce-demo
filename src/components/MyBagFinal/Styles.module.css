@@ -4,7 +4,7 @@
   height: 590px;
   overflow: auto;
 }
-.Mainbox4:hover{
+.Mainbox4:hover {
   cursor: pointer;
 }
 .MyBagFinalMain {
@@ -13,7 +13,7 @@
   padding: 38px 30px 30px 10px;
   margin: 10px 0 0 0;
 }
-.ClearBag{
+.ClearBag {
   background-color: #f1f0f0;
 }
 .MainInner {
@@ -22,7 +22,15 @@
   min-height: 400px;
   overflow: auto;
 }
-
+.customPriceInput {
+  width: 75px !important;
+  border: 1px solid rgb(204, 204, 204) !important;
+  border-radius: 5px !important;
+  padding: 1px 5px !important;
+}
+.customPriceInput:focus {
+  outline: none !important;
+}
 .MainInner::-webkit-scrollbar {
   border-radius: 50px;
   background-color: #d9d9d9;
@@ -117,7 +125,7 @@
   width: 100%;
   max-width: 100px;
 }
-.Mainbox3{
+.Mainbox3 {
   width: fit-content;
 }
 .Mainbox3 h2 {
@@ -284,8 +292,7 @@
   /* text-transform: uppercase; */
 }
 
-
-.ShipAdress2 label{
+.ShipAdress2 label {
   color: #000;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 19px;
@@ -299,20 +306,21 @@
   background-color: transparent;
   /* text-transform: uppercase; */
 }
-.warning{
+.warning {
   text-decoration: underline;
 }
 
 .ShipBut {
   width: 100%;
 }
-.ShipBut button{
+.ShipBut button {
   width: 100%;
 }
-.btnHolder{
+.btnHolder {
   width: 100px;
 }
-.ShipBut button,.btnHolder {
+.ShipBut button,
+.btnHolder {
   color: #fff;
   text-align: center;
   font-family: "Montserrat";
@@ -326,10 +334,10 @@
   margin: 0 0 28px 0;
 }
 
-.ClearBag{
+.ClearBag {
   background-color: #f1f0f0;
   width: 100%;
-  color:black;
+  color: black;
   text-align: center;
   font-family: "Montserrat";
   font-size: 15px;
@@ -338,7 +346,7 @@
   line-height: 32px; /* 213.333% */
   letter-spacing: 1.5px;
   text-transform: uppercase;
- 
+
   margin: 0 0 28px 0;
 }
 @media (max-width: 1199px) {
@@ -354,33 +362,29 @@
   }
 }
 
-
 @media (max-width: 767.98px) {
-  
-  .MyBagFinalRight h4 span{
+  .MyBagFinalRight h4 span {
   }
 
-  .MyBagFinalRight h4{
+  .MyBagFinalRight h4 {
     display: block;
   }
 
-.MyBagFinalTop {
-  display: block;
-  justify-content: space-between;
-}
+  .MyBagFinalTop {
+    display: block;
+    justify-content: space-between;
+  }
 
-.MyBagFinalleft{
-      margin: 23px 0 0 0;
-}
-
+  .MyBagFinalleft {
+    margin: 23px 0 0 0;
+  }
 }
 
 @media (max-width: 767.98px) {
-.Mainbox{
-  display: block;
+  .Mainbox {
+    display: block;
+  }
+  .Mainbox2M {
+    margin: 20px 0 0px 0;
+  }
 }
-.Mainbox2M{
-  margin: 20px 0 0px 0;
-}
-}
-
