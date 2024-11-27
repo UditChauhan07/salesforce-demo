@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, admins, fetchBeg, getProductImageAll, getSalesRepList, salesRepIdKey } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, admins, defaultLoadTime, fetchBeg, getProductImageAll, getSalesRepList, salesRepIdKey } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -12,6 +12,7 @@ import LoaderV2 from "../loader/v2";
 import ProductDetails from "../../pages/productDetails";
 import Loading from "../Loading";
 import { DeleteIcon } from "../../lib/svg";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -43,31 +44,33 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     setTotal(getOrderTotal() ?? 0)
   }, [order])
-  useEffect(() => {
-    const FetchPoNumber = async () => {
-      try {
-        const res = await POGenerator();
-        if (res) {
-          
-          let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
-          let poInit = res;
-          if (isPreOrder) {
-            poInit = `PRE-${poInit}`
-          }
-          keyBasedUpdateCart({ PoNumber: poInit });
-          setPONumber(poInit);
+  const FetchPoNumber = async () => {
+    try {
+      const res = await POGenerator();
+      if (res) {
+        
+        let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
+        let poInit = res;
+        if (isPreOrder) {
+          poInit = `PRE-${poInit}`
         }
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching PO number:", error);
-        setIsLoading(false);
-      } finally {
-
+        keyBasedUpdateCart({ PoNumber: poInit });
+        setPONumber(poInit);
       }
-    };
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching PO number:", error);
+      setIsLoading(false);
+    } finally {
 
+    }
+  };
+  useEffect(() => {
     FetchPoNumber();
   }, []);
+
+  useBackgroundUpdater(FetchPoNumber,defaultLoadTime)
+  
 
   const orderGenerationHandler = () => {
 
