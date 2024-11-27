@@ -16,6 +16,19 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
     const [btnAct, setBtnAct] = useState(true)
     const [token, setUsertoken] = useState(null);
     const [showFullUserDesc, setShowFullUserDesc] = useState(false);
+    const [userDesc, setUserDesc] = useState("");
+    const [issueDesc, setIssueDesc] = useState("");
+    useEffect(() => {
+      const description = data.Description || "";
+      const userDescMatch = description
+        .split("User Desc:")[1]
+        ?.split("Issue Desc:")[0]
+        ?.trim();
+      const issueDescMatch = description.split("Issue Desc:")[1]?.trim();
+  
+      setUserDesc(userDescMatch || "");
+      setIssueDesc(issueDescMatch || "");
+    }, [data.Description]);
     function formatAMPM(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
@@ -113,6 +126,38 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
             ? truncated
             : truncated.slice(0, lastSpaceIndex) + ".....";
     };
+    const GetDescriptionContent = () => {
+        return (
+            <div>
+                <div>
+                    {issueDesc && (
+                        <div className={Detail.descriptionMarginTop}>
+                            <b>Issue Description : </b> {issueDesc}
+                        </div>
+                    )}
+
+                    {userDesc && (
+                        <div
+                            className={`${Detail.UserDescWrapper} ${showFullUserDesc ? Detail.ShowFullDesc : ""
+                                }`}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <b>User Description : </b>
+                            <span className={Detail.UserDescContent}>
+                                {userDesc
+                                    ? showFullUserDesc
+                                        ? userDesc
+                                        : truncateAtLastWord(userDesc, 180)
+                                    : "No user description provided."}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div>
             {orderStatus?.status ? (
@@ -152,7 +197,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                                     <span>{data.Account?.Name}</span>&nbsp; raised this on {DateConvert(data.Date_Opened__c)}
                                 </p>
                             </div>
-                            <div
+                            {/* <div
                                 className={`${Detail.UserDescWrapper} ${showFullUserDesc ? Detail.ShowFullDesc : ""
                                     }`}
                                 onMouseEnter={handleMouseEnter}
@@ -165,6 +210,9 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                                             : truncateAtLastWord(data.Description, 180)
                                         : "No user description provided."}
                                 </span>
+                            </div> */}
+                            <div className={Detail.MainDescDiv}>
+                                <GetDescriptionContent />
                             </div>
 
                             <h6>Activity</h6>
