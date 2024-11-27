@@ -34,7 +34,9 @@ function MyBagFinal({ showOrderFor }) {
   const [isLoading, setIsLoading] = useState(true);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const { getOrderQuantity,updateProductPrice } = useCart();
+  const { getOrderQuantity, updateProductPrice } = useCart();
+  const [alert, setAlert] = useState(0);
+  const [limitCheck, setLimitCheck] = useState(false);
   const handleNameChange = (event) => {
     const limit = 11;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -78,20 +80,6 @@ function MyBagFinal({ showOrderFor }) {
 
   useBackgroundUpdater(FetchPoNumber, defaultLoadTime)
 
-
-  const orderGenerationHandler = () => {
-
-    // Check if PONumber contains spaces
-    if (PONumber.includes(" ")) {
-      // Replace all spaces with underscores
-      const updatedPONumber = PONumber.replace(/ /g, "_");
-      setPONumber(updatedPONumber);
-    }
-    // Check if orders object has any orders
-    if (Object.keys(order).length) {
-      setConfirm(true); // Proceed with order placement
-    }
-  };
 
 
   // .............
@@ -268,6 +256,112 @@ function MyBagFinal({ showOrderFor }) {
         <Loading height={'50vh'} /> // Display full-page loader while data is loading
       ) : (
         <section>
+          {!PONumberFilled ? (
+            <ModalPage
+              open
+              content={
+                <>
+                  <div style={{ maxWidth: "309px" }}>
+                    <h1
+                      className={`fs-5 ${StylesModal.ModalHeader}`}
+                    >
+                      Warning
+                    </h1>
+                    <p className={` ${StylesModal.ModalContent}`}>
+                      {" "}
+                      Please Enter PO Number
+                    </p>
+                    <div className="d-flex justify-content-center">
+                      <button
+                        className={`${StylesModal.modalButton}`}
+                        onClick={() => {
+                          setPONumberFilled(true);
+                        }}
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </>
+              }
+              onClose={() => {
+                setPONumberFilled(true);
+              }}
+            />
+          ) : null}
+          {alert == 1 && (
+            <ModalPage
+              open
+              content={
+                <>
+                  <div style={{ maxWidth: "309px" }}>
+                    <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
+                    <p className={` ${Styles.ModalContent}`}>
+                      Please Select Products of Minimum Order Amount
+                    </p>
+                    {/* <p className={` ${Styles.ModalContent}`}><b>Current Order Total:</b> ${formentAcmount(orderTotal)}</p> */}
+                    <div className="d-flex justify-content-center">
+                      <button
+                        className={Styles.btnHolder}
+                        onClick={() => setAlert(0)}
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </>
+              }
+              onClose={() => setAlert(0)}
+            />
+          )}
+          {alert == 2 && (
+            <ModalPage
+              open
+              content={
+                <>
+                  <div style={{ maxWidth: "309px" }}>
+                    <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
+                    <p className={` ${Styles.ModalContent}`}>
+                      Please Select Tester Product of Minimum Order Amount
+                    </p>
+                    <div className="d-flex justify-content-center">
+                      <button
+                        className={Styles.btnHolder}
+                        onClick={() => setAlert(0)}
+                      >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </>
+              }
+              onClose={() => {
+                setAlert(0);
+              }}
+            />
+          )}
+          <ModalPage
+            open={limitCheck || false}
+            content={
+              <>
+                <div style={{ maxWidth: "309px" }}>
+                  <h1 className={`fs-5 ${Styles.ModalHeader}`}>Warning</h1>
+                  <p className={` ${Styles.ModalContent}`}>
+                    Please upload file with less than 100 products
+                  </p>
+                  <div className="d-flex justify-content-center">
+                    <button
+                      className={StylesModal.modalButton}
+                      onClick={() => setLimitCheck(false)}
+                    >
+                      OK
+                    </button>
+                  </div>
+                </div>
+              </>
+            }
+            onClose={() => setLimitCheck(false)}
+          />
           <ModalPage
             open={confirm || false}
             content={
@@ -456,9 +550,9 @@ function MyBagFinal({ showOrderFor }) {
                                         <span className={Styles.Span2}>
                                           {/* ${Number(salesPrice).toFixed(2)} */}
                                           <input type="number" value={salesPrice} placeholder={Number(salesPrice).toFixed(2)} className={`ms-1 ${Styles.customPriceInput}`}
-                                  onChange={(e) => { onPriceChangeHander(ele?.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
-                                  name="limit_input" />
-                                          </span>
+                                            onChange={(e) => { onPriceChangeHander(ele?.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
+                                            name="limit_input" />
+                                        </span>
                                       </p>
                                     </div>
                                   </div>
@@ -554,7 +648,31 @@ function MyBagFinal({ showOrderFor }) {
                       ) : (
                         <div className={Styles.ShipBut}>
                           <button
-                            onClick={orderGenerationHandler}
+                            onClick={() => {
+
+                              if (order?.items?.length) {
+                                if (PONumber.length) {
+                                  if (order?.items?.length > 100) {
+                                    setLimitCheck(true);
+                                  } else {
+                                    if (
+                                      order.Account.discount.MinOrderAmount >
+                                      total
+                                    ) {
+                                      setAlert(1);
+                                    } else {
+                                      // if (testerInBag && order.Account.discount.testerproductLimit > total) {
+                                      //   setAlert(2);
+                                      // } else {
+                                      setConfirm(true);
+                                      // }
+                                    }
+                                  }
+                                } else {
+                                  setPONumberFilled(false);
+                                }
+                              }
+                            }}
                             disabled={!buttonActive}
                           >
                             ${Number(total).toFixed(2)} PLACE ORDER

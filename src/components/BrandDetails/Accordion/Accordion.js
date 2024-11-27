@@ -65,7 +65,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
     let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
     element.price = salesPrice;
     element.qty = quantity;
-    console.log(salesPrice, "salesprice")
+    // console.log(salesPrice, "salesprice")
     // element.discount = discount;
     let cartStatus = addOrder(element, account, manufacturer);
 
@@ -231,8 +231,6 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                   value={order?.Account?.id === localStorage.getItem("AccountId__c") ? qtyofItem : 0}
                                 />
                               </td>
-                              {console.log({ priceInputs })
-                              }
                               <td>
                                 {order?.Account?.id === localStorage.getItem("AccountId__c") ? (
                                   qtyofItem > 0 ? (
