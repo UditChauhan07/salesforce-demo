@@ -365,10 +365,7 @@ export async function DestoryAuth() {
     // localStorage.removeItem("lCpFhWZtGKKejSX")
     // console.log('All localStorage keys have been removed.');
     // window.location.href = window.location.origin;
-    return true;
-  } catch (e) {
     localStorage.removeItem("lCpFhWZtGKKejSX")
-    console.error('Error clearing localStorage:', e);
     for (var key in localStorage) {
       if (localStorage.hasOwnProperty(key)) {
         localStorage.removeItem(key);
@@ -376,6 +373,7 @@ export async function DestoryAuth() {
     }
     window.location.href = window.location.origin;
     return true;
+  } catch (e) {
   }
 }
 export async function cartSync({ cart }) {
