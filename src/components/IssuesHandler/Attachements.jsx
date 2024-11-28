@@ -159,7 +159,7 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,d
             <div className={Styles.attachContainer}>
                 <div className={Styles.dFlex}>
                     <div className={Styles.descholder}>
-                        <p className={Styles.subTitle}>Describe you Problem</p>
+                        <p className={Styles.subTitle}>Describe your Problem</p>
                         <textarea name="desc" id="" className={Styles.textAreaPut} 
                                      value={desc}
                                      onChange={(e) => setDesc(e.target.value)} 
@@ -167,7 +167,7 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,d
                         ></textarea>
                     </div>
                     <div className={Styles.attachHolder}>
-                        <p className={Styles.subTitle}>upload some Attachements</p>
+                        <p className={Styles.subTitle}>upload some Attachments</p>
                         <label className={Styles.attachLabel} for="attachement"><div><div className={Styles.attachLabelDiv}><BiUpload /></div></div></label>
                         <input type="file" style={{ width: 0, height: 0 }} id="attachement" onChange={handleChange} multiple accept="image/*" />
                         <div className={Styles.imgHolder}>

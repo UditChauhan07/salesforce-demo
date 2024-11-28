@@ -585,7 +585,7 @@ function Product() {
                         </div>
                         <div className={`${styles.TotalSide} `}>
                           <div className="d-flex align-items-start flex-column">
-                            <h4>Total Number of Products : <OrderQuantity /></h4>
+                            <h4>Total Number of Products in Bag : <OrderQuantity /></h4>
                             <h4>Total Price : $<OrderPrice /></h4>
                           </div>
                           <button
