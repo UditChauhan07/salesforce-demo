@@ -13,7 +13,7 @@ import { MdOutlineDownload } from "react-icons/md";
 import ModalPage from "../../components/Modal UI";
 import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
-import { defaultLoadTime, GetAuthData } from "../../lib/store";
+import { defaultLoadTime } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
@@ -23,7 +23,7 @@ const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sh
 const fileExtension = ".xlsx";
 
 const SalesReport = () => {
-  const[PageSize,setPageSize] = useState(3);
+  const [PageSize, setPageSize] = useState(3);
   const [manufacturers, setManufacturers] = useState([]);
   const [yearFor, setYearFor] = useState(2024);
   const salesReportApi = useSalesReport();
@@ -38,9 +38,6 @@ const SalesReport = () => {
   const [salesRepList, setSalesRepList] = useState([]);
   const [yearForTableSort, setYearForTableSort] = useState(2024);
   const [exportToExcelState, setExportToExcelState] = useState(false);
-  const [selectedSalesRepId, setSelectedSalesRepId] = useState();
-  const [userData, setUserData] = useState({});
-  const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
   const [dateFilter, setDateFilter] = useState("Created-Date");
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,11 +74,6 @@ const SalesReport = () => {
         };
       });
     }
-    // if (activeAccounts === "Active Account") {
-    //   filtered = filtered?.filter((ele) =>
-    //     ele.Orders.find((item) => item.Status === "Active Account"));
-    //   // i need only active account in this function but is not working?
-    // }
 
     if (activeAccounts === "Active Account") {
       filtered = filtered?.map((ele) => {
@@ -231,11 +223,6 @@ const SalesReport = () => {
   };
   const navigate = useNavigate();
 
-
-  // Memoize permissions to avoid unnecessary re-calculations
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
-
-
   const readyReportHandler = (data) => {
     let salesListName = [];
     let salesList = [];
@@ -298,11 +285,6 @@ const SalesReport = () => {
   const sendApiCall = () => {
     setManufacturerFilter(null);
     setSearchBySalesRep("");
-    // setManufacturerFilter(null);
-    // setHighestOrders(true);
-    // getSalesData(yearFor);
-    // setSearchBy("");
-    // setSearchBySalesRep("");
     getSalesData(yearFor, dateFilter);
   };
   let yearList = [
@@ -325,7 +307,6 @@ const SalesReport = () => {
 
         const userPermissions = await getPermissions();
         setPermissions(userPermissions);
-        setHasPermission(userPermissions?.modules?.reports?.salesReport?.view);
 
         // If no permission, redirect to dashboard
         if (userPermissions?.modules?.reports?.salesReport?.view === false) {
@@ -341,14 +322,13 @@ const SalesReport = () => {
     fetchData();
   }, []);
 
-  
-  const paginatedData = useMemo(()=>{
+
+  const paginatedData = useMemo(() => {
     return filteredSalesReportData?.slice(
       (currentPage - 1) * PageSize,
       currentPage * PageSize
     )
-  },[filteredSalesReportData,PageSize,currentPage])
-  console.log({filteredSalesReportData,paginatedData,isLoading});
+  }, [filteredSalesReportData, PageSize, currentPage])
 
   return (
     <AppLayout
@@ -378,11 +358,11 @@ const SalesReport = () => {
 
             <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
             <div className="d-flex justify-content-end gap-4 col-8">
-            <FilterItem
+              <FilterItem
                 minWidth="220px"
                 label="Pagination"
                 name="Pagination"
-                value={PageSize?PageSize:false}
+                value={PageSize ? PageSize : false}
                 options={[
                   {
                     label: "Paginated",
@@ -456,8 +436,6 @@ const SalesReport = () => {
               </button>
             </div>
           </div>
-
-
         </>
       }
     >
@@ -493,41 +471,6 @@ const SalesReport = () => {
           </h2>
         </div>
         <div>
-          {false && <div className={`d-flex align-items-center ${Styles.InputControll}`}>
-            <select onChange={(e) => setYearFor(e.target.value)}>
-              <option value={2015} selected={yearFor == 2015 ? true : false}>
-                2015
-              </option>
-              <option value={2016} selected={yearFor == 2016 ? true : false}>
-                2016
-              </option>
-              <option value={2017} selected={yearFor == 2017 ? true : false}>
-                2017
-              </option>
-              <option value={2018} selected={yearFor == 2018 ? true : false}>
-                2018
-              </option>
-              <option value={2019} selected={yearFor == 2019 ? true : false}>
-                2019
-              </option>
-              <option value={2020} selected={yearFor == 2020 ? true : false}>
-                2020
-              </option>
-              <option value={2021} selected={yearFor == 2021 ? true : false}>
-                2021
-              </option>
-              <option value={2022} selected={yearFor == 2022 ? true : false}>
-                2022
-              </option>
-              <option value={2023} selected={yearFor == 2023 ? true : false}>
-                2023
-              </option>
-              <option value={2024} selected={yearFor == 2024 ? true : false}>
-                2024
-              </option>
-            </select>
-            <button onClick={() => sendApiCall()}>Search Sales</button>
-          </div>}
         </div>
       </div>
 
