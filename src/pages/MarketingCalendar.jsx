@@ -31,7 +31,7 @@ const MarketingCalendar = () => {
   const [pdfLoadingText, setPdfLoadingText] = useState(".");
   const [productList, setProductList] = useState([]);
   const navigate = useNavigate();
-  const [selectYear, setSelectYear] = useState(date.getFullYear())
+  const [selectYear, setSelectYear] = useState()
   const yearList = useMemo(() => {
     const currentYear = new Date().getFullYear();
     return [
@@ -75,10 +75,18 @@ const MarketingCalendar = () => {
       console.error("Data Fetch Error", error);
     }
   };
+  useEffect(()=>{
+    setSelectYear(date.getFullYear());
+  },[])
   useEffect(() => {
-
-
     fetchData();
+    setTimeout(() => {
+      let getMonth = new Date().getMonth();
+      var element = document.getElementById(monthNames[getMonth]);
+      if (element && selectYear == date.getFullYear()) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 3000);
     return () => dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
   }, [selectYear]);
   const [month, setMonth] = useState("");

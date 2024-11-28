@@ -98,17 +98,17 @@ const ErrorProductCard = ({
                                         e.target.value = null;
                                         ErrorProductQtyHandler(errorList?.[product.Id]?.Id, 0);
                                         return;
-                                    }
-                                    if (enteredValue > product.Quantity) {
-                                        Swal.fire({
-                                            title: `${reason}!`,
-                                            text: `You have entered more than the allowed quantity`,
-                                            icon: 'error',
-                                            confirmButtonText: 'Ok',
-                                            confirmButtonColor: '#000',
-                                        });
-                                        e.target.value = errorList?.[product.Id]?.issue || 0; // Reset to previous value
-                                    } else {
+                                    }else{
+                                    // if (enteredValue > product.Quantity) {
+                                    //     Swal.fire({
+                                    //         title: `${reason}!`,
+                                    //         text: `You have entered more than the allowed quantity`,
+                                    //         icon: 'error',
+                                    //         confirmButtonText: 'Ok',
+                                    //         confirmButtonColor: '#000',
+                                    //     });
+                                    //     e.target.value = errorList?.[product.Id]?.issue || 0; // Reset to previous value
+                                    // } else {
                                         ErrorProductQtyHandler(errorList?.[product.Id]?.Id, enteredValue);
                                     }
                                 }} 

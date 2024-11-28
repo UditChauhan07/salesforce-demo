@@ -257,11 +257,15 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
             let confimationStatus = true;
             if (reason != "Charges") {
                 error.map((id) => {
+                    console.log({reason});
+                    
                     if ((errorList[id].issue == 0 || !errorList[id].issue) || (reason != "Product Overage" && errorList[id].issue > errorList[id].Quantity)) {
                         confimationStatus = false;
                         const myElement = document.getElementById(`oP${id}`);
                         if (myElement) {
                             let msg;
+                            console.log({errorList});
+                            
                             if(errorList[id].issue == 0){
                                 msg = `Please enter issue quantity`;
                             }else{
