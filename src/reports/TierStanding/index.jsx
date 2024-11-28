@@ -13,6 +13,7 @@ import MapGenerator from "../../components/Map";
 import classNames from "classnames";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../../lib/dataStore";
 const center = {
     lat: 38,
     lng: -97
@@ -28,9 +29,30 @@ const Tier = () => {
     const [ext, setExt] = useState(false);
     const [year, setYear] = useState(dYear)
     const [tier, setTier] = useState({ isLoad: false, data: [], getSalesHolder: {}, currentYearRevenue: 0, previousYearRevenue: 0 });
-    const [permissions, setPermissions] = useState(null);
+
+    const TierReady = (data)=>{
+        let currentYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
+        let previousYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year - 1], 0);
+        setTier({ isLoad: true, data: data?.salesArray ?? [], getSalesHolder: data?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
+    }
+    const GetDataHandler = () => {
+        GetAuthData().then((user) => {
+            if (admins.includes(user.Sales_Rep__c)) {
+                dataStore.getPageData("/TierStanding",()=>getTierReportHandler({ token: user.x_access_token, year: year })).then((res) => {
+                    TierReady(res)
+
+                }).catch((resErr) => {
+                    console.log({ resErr });
+                })
+            } else {
+                
+            }
+        })
+    }
     useEffect(() => {
+        dataStore.subscribe("/TierStanding",TierReady)
         GetDataHandler()
+        return ()=> dataStore.unsubscribe("/TierStanding",TierReady)
     }, [])
     //define marker
     const MarkLocations = useMemo(() => {
@@ -95,22 +117,7 @@ const Tier = () => {
         return response;
     }, [tier?.data])
 
-    const GetDataHandler = () => {
-        GetAuthData().then((user) => {
-            if (admins.includes(user.Sales_Rep__c)) {
-                getTierReportHandler({ token: user.x_access_token, year: year }).then((res) => {
-                    let currentYearRevenue = res?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
-                    let previousYearRevenue = res?.salesArray.reduce((acc, curr) => acc + curr[year - 1], 0);
-                    setTier({ isLoad: true, data: res?.salesArray ?? [], getSalesHolder: res?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
-
-                }).catch((resErr) => {
-                    console.log({ resErr });
-                })
-            } else {
-                
-            }
-        })
-    }
+ 
 
     const excelExportHandler = () => {
         const ws = XLSX.utils.json_to_sheet(csvData());
@@ -151,7 +158,6 @@ useEffect(()=>{
     const fetchData = async()=>{
         try {
             const userPermissions = await getPermissions()
-            setPermissions(userPermissions);
         if(userPermissions?.modules?.reports?.accountTier?.view=== false){ 
             navigate('/dashboard');  PermissionDenied();
         }
@@ -162,8 +168,6 @@ useEffect(()=>{
     fetchData()
 } , [])
 
-
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
     return (
         <AppLayout
             filterNodes={
