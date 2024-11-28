@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./table.module.css";
 import { Link } from "react-router-dom";
 import Loading from "../Loading";
 const NewnessReportTable = ({ newnessData, dataDisplay }) => {
+  
   const handleTableDataDisplay = (value) => {
     if (dataDisplay === "price")
       return `$${Number(value)
