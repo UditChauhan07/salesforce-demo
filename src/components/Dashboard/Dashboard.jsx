@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, startTransition, Suspense } from "react";
 import Styles from "./Dashboard.module.css";
-import Chart from "react-apexcharts";
+// import Chart from "react-apexcharts";
+import { CSSTransition } from 'react-transition-group';
 import img1 from "./Images/Active-1.png";
 import img2 from "./Images/Vector.png";
 import img3 from "./Images/Group.png";
@@ -21,6 +22,8 @@ import { salesRepIdKey } from "../../lib/store";
 import { useSearchParams } from "react-router-dom";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+const GraphHandler=React.lazy(() => import("./GraphHandler"));
+const Chart=React.lazy(() => import("react-apexcharts"));
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function Dashboard() {
@@ -999,10 +1002,9 @@ function Dashboard() {
               {!isLoading ? (
                 <ContentLoader />
               ) : (
-                <>
-
+                <Suspense fallback={<ContentLoader />}>
                   <Chart options={salesByBrandData.options} series={salesByBrandData.series} type="donut" className={Styles.donutchart} width="90%" height="400px" />
-                </>
+                </Suspense >
               )}
             </div>
           </div>
@@ -1097,15 +1099,9 @@ function Dashboard() {
             </div>
           </div>
         </div>
-
-        <div className="row mt-5">
-          <div className="">
-            <p className={Styles.Tabletext}>Total Sale By Brand</p>
-            <div className={`${Styles.graphmain} cardShadowHover`}>
-              <Chart options={dataa.options} series={manufacturerSalesYear} type="area" width="100%" height="100%" />
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={<ContentLoader />}>
+            <GraphHandler options={dataa.options} manufacturerSalesYear={manufacturerSalesYear} Styles={Styles} />
+        </Suspense>
       </div>
     </AppLayout>
   );
