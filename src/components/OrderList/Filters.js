@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FilterItem } from "../FilterItem";
 import { useManufacturer } from "../../api/useManufacturer";
 import FilterSearch from "../FilterSearch";
 import { CloseButton } from "../../lib/svg";
+import dataStore from "../../lib/dataStore";
 
 const Filters = ({ value, onChange, resetFilter,monthHide=true }) => {
-  const { data: manufacturerData } = useManufacturer();
+  const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const handleMonthFilter = (v) => onChange("month", v);
   const handleManufacturerFilter = (v) => onChange("manufacturer", v);
   const handleSearchFilter = (v) => onChange("search", v);
@@ -39,8 +49,8 @@ const Filters = ({ value, onChange, resetFilter,monthHide=true }) => {
           minWidth="220px"
         value={value.manufacturer}
         options={
-          Array.isArray(manufacturerData?.data)
-            ? manufacturerData?.data?.map((manufacturer) => ({
+          Array.isArray(manufacturerList)
+            ? manufacturerList?.map((manufacturer) => ({
                 label: manufacturer.Name,
                 value: manufacturer.Id,
               }))

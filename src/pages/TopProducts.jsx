@@ -19,6 +19,15 @@ let months = ["January", "February", "March", "April", "May", "June", "July", "A
 
 const TopProducts = () => {
   const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [topProductList, setTopProductList] = useState({ isLoaded: false, data: [], message: null });
   const [monthList, setMonthList] = useState([])
   const d = new Date();
@@ -170,7 +179,7 @@ const TopProducts = () => {
           value={manufacturerFilter}
           options={[
             { label: "All Brands", value: null }, // Add the first option
-            ...(manufacturers?.data?.map((manufacturer) => ({
+            ...(manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             })) || []), // Safely map if manufacturers.data exists, fallback to an empty array

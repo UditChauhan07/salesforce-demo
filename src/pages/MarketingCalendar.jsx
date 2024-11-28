@@ -22,6 +22,15 @@ const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep
 
 const MarketingCalendar = () => {
   const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [isAlert, setIsAlert] = useState(false);
   let date = new Date();
   // const [isLoading, setIsLoading] = useState(true);
@@ -301,7 +310,7 @@ const MarketingCalendar = () => {
             label="All Brands"
             name="All-Brand"
             value={brand}
-            options={manufacturers?.data?.map((manufacturer) => ({
+            options={manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             }))}

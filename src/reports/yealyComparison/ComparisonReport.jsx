@@ -31,6 +31,15 @@ const YearlyComparisonReport = () => {
     year: date.getFullYear(),
   };
   const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [filter, setFilter] = useState(initialValues);
   const [apiData, setApiData] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -304,7 +313,7 @@ const YearlyComparisonReport = () => {
             label="All Manufacturers"
             name="All-Manufacturers"
             value={filter.ManufacturerId__c}
-            options={manufacturers?.data?.map((manufacturer) => ({
+            options={manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             }))}

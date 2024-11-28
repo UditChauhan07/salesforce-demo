@@ -33,6 +33,15 @@ const ComparisonReport = () => {
 
   };
   const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [dataDisplayHandler, setDataDisplayHandler] = useState('Active Account');
   const [filter, setFilter] = useState(initialValues);
   const originalApiData = useComparisonReport();
@@ -160,7 +169,7 @@ const ComparisonReport = () => {
             label="All Manufacturers"
             name="All-Manufacturers"
             value={filter.ManufacturerId__c}
-            options={manufacturers?.data?.map((manufacturer) => ({
+            options={manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             }))}
