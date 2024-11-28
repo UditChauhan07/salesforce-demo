@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./Style.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ProductDetails from "../../pages/productDetails";
 import { Link } from "react-router-dom";
+import LoaderV2 from "../loader/v2";
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 function LaunchCalendar({ productList, brand, month }) {
   const products = productList;
- 
+  console.log({ products });
+
+
   const [productDetailId, setProductDetailId] = useState();
   const [isEmpty, setIsEmpty] = useState(false);
   useEffect(() => {
@@ -14,7 +17,7 @@ function LaunchCalendar({ productList, brand, month }) {
     let temp = true;
     products.map((month) => {
       month.content.map((item) => {
-        if (!brand || brand == item.brand||brand ==item.ManufacturerId__c) {
+        if (!brand || brand == item.brand || brand == item.ManufacturerId__c) {
           temp = false;
         }
       });
@@ -22,49 +25,36 @@ function LaunchCalendar({ productList, brand, month }) {
     });
   }, [brand]);
 
-  const [filterData, setFilterData] = useState();
-  const allOrdersEmpty = filterData?.every((item) => item.content.length <= 0);
-  useEffect(() => {
-    if (!month || month == "") {
-      setFilterData(products);
+  const filterData = useMemo(() => {
+    if (!month || month === "") {
+      return products; // Return all products if no month is selected
     }
-    const newValues = products?.map((months) => {
-      const filterData = months.content?.filter((item) => {
-        // let match = item.OCDDate.split("/")
-        // console.log(match)
-        if (month) {
-          if (brand) {
-            if (brand == item.ManufacturerId__c) {
-              if (month == "TBD") {
-                return parseInt(item.Ship_Date__c.split("-")[2]) == 15;
-              } else {
-                return monthNames[parseInt(item.Ship_Date__c.split("-")[1]) - 1].toLowerCase() == month.toLowerCase();
-              }
-            }
-          } else {
-            if (month == "TBD") {
-              return parseInt(item.Ship_Date__c.split("-")[2]) == 15;
-            } else {
-              return monthNames[parseInt(item.Ship_Date__c.split("-")[1]) - 1].toLowerCase() == month.toLowerCase();
-            }
+
+    return products?.map((months) => {
+      const filteredContent = months.content?.filter((item) => {
+        const shipDateParts = item.Ship_Date__c.split("-");
+        const shipMonth = parseInt(shipDateParts[1]) - 1; // Get month index (0-11)
+        const shipDay = parseInt(shipDateParts[2]);
+
+        if (brand) {
+          if (brand !== item.ManufacturerId__c) {
+            return false; // Filter out items that don't match the brand
           }
-          // return match.includes(month.toUpperCase() )
+        }
+
+        if (month === "TBD") {
+          return shipDay === 15; // Special case for "TBD"
         } else {
-          if (brand) {
-            if (brand == item.ManufacturerId__c) {
-              return true;
-            }
-          } else {
-            return true;
-          }
-          // If month is not provided, return all items
+          return monthNames[shipMonth].toLowerCase() === month.toLowerCase();
         }
       });
+
       // Create a new object with filtered content
-      return { ...months, content: filterData };
+      return { ...months, content: filteredContent };
     });
-    setFilterData(newValues);
-  }, [month, brand]);
+  }, [products, month, brand]); // Dependencies for useMemo
+  const allOrdersEmpty = filterData?.every((item) => item.content.length <= 0);
+  // Memoize the filtered data based on month and brand
 
   //   if(!ShipDate){
   // setFilterData(products)
@@ -88,25 +78,62 @@ function LaunchCalendar({ productList, brand, month }) {
   //   setFilterData(newValues);
   // }, [ShipDate]);
 
-  const ImageWithFallback = ({ src, alt, fallback,className,style }) => {
+  const ImageWithFallback = ({ src, alt, fallback, className, style }) => {
     // State to manage the current image source
     const [imgSrc, setImgSrc] = useState(src);
 
     // Function to handle image loading errors
     const handleError = () => {
-        setImgSrc(fallback); // Set fallback image on error
+      setImgSrc(fallback); // Set fallback image on error
     };
 
     return (
-        <img
-            src={imgSrc}
-            alt={alt}
-            onError={handleError}
-            style={style}
-            className={className}
-        />
+      <img
+        src={imgSrc}
+        alt={alt}
+        onError={handleError}
+        style={style}
+        className={className}
+      />
     );
-};
+  };
+  const ProductImage = ({ product }) => {
+    const [loading, setLoading] = useState(true); // State to track loading
+    const [error, setError] = useState(false); // State to track image loading error
+
+    const handleImageLoad = () => {
+      setLoading(false); // Set loading to false when image loads
+    };
+
+    const handleImageError = () => {
+      setError(true); // Set error to true if image fails to load
+      setLoading(false); // Also stop loading
+    };
+
+    return (
+      <div style={{ position: 'relative', display: 'inline-block' }}>
+        {/* Show a loading spinner or placeholder while the image is loading */}
+        {loading && !error && (
+          <div className="loading-placeholder">
+            {/* You can customize this placeholder */}
+            <LoaderV2 />
+          </div>
+        )}
+
+        <img
+          className={`zoomInEffect ${loading ? 'hidden' : ''}`} // Hide image while loading
+          src={product?.ProductImage ?? "\\assets\\images\\dummy.png"}
+          alt={product.Name}
+          onClick={() => {
+            setProductDetailId(product.Id);
+          }}
+          style={{ cursor: 'pointer', transition: 'opacity 0.5s' }}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+        />
+      </div>
+    );
+  };
 
   return (
     <div id="Calendar">
@@ -127,7 +154,7 @@ function LaunchCalendar({ productList, brand, month }) {
                           if (!brand || brand == product.brand || brand == product.ManufacturerId__c) {
                             let price = 'TBD';
                             if (product.usdRetail__c) {
-                              if(product.usdRetail__c !="TBD"){
+                              if (product.usdRetail__c != "TBD") {
                                 if (product.usdRetail__c.includes("$")) {
                                   let priceSplit = product.usdRetail__c.split('$')
                                   if (priceSplit.length == 2) {
@@ -158,16 +185,17 @@ function LaunchCalendar({ productList, brand, month }) {
                                     </div>
                                     <div className="d-flex mt-2">
                                       <div className="m-auto ProductImg">
-                                        <img className="zoomInEffect" src={product?.ProductImage ?? "\\assets\\images\\dummy.png"} alt={product.Name} onClick={() => {
+                                        {/* <img className="zoomInEffect" src={product?.ProductImage ?? "\\assets\\images\\dummy.png"} alt={product.Name} onClick={() => {
                                           setProductDetailId(product.Id);
-                                        }} style={{ cursor: 'pointer' }} />
+                                        }} style={{ cursor: 'pointer' }} /> */}
+                                        <ProductImage product={product} />
                                       </div>
                                       <div className="LaunchProductDetail " style={{ position: 'relative' }}>
                                         <h3 onClick={() => {
                                           setProductDetailId(product.Id);
                                         }} style={{ cursor: 'pointer', marginBottom: '10px' }} className="linkEffect">{product.Name}</h3>
                                         <div className="size">
-                                          <span>Size <span className="ProductQty">{product.Size_Volume_Weight__c??"NA"}</span></span>
+                                          <span>Size <span className="ProductQty">{product.Size_Volume_Weight__c ?? "NA"}</span></span>
                                           <span>Price <span className="ProductQty">{price}</span></span>
                                         </div>
                                         <p>{product.Description}</p>
@@ -175,9 +203,9 @@ function LaunchCalendar({ productList, brand, month }) {
                                     </div>
                                   </div>
                                   <div className="launchBrand">
-                                    <Link to={'/Brand/'+product.ManufacturerId__c}>
-                                    <ImageWithFallback className="img-fluid" src={"\\assets\\images\\brandImage\\" + product.ManufacturerId__c + ".png"} alt={`${product.name} logo`} fallback={"\\assets\\images\\dummy.png"} style={{maxWidth:'200px',height:'auto'}} />
-                                    {/* {console.log(product.ManufacturerId__c)} */}
+                                    <Link to={'/Brand/' + product.ManufacturerId__c}>
+                                      <ImageWithFallback className="img-fluid" src={"\\assets\\images\\brandImage\\" + product.ManufacturerId__c + ".png"} alt={`${product.name} logo`} fallback={"\\assets\\images\\dummy.png"} style={{ maxWidth: '200px', height: 'auto' }} />
+                                      {/* {console.log(product.ManufacturerId__c)} */}
                                     </Link>
                                   </div>
                                 </div>

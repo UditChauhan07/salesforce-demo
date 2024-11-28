@@ -4,7 +4,7 @@ import LogoHeader from "./All Headers/logoHeader/LogoHeader";
 import Header from "./All Headers/header/Header";
 import MobileHeader from "./All Headers/mobileHeader/MobileHeader";
 import Footer from "./Footer/Footer";
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 const AppLayout = ({ children, filterNodes }) => {
   return (
     <div className="col-12">
@@ -17,14 +17,17 @@ const AppLayout = ({ children, filterNodes }) => {
           <MobileHeader />
           <div className="filter-container">{filterNodes}</div>
         </div>
-        <main>  <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.3 }}
-        >
-          {children}
-        </motion.div>
+        <main>
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.5 }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
       <Footer />

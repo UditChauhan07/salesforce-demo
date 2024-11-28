@@ -28,10 +28,10 @@ const MarketingCalendar = () => {
   const [brand, setBrand] = useState(null);
   const [isLoaded, setIsloaed] = useState(false);
   const [isPDFLoaded, setPDFIsloaed] = useState(false);
-  const [pdfLoadingText, setPdfLoadingText] = useState(".");
   const [productList, setProductList] = useState([]);
   const navigate = useNavigate();
   const [selectYear, setSelectYear] = useState()
+  const [month, setMonth] = useState("");
   const yearList = useMemo(() => {
     const currentYear = new Date().getFullYear();
     return [
@@ -48,48 +48,97 @@ const MarketingCalendar = () => {
     ],
     []
   );
-  const readyCalenderHandle = (data) => {
-    setProductList(data)
-    setIsloaed(true)
-  }
+  // const readyCalenderHandle = (data) => {
+  //   setProductList(data)
+  //   setIsloaed(true)
+  // }
+
+  // const readyCalendarHandle = (data) => {
+  //   setProductList(data);
+  //   setIsloaed(true);
+  // };
+  // const fetchData = async () => {
+  //   setIsloaed(false);
+  //   try {
+  //     const user = await GetAuthData();
+  //     dataStore.subscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+  //     let res =await dataStore.getPageData(
+  //       `/marketing-calendar${selectYear}`,
+  //       () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })
+  //     );
+  //     if(res){
+  //       readyCalendarHandle(res);
+  //     }
+      
+  //   } catch (error) {
+  //     console.error("Data Fetch Error", error);
+  //   }
+  // };
+  // useEffect(()=>{
+  //   setSelectYear(date.getFullYear());
+  // },[])
+  // useEffect(() => {
+  //   fetchData();
+  //   setTimeout(() => {
+  //     let getMonth = new Date().getMonth();
+  //     var element = document.getElementById(monthNames[getMonth]);
+  //     if (element && selectYear == date.getFullYear()) {
+  //       element.scrollIntoView({ behavior: "smooth", block: "center" });
+  //     }
+  //   }, 3000);
+  //   return () => dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+  // }, [selectYear]);
 
   const readyCalendarHandle = (data) => {
     setProductList(data);
     setIsloaed(true);
   };
+
   const fetchData = async () => {
     setIsloaed(false);
     try {
       const user = await GetAuthData();
+      // Subscribe to the data store for the selected year
       dataStore.subscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
-      let res =await dataStore.getPageData(
+
+      // Fetch data from API
+      const res = await dataStore.getPageData(
         `/marketing-calendar${selectYear}`,
         () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })
       );
-      // if(res){
-      //   setProductList([]);
-      //   readyCalendarHandle(res);
-      // }
-      
+
+      // If response is received, update the product list
+      if (res) {
+        readyCalendarHandle(res);
+      }
     } catch (error) {
       console.error("Data Fetch Error", error);
     }
   };
-  useEffect(()=>{
-    setSelectYear(date.getFullYear());
-  },[])
+
   useEffect(() => {
+    // Fetch data when the component mounts
     fetchData();
-    setTimeout(() => {
-      let getMonth = new Date().getMonth();
-      var element = document.getElementById(monthNames[getMonth]);
-      if (element && selectYear == date.getFullYear()) {
+    
+    // Scroll to the current month after a delay
+    const timeoutId = setTimeout(() => {
+      const getMonth = new Date().getMonth();
+      const element = document.getElementById(monthNames[getMonth]);
+      if (element && selectYear === new Date().getFullYear()) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }, 3000);
-    return () => dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
-  }, [selectYear]);
-  const [month, setMonth] = useState("");
+
+    // Cleanup subscription on unmount
+    return () => {
+      dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+      clearTimeout(timeoutId);
+    };
+  }, [selectYear]); // Fetch data whenever selectYear changes
+
+  const handleYearChange = (newYear) => {
+    setSelectYear(newYear); // Update the selected year
+  };
 
   useBackgroundUpdater(fetchData,defaultLoadTime);
 
@@ -245,7 +294,7 @@ const MarketingCalendar = () => {
             name="Year"
             value={selectYear}
             options={yearList}
-            onChange={(value) => setSelectYear(value)}
+            onChange={handleYearChange}
           />
           <FilterItem
             minWidth="220px"
