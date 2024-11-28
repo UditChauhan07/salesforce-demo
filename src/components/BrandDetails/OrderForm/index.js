@@ -222,7 +222,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
               product.orderType = orderType;
               // console.log(product , "product")
               manufacturer.name = product.ManufacturerName__c
-              manufacturer.id = product.Id
+              manufacturer.id = localStorage.getItem("ManufacturerId__c")
 
               createOrderList.push(product)
 
