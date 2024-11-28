@@ -37,36 +37,6 @@ function Dashboard() {
     "ESTEE LAUDER": "esteeLauderBg",
   };
   const [dataa, setDataa] = useState({
-    series: [
-      {
-        name: "Diptyque",
-        data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-      },
-      {
-        name: "Byredo",
-        data: [76, 85, 87, 98, 87, 97, 91, 74, 94],
-      },
-      {
-        name: "Bobbi Brown",
-        data: [16, 25, 37, 48, 57, 67, 73, 84, 94],
-      },
-      {
-        name: "By Terry",
-        data: [6, 15, 23, 35, 41, 53, 66, 74, 87],
-      },
-      {
-        name: "Revive",
-        data: [2, 12, 21, 30, 33, 42, 37, 41, 54],
-      },
-      {
-        name: "Kevyn Aucoin",
-        data: [71, 88, 83, 91, 82, 99, 61, 70, 98],
-      },
-      {
-        name: "Smashbox",
-        data: [10, 12, 14, 11, 16, 20, 24, 29, 32],
-      },
-    ],
     options: {
       chart: {
         type: "area",
@@ -274,36 +244,6 @@ function Dashboard() {
             colorArray.push(hexabrand[value.id]);
           })
           setDataa({
-            series: [
-              {
-                name: "Diptyque",
-                data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-              },
-              {
-                name: "Byredo",
-                data: [76, 85, 87, 98, 87, 97, 91, 74, 94],
-              },
-              {
-                name: "Bobbi Brown",
-                data: [16, 25, 37, 48, 57, 67, 73, 84, 94],
-              },
-              {
-                name: "By Terry",
-                data: [6, 15, 23, 35, 41, 53, 66, 74, 87],
-              },
-              {
-                name: "Revive",
-                data: [2, 12, 21, 30, 33, 42, 37, 41, 54],
-              },
-              {
-                name: "Kevyn Aucoin",
-                data: [71, 88, 83, 91, 82, 99, 61, 70, 98],
-              },
-              {
-                name: "Smashbox",
-                data: [10, 12, 14, 11, 16, 20, 24, 29, 32],
-              },
-            ],
             options: {
               chart: {
                 type: "area",
@@ -500,14 +440,6 @@ function Dashboard() {
   const oR = 100;
   const [value, setValue] = useState((box.REVENUE / box.TARGET * 100) <= 100 ? box.REVENUE / box.TARGET * 100 : 100)
   const needle = (value, data, cx, cy, iR, oR, color) => {
-    let total = 0;
-    // needle_data.forEach((v) => {
-    //   total += v.value;
-    // });
-    // let ang = 180.0 * (1 - value / total);
-    // if(value == 0 &&value < total){
-    //   ang = 0;
-    // }
     let ang = 180 - ((value / 100) * 180);
     if (value == 0) {
       ang = 180;
@@ -529,7 +461,6 @@ function Dashboard() {
   useEffect(() => {
     async function fetchPermissions() {
       try {
-        const user = await GetAuthData(); // Fetch user data
         const userPermissions = await getPermissions(); // Fetch permissions
         setPermissions(userPermissions); // Set permissions in state
       } catch (err) {
@@ -611,7 +542,6 @@ function Dashboard() {
     <AppLayout
       filterNodes={
         <>
-
           <FilterItem
             minWidth="220px"
             label="Month-Year"
@@ -625,8 +555,6 @@ function Dashboard() {
             }}
             name={"dashboard-manu"}
           />
-
-
         </>
       }
     >
@@ -637,15 +565,10 @@ function Dashboard() {
               {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Sales By Rep
                 {permissions?.modules?.godLevel ?
                   <span>{Monthlydataa.isLoaded ?
-
-
                     <BiRefresh className="cursor-pointer" size={25} onClick={targeetRollReferesh} title="Click here for Refresh" />
-
                     : null}</span>
                   : null
                 }
-
-
               </p> : <p className={Styles.Tabletext}>Month to date(MTD): Sales By Rep</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className="">
