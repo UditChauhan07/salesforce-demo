@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import BMAIHandler from "../components/IssuesHandler/BMAIHandler.jsx";
-import { GetAuthData, admins, getAllAccount, getOrderCustomerSupport, getOrderList, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
+import { GetAuthData, admins, getAllAccount, getOrderCustomerSupport, getSalesRepList, postSupportAny, uploadFileSupport } from "../lib/store.js";
 import OrderCardHandler from "../components/IssuesHandler/OrderCardHandler.jsx";
 import Attachements from "../components/IssuesHandler/Attachements.jsx";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { FilterItem } from "../components/FilterItem.jsx";
 import AppLayout from "../components/AppLayout.jsx";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied.jsx";
+import dataStore from "../lib/dataStore.js";
 const CustomerService = () => {
   const { state } = useLocation();
   let Reason = null;
@@ -23,11 +24,12 @@ const CustomerService = () => {
     SalesRepId = state?.SalesRepId
     PONumber = state?.PONumber
   }
+
   const navigate = useNavigate();
   const [reason, setReason] = useState();
   const [accountList, setAccountList] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [orderId, setOrderId] = useState();
+  const [orderId, setOrderId] = useState(state?.OrderId);
   const [orderConfirmed, setOrderConfirmed] = useState(false)
   const [sendEmail, setSendEmail] = useState(false)
   const [files, setFile] = useState([]);
@@ -59,7 +61,7 @@ const CustomerService = () => {
     setContactId(null)
     setManufacturerId(null)
     setActual_Amount__c(null)
-    setErrorList({})
+    setErrorList({});
   }
 
   const reasons = [
@@ -69,6 +71,59 @@ const CustomerService = () => {
     { name: "Product Damage", icon: '/assets/damage.svg', desc: "Got damaged product in order?" },
     { name: "Update Account Info", icon: '/assets/account.svg', desc: "Change shipping or billing details" }
   ];
+  useEffect(() => {
+    if (Reason) {
+      setReason(Reason)
+    }
+    if (OrderId) {
+      setOrderId(OrderId)
+    }
+  }, []);
+
+  const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
+    setLoaded(false)
+    setSelectedSalesRepId(Sales_Rep__c)
+    if (searchId) {
+      getOrderCustomerSupport({
+        user: { key, Sales_Rep__c },
+        PONumber: searchPo, searchId
+      })
+        .then((order) => {
+          if (ReasonNull) {
+            setReason(null)
+          }
+          setOrders(order);
+          setLoaded(true)
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    } else {
+      dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
+        user: { key, Sales_Rep__c },
+        PONumber: searchPo, searchId
+      }))
+        .then((order) => {
+          if (ReasonNull) {
+            setReason(null)
+          }
+          setOrders(order);
+          resetHandler()
+          setLoaded(true)
+        })
+        .catch((error) => {
+          console.log({ error });
+        });
+    }
+    dataStore.getPageData("/getAllAccount" + Sales_Rep__c, () => getAllAccount({ user: { x_access_token: key, Sales_Rep__c } }))
+      .then((accounts) => {
+        setAccountList(accounts);
+      })
+      .catch((actError) => {
+        console.error({ actError });
+      });
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -86,18 +141,26 @@ const CustomerService = () => {
 
         // Redirect based on permission
         if (!customerServicePermission) {
-          // console.log('Redirecting to Dashboard...');
+          console.log('Redirecting to Dashboard...');
           PermissionDenied()
           navigate("/dashboard");
           return; // Ensure no further code execution
         }
-
+        dataStore.subscribe("/orderList" + SalesRepId, (data) => {
+          if (Reason) {
+            setReason(null)
+          }
+          setOrders(data);
+          resetHandler()
+          setLoaded(true)
+        })
+        
         // Continue with data fetching if permission is granted
         orderListBasedOnRepHandler(user.x_access_token, Reason ? SalesRepId : user.Sales_Rep__c, Reason ? false : true, OrderId);
 
         if (admins.includes(user.Sales_Rep__c)) {
           try {
-            const repRes = await getSalesRepList({ key: user.x_access_token });
+            const repRes = await dataStore.getPageData("getSalesRepList", () =>getSalesRepList({ key: user.x_access_token }));
             setSalesRepList(repRes.data);
           } catch (repErr) {
             console.log('SalesRepList Error:', repErr);
@@ -110,59 +173,7 @@ const CustomerService = () => {
 
     fetchData();
   }, [Reason, SalesRepId, OrderId]);
-  useEffect(() => {
-    if (Reason) {
-      setReason(Reason)
-    }
-    if (OrderId) {
-      setOrderId(OrderId)
-    }
-    GetAuthData()
-      .then((response) => {
-        setUserData(response)
-        orderListBasedOnRepHandler(response.x_access_token, Reason ? SalesRepId : response.Sales_Rep__c, Reason ? false : true, OrderId)
-        if (admins.includes(response.Sales_Rep__c)) {
-          getSalesRepList({ key: response.x_access_token }).then((repRes) => {
-            setSalesRepList(repRes.data)
-          }).catch((repErr) => {
-            console.log({ repErr });
-          })
-        }
-      })
-      .catch((err) => {
-        console.log({ err });
-      });
-  }, []);
-
-
-
-  const orderListBasedOnRepHandler = (key, Sales_Rep__c, ReasonNull = true, searchId = null) => {
-    setLoaded(false)
-    setSelectedSalesRepId(Sales_Rep__c)
-    getOrderCustomerSupport({
-      user: { key, Sales_Rep__c },
-      PONumber: searchPo, searchId
-    })
-      .then((order) => {
-        console.log({ order });
-        if (ReasonNull) {
-          setReason(null)
-        }
-        setOrders(order);
-        resetHandler()
-        setLoaded(true)
-      })
-      .catch((error) => {
-        console.log({ error });
-      });
-    getAllAccount({ user: { x_access_token: key, Sales_Rep__c } })
-      .then((accounts) => {
-        setAccountList(accounts);
-      })
-      .catch((actError) => {
-        console.error({ actError });
-      });
-  }
+ 
 
   const SubmitHandler = () => {
     setSubmitForm(true)
@@ -263,7 +274,7 @@ const CustomerService = () => {
         <BMAIHandler reasons={reasons} setReason={setReason} reason={reason} resetHandler={resetHandler} />
         {reason != "Update Account Info" && <OrderCardHandler orders={orders} orderId={orderId} setOrderId={setOrderId} reason={reason} orderConfirmedStatus={{ setOrderConfirmed, orderConfirmed }} accountIdObj={{ accountId, setAccountId }} manufacturerIdObj={{ manufacturerId, setManufacturerId }} errorListObj={{ errorList, setErrorList }} contactIdObj={{ contactId, setContactId }} accountList={accountList} setSubject={setSubject} sendEmailObj={{ sendEmail, setSendEmail }} Actual_Amount__cObj={{ Actual_Amount__c, setActual_Amount__c }} searchPoOBJ={{ searchPo, setSearchPO }} autoSelect={OrderId} />}
         {/*  files={files} desc={desc} */}
-        {reason != "Update Account Info" && <Attachements setFile={setFile} files={files} setDesc={setDesc} orderConfirmed={orderConfirmed} SubmitHandler={SubmitHandler} />}
+        {reason != "Update Account Info" && <Attachements setFile={setFile} files={files} setDesc={setDesc} orderConfirmed={orderConfirmed} SubmitHandler={SubmitHandler} desc={desc} />}
         {reason == "Update Account Info" && <AccountInfo reason={reason} Accounts={accountList} postSupportAny={postSupportAny} GetAuthData={GetAuthData} setSubmitForm={setSubmitForm} typeId={"0123b0000007z9pAAA"} salesRepId={selectedSalesRepId} />}
       </section>}
   </CustomerSupportLayout>)

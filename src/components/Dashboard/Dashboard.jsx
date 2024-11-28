@@ -22,56 +22,6 @@ import { useSearchParams } from "react-router-dom";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const monthList = [
-  {
-    name: "January - 2024",
-    value: "2024|1",
-  },
-  {
-    name: "February - 2024",
-    value: "2024|2",
-  },
-  {
-    name: "March - 2024",
-    value: "2024|3",
-  },
-  {
-    name: "April - 2024",
-    value: "2024|4",
-  },
-  {
-    name: "May - 2024",
-    value: "2024|5",
-  },
-  {
-    name: "June - 2024",
-    value: "2024|6",
-  },
-  {
-    name: "July - 2024",
-    value: "2024|7",
-  },
-  {
-    name: "August - 2024",
-    value: "2024|8",
-  },
-  {
-    name: "September - 2024",
-    value: "2024|9",
-  },
-  {
-    name: "October - 2024",
-    value: "2024|10",
-  },
-  {
-    name: "November - 2024",
-    value: "2024|11",
-  },
-  {
-    name: "December - 2024",
-    value: "2024|12",
-  },
-];
 
 function Dashboard() {
 
@@ -86,7 +36,6 @@ function Dashboard() {
     "RMS Beauty": "RMSBeautyBg",
     "ESTEE LAUDER": "esteeLauderBg",
   };
-
   const [dataa, setDataa] = useState({
     series: [
       {
@@ -177,6 +126,19 @@ function Dashboard() {
   const [Yearlydataa, setYearlydata] = useState({ isLoaded: false, data: [] });
   const [accountPerformance, setAccountPerformance] = useState({ isLoaded: false, data: [] });
   const [leadsbybrand, setleadsbtbrand] = useState({ isLoaded: false, data: [] });
+  const monthList = useMemo(() => {
+    const months = [];
+    for (let month = 1; month <= 12; month++) {
+      const monthName = new Date(currentYear, month - 1)
+        .toLocaleString('default', { month: 'long' })
+        .slice(0, 3); // Get the first 3 letters of the month name
+      months.push({
+        name: `${monthName} - ${currentYear}`,
+        value: `${currentYear}|${month}`,
+      });
+    }
+    return months;
+  }, [currentYear]);
   const [salesByBrandData, setSalesByBrandData] = useState({
 
     series: [],
@@ -477,7 +439,7 @@ function Dashboard() {
         if (admins.includes(user.Sales_Rep__c)) {
           setSalesRepAdmin(true)
         }
-        dataStore.getPageData("/dashboard"+headers.month??currentMonth+headers.year??currentYear,()=>getDashboardata({ user, saleRepId }))
+        dataStore.getPageData("/dashboard" + headers.month ?? currentMonth + headers.year ?? currentYear, () => getDashboardata({ user, saleRepId }))
           .then((dashboard) => {
             readyDashboardHandle(dashboard)
           })
@@ -513,7 +475,7 @@ function Dashboard() {
 
   let lowPerformanceArray = accountPerformance?.data?.slice(0)?.reverse()?.map((ele) => ele);
 
-  useBackgroundUpdater(()=>getDataHandler({month:selectMonth,year:selectYear}),defaultLoadTime);
+  useBackgroundUpdater(() => getDataHandler({ month: selectMonth, year: selectYear }), defaultLoadTime);
   const changeMonthHandler = (value) => {
     setIsLoading(false);
     setleadsbtbrand({ isLoaded: false, data: [] })

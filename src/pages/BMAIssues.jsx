@@ -2,10 +2,10 @@ import { useEffect, useState, useMemo } from "react";
 import BrandManagementPage from "../components/Brand Management Approval/BrandManagementPage"
 import Loading from "../components/Loading";
 import CustomerSupportLayout from "../components/customerSupportLayout"
-import { GetAuthData, admins, getAllAccount, getSalesRepList } from "../lib/store";
+import { GetAuthData, getAllAccount, getSalesRepList } from "../lib/store";
 import { FilterItem } from "../components/FilterItem";
 import { getPermissions } from "../lib/permission";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
 import AppLayout from "../components/AppLayout";
