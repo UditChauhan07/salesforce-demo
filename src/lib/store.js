@@ -2,7 +2,7 @@ import axios from "axios";
 import { getPermissions } from "./permission";
 // export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
  export const originAPi = "https://live.beautyfashionsales.com"
-// export const originAPi = "http://localhost:2611"
+// export const originAPi = "http://localhost:3001"
 
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
