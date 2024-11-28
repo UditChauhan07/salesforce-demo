@@ -13,6 +13,15 @@ import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 const MyRetailersPage = () => {
   const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [searchParams] = useSearchParams();
   const manufacturerId = searchParams.get("manufacturerId");
   const [retailerList, setRetailerList] = useState({ data: [], isLoading: true });
@@ -144,7 +153,7 @@ const MyRetailersPage = () => {
             label="All Brands"
             name="Manufacturer1"
             value={manufacturerFilter}
-            options={manufacturers?.data?.map((manufacturer) => ({
+            options={manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             }))}
@@ -182,7 +191,7 @@ const MyRetailersPage = () => {
         selectedSalesRepId={selectedSalesRepId}
         filterBy={
           manufacturerFilter
-            ? manufacturers?.data?.find(
+            ? manufacturerList?.find(
               (manufacturer) => manufacturer.Id === manufacturerFilter
             )
             : null

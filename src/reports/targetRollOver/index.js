@@ -25,6 +25,15 @@ const TargetReport = () => {
     const location = useLocation();
     const { state } = location || {};
     const { data: manufacturers } = useManufacturer();
+    const [manufacturerList,setManufacturerList] = useState([]);
+    useEffect(()=>{
+      dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+      if(manufacturers?.data?.length){
+        dataStore.updateData("/brands",manufacturers.data);
+        setManufacturerList(manufacturers.data)
+      }
+      return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+    },[manufacturers?.data])
     const [isLoaded, setIsLoaded] = useState(false);
     const [target, setTarget] = useState({ ownerPermission: false, list: [] });
     const [manufacturerFilter, setManufacturerFilter] = useState();
@@ -510,7 +519,7 @@ const TargetReport = () => {
                             minWidth="220px"
                             label="All Manufacturers"
                             value={manufacturerFilter}
-                            options={manufacturers?.data?.map((manufacturer) => ({
+                            options={manufacturerList?.map((manufacturer) => ({
                                 label: manufacturer.Name,
                                 value: manufacturer.Id,
                             }))}

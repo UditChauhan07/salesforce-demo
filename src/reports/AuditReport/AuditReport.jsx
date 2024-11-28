@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import { FilterItem } from "../../components/FilterItem";
 import FilterSearch from "../../components/FilterSearch";
+import dataStore from "../../lib/dataStore";
 // Styling
 const styles = {
     optionContainer: {
@@ -68,6 +69,15 @@ const styles = {
 const AuditReport = () => {
     const [isShowBrandModal, setIsShowBrandModal] = useState(false);
     const { data: manufacturers, isLoading, error } = useManufacturer();
+    const [manufacturerList,setManufacturerList] = useState([]);
+    useEffect(()=>{
+      dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+      if(manufacturers?.data?.length){
+        dataStore.updateData("/brands",manufacturers.data);
+        setManufacturerList(manufacturers.data)
+      }
+      return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+    },[manufacturers?.data])
     const [isPdfGenerated, setIsPdfGenerated] = useState(false)
     const [brandSelect, setbrandSelected] = useState();
     const [brandStep, setBrandStep] = useState(0);
@@ -260,7 +270,7 @@ const AuditReport = () => {
                             {brandPages.isLoaded ? <small className="d-block w-[100%] text-right mb-2">Total Accounts: <b>{totalAccount}</b></small> : null}
                             <ReportDownloadComparison /></section></div>
                     : brandStep == 0 ?
-                        <SelectBrandModel brands={manufacturers?.data} onChange={BrandPaginateHanlder} onClose={onCloseModal} />
+                        <SelectBrandModel brands={manufacturerList} onChange={BrandPaginateHanlder} onClose={onCloseModal} />
                         :
                         null}
             </>
@@ -326,7 +336,7 @@ const AuditReport = () => {
                             label="All Brands"
                             name="AllManufacturers1"
                             value={manufacturerFilter}
-                            options={manufacturers?.data?.map((manufacturer) => ({
+                            options={manufacturerList?.map((manufacturer) => ({
                                 label: manufacturer.Name,
                                 value: manufacturer.Id,
                             })) || []}

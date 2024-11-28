@@ -40,6 +40,15 @@ const NewnessReport = () => {
   const [filter, setFilter] = useState(initialValues);
   const originalApiData = useNewnessReport();
   const { data: manufacturers, isLoading, error } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [newnessData, setNewnessData] = useState({});
   const [loading, setLoading] = useState(false);
   const [status, setstatus] = useState(1)
@@ -255,7 +264,7 @@ const NewnessReport = () => {
             label="All Manufacturers"
             name="AllManufacturers12"
             value={filter.ManufacturerId__c}
-            options={manufacturers?.data?.map((manufacturer) => ({
+            options={manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             }))}

@@ -24,6 +24,15 @@ const months = monthNames.map((month, index) => ({ value: month.toUpperCase(), l
 
 const NewArrivals = () => {
   const { data: manufacturers } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const navigate = useNavigate();
 
   const [accountDetails, setAccountDetails] = useState(null);
@@ -163,7 +172,7 @@ const NewArrivals = () => {
           value={brand}
           options={[
             { label: "All Brands", value: null },
-            ...(manufacturers?.data?.map((manufacturer) => ({
+            ...(manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id
             })) || [])

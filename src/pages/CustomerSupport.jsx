@@ -84,7 +84,7 @@ const CustomerSupport = () => {
     }).catch((retailerErr) => console.log({ retailerErr }))
   }
   const brandhandler = ({ key, userId }) => {
-    dataStore.getPageData("getBrandList" + userId, () => getBrandList({ key, userId })).then((brandRes) => {
+    dataStore.getPageData("/brands" + userId, () => getBrandList({ key, userId })).then((brandRes) => {
       setbrandList(brandRes.data)
     }).catch((brandErr) => console.log({ brandErr }))
   }
