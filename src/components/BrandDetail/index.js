@@ -101,14 +101,14 @@ const BrandDetailCard = ({ brandId }) => {
                 <div className="row">
                     <div className="col-xl-4 col-lg-4 col-md-12 col-sm-12 m-auto">
                         <div className={`${Styles.BnadLogo} w-100`}>
-                            <img className={`img-fluid ${Styles.brandLogoHolder}`} src={brand?.img?.src || "/assets/images/dummy.png"} />
+                            <img  className={`img-fluid ${Styles.brandLogoHolder}`} src={brand?.img?.src || "/assets/images/dummy.png"} />
                         </div>
                     </div>
                     <div className="col-xl-8 col-lg-8 col-md-12 col-sm-12 m-auto ">
                         <div className="row">
                         <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
                                 {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0].ManufacturerName__c : null}</p> :
-                                    <img className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
+                                    <img style={{width: '65%'}}  className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
                             </div>
                             {brand?.tagLine ?
                                 <div className="col-xl-5 col-lg-6 col-md-12 col-sm-12 m-auto ">

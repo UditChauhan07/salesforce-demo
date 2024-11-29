@@ -185,7 +185,7 @@ function Product() {
     let productData = productRes.data.records || []
     productData.map((element) => {
       if (element.AttachedContentDocuments) {
-        console.log({ element });
+  
       }
     })
     let discount = productRes.discount;
