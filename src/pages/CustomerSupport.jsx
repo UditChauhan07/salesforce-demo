@@ -41,13 +41,38 @@ const CustomerSupport = () => {
   }, [])
   let statusList = ["Open", "New", "Follow up Needed By Brand Customer Service", "Follow up needed by Rep", "Follow up Needed By Brand Accounting", "Follow up needed by Order Processor", "RTV Approved", "Closed"];
   const [status, setStatus] = useState(["Open"]);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const reatilerHandler = ({ key, userId }) => {
+    dataStore.getPageData("getRetailerList" + userId, () => getRetailerList({ key, userId })).then((retailerRes) => {
+      setRetailerList(retailerRes.data)
+    }).catch((retailerErr) => console.log({ retailerErr }))
+  }
+  const supportHandler = ({ key, salesRepId }) => {
+    dataStore.getPageData("/customer-support" + salesRepId, () => getSupportList({ key, salesRepId }))
+      .then((supports) => {        
+        let sorting = sortArrayHandler(supports, g => g.CreatedDate, 'desc')
+        setSupportList(sorting);
+        setLoaded(true);
+      })
+      .catch((error) => {
+        console.error({ error });
+      });
+  }
+  
+  const brandhandler = ({ key, userId }) => {
+    dataStore.getPageData("/brands" + userId, () => getBrandList({ key, userId })).then((brandRes) => {
+      setbrandList(brandRes.data)
+    }).catch((brandErr) => console.log({ brandErr }))
+  }
   useEffect(() => {
     GetAuthData()
       .then((user) => {
         if (user) {
+          if(!selectedSalesRepId) setSelectedSalesRepId(user.Sales_Rep__c);
           setUserData(user)
           dataStore.subscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
+            console.log({data});
+            
             let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
             setSupportList(sorting);
             setLoaded(true);
@@ -57,7 +82,7 @@ const CustomerSupport = () => {
           reatilerHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
           brandhandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
           if (admins.includes(user.Sales_Rep__c)) {
-            getSalesRepList({ key: user.x_access_token }).then((repRes) => {
+            dataStore.getPageData("getSalesRepList",()=>getSalesRepList({ key: user.x_access_token })).then((repRes) => {
               setSalesRepList(repRes.data)
             }).catch((repErr) => {
               console.log({ repErr });
@@ -65,6 +90,7 @@ const CustomerSupport = () => {
           }
           return () => {
             dataStore.unsubscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
+            console.log({data});
               let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
               setSupportList(sorting);
               setLoaded(true);
@@ -78,27 +104,8 @@ const CustomerSupport = () => {
         console.error(err);
       });
   }, []);
-  const reatilerHandler = ({ key, userId }) => {
-    dataStore.getPageData("getRetailerList" + userId, () => getRetailerList({ key, userId })).then((retailerRes) => {
-      setRetailerList(retailerRes.data)
-    }).catch((retailerErr) => console.log({ retailerErr }))
-  }
-  const brandhandler = ({ key, userId }) => {
-    dataStore.getPageData("/brands" + userId, () => getBrandList({ key, userId })).then((brandRes) => {
-      setbrandList(brandRes.data)
-    }).catch((brandErr) => console.log({ brandErr }))
-  }
-  const supportHandler = ({ key, salesRepId }) => {
-    dataStore.getPageData("/customer-support" + salesRepId, () => getSupportList({ key, salesRepId }))
-      .then((supports) => {
-        let sorting = sortArrayHandler(supports, g => g.CreatedDate, 'desc')
-        setSupportList(sorting);
-        setLoaded(true);
-      })
-      .catch((error) => {
-        console.error({ error });
-      });
-  }
+
+
   useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
   useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
   useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
