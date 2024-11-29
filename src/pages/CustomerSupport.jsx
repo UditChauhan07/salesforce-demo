@@ -90,7 +90,6 @@ const CustomerSupport = () => {
           }
           return () => {
             dataStore.unsubscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
-            console.log({data});
               let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
               setSupportList(sorting);
               setLoaded(true);
@@ -104,12 +103,12 @@ const CustomerSupport = () => {
         console.error(err);
       });
   }, []);
-console.log({selectedSalesRepId});
 
 
-  useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId || userData.Sales_Rep__c }), defaultLoadTime);
-  useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId || userData.Sales_Rep__c }), defaultLoadTime);
-  useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId || userData.Sales_Rep__c }), defaultLoadTime);
+
+  useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
+  useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
+  useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
   const supportBasedOnSalesRep = (value) => {
     setSelectedSalesRepId(value)
     setSupportList([])
@@ -143,6 +142,7 @@ console.log({selectedSalesRepId});
     return newValues;
   }, [supportList, retailerFilter, manufacturerFilter, searchBy, status]);
 
+console.log({filteredData,supportList});
 
 
   // Memoize permissions to avoid unnecessary re-calculations
