@@ -38,8 +38,6 @@ const OrderListPage = () => {
     const fetchData = async () => {
       try {
         const userPermissions = await getPermissions();
-        console.log({ userPermissions });
-
         setPermissions(userPermissions);
         if (userPermissions?.modules?.order?.view === false) { PermissionDenied(); navigate('/dashboard'); }
       } catch (error) {

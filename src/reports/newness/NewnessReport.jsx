@@ -257,8 +257,6 @@ const NewnessReport = () => {
     <AppLayout
       filterNodes={
         <>
-
-
           <FilterItem
             minWidth="200px"
             label="All Manufacturers"
