@@ -106,9 +106,9 @@ const CustomerSupport = () => {
 
 
 
-  useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
-  useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
-  useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
+  // useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
+  // useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
+  // useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
   const supportBasedOnSalesRep = (value) => {
     setSelectedSalesRepId(value)
     setSupportList([])
