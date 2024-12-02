@@ -16,9 +16,7 @@ const CustomerSupportDetails = () => {
   const detailsId = queryParams.get("id");
   const [detailsData, setDetailsData] = useState({});
   const [attachmentUrls, setAttachmentUrls] = useState([]);
-  const [isLoadingAttachments, setLoadingAttachments] = useState(false);
   const [isLoaded, setLoaded] = useState(false);
-  const [isAttachmentsLoaded, setAttachmentsLoaded] = useState(false);
   const handleCustomerSupportReady = (data) => {
     setDetailsData(data);
     setLoaded(true);
@@ -110,6 +108,8 @@ const CustomerSupportDetails = () => {
 
     fetchAttachmentsWithTimeout();
   }, [detailsId]);
+  console.log({detailsData});
+  
 
   if (!detailsId || detailsId === "") return navigate("/customer-support");
 
