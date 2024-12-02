@@ -177,12 +177,11 @@ const dataStore = {
             return new Promise((resolve, reject) => {
                 const request = store.clear();
     
-                request.onsuccess = () => {
-                    console.log("All data cleared successfully.");
-                    Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, true)); // Notify all listeners
-                    resolve(); // Resolve the promise on success
+                request.onsuccess = (event) => {
+                    console.log("All data cleared successfully.",{event});
+                    Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, null)); // Notify all listeners
+                    resolve(true); // Resolve the promise on success
                 };
-    
                 request.onerror = (event) => {
                     console.error('Error clearing all data:', event.target.error);
                     reject(event.target.error); // Reject the promise on error

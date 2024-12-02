@@ -376,8 +376,9 @@ export async function OrderPlaced({ order }) {
 export async function DestoryAuth() {
   try {
     // Start clearing IndexedDB
-    await dataStore.clearAll();
+    let status =await dataStore.clearAll();
 
+    if(status){
     // Clear localStorage except for specified keys
     Object.keys(localStorage).forEach((key) => {
       if (key !== "passwordB2B" && key !== "emailB2B") {
@@ -389,10 +390,11 @@ export async function DestoryAuth() {
     // Example: showLoadingIndicator();
 
     // Redirect to the home page immediately
-    window.location.href = window.location.origin;
+      window.location.href = window.location.origin;
 
     // Note: The clearing of IndexedDB will continue in the background
     return true;
+    }
   } catch (e) {
     console.error('Error during logout:', e);
     // Optionally handle the error (e.g., show a message to the user)
