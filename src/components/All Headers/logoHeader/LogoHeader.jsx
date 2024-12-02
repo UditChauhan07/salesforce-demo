@@ -97,8 +97,11 @@ useBackgroundUpdater(fetchCart,defaultLoadTime);
     const delayDebounceFn = setTimeout(() => searchAccounts(searchTerm), 300);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
-
   const handleSuggestionClick = (id, manufacturerId, type, opportunityId) => {
+    
+    setSearchTerm("");
+    setSuggestions([]);
+  
     if (type === "account") {
       navigate(`/store/${id}`);
     } else if (type === "Account_Manufacturer__c") {
@@ -107,12 +110,12 @@ useBackgroundUpdater(fetchCart,defaultLoadTime);
       navigate(`/productPage/${id}`);
     } else if (type === "case") {
       navigate(`/CustomerSupportDetails?id=${id}`);
-    } else if (type == "order") {
+    } else if (type === "order") {
       localStorage.setItem("OpportunityId", JSON.stringify(opportunityId));
       window.location.href = "/orderDetails";
     }
   };
-
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
