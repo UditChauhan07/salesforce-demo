@@ -18,7 +18,6 @@ import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
-import Pagination from "../../components/Pagination/Pagination";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 

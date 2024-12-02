@@ -17,9 +17,6 @@ const DynamicTable = ({ mainData=[], itemsPerPage = 100, children, head = null, 
     if (mainData.length == 0) {
       setHasMoreData(false);
     } else {
-      console.log({cal:(currentIndex * itemsPerPage)<mainData.length,aaaa:(currentIndex * itemsPerPage),mmm:mainData.length});
-      
-      
       if((currentIndex * itemsPerPage)>mainData.length){
         setHasMoreData(false);
       }

@@ -50,7 +50,8 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
     if (filterData && filterData.length > 0) {
       const startIndex = (currentPage - 1) * PageSize;
       const endIndex = currentPage * PageSize;
-      const newValues = filterData.flatMap((month) => month?.content).slice(startIndex, endIndex);
+      const newValues = filterData.flatMap((month) => month?.content);
+      //.slice(startIndex, endIndex)
       setPagination([{ content: newValues }]);
     } else {
       setPagination([{ content: [] }]);

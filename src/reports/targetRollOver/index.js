@@ -528,7 +528,7 @@ const TargetReport = () => {
                 />
             )}
             {!isLoaded ? (
-                <Loading />
+                <Loading  height={"70vh"} />
             ) : (
                 <section>
                     {true && (
