@@ -104,11 +104,30 @@ const CustomerSupport = () => {
       });
   }, []);
 
-
-
-  // useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
-  // useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
-  // useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId?selectedSalesRepId: userData.Sales_Rep__c }), defaultLoadTime);
+  const reatilerHandler = ({ key, userId }) => {
+    dataStore.getPageData("getRetailerList" + userId, () => getRetailerList({ key, userId })).then((retailerRes) => {
+      setRetailerList(retailerRes.data)
+    }).catch((retailerErr) => console.log({ retailerErr }))
+  }
+  const brandhandler = ({ key, userId }) => {
+    dataStore.getPageData("/brands" + userId, () => getBrandList({ key, userId })).then((brandRes) => {
+      setbrandList(brandRes.data)
+    }).catch((brandErr) => console.log({ brandErr }))
+  }
+  const supportHandler = ({ key, salesRepId }) => {
+    dataStore.getPageData("/customer-support" + salesRepId, () => getSupportList({ key, salesRepId }))
+      .then((supports) => {
+        let sorting = sortArrayHandler(supports, g => g.CreatedDate, 'desc')
+        setSupportList(sorting);
+        setLoaded(true);
+      })
+      .catch((error) => {
+        console.error({ error });
+      });
+  }
+  // useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
+  // useBackgroundUpdater(() => brandhandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
+  // useBackgroundUpdater(() => supportHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);
   const supportBasedOnSalesRep = (value) => {
     setSelectedSalesRepId(value)
     setSupportList([])

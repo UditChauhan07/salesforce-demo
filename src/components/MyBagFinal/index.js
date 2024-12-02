@@ -13,6 +13,7 @@ import ProductDetails from "../../pages/productDetails";
 import Loading from "../Loading";
 import { DeleteIcon } from "../../lib/svg";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import ImageHandler from "../loader/ImageHandler";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -532,14 +533,8 @@ function MyBagFinal({ showOrderFor }) {
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
                                     <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
-                                      {
-                                        ele?.ContentDownloadUrl ? <img src={ele?.ContentDownloadUrl} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : ele?.ProductImage ? <img src={ele?.ProductImage} f className="zoomInEffect" alt="img" width={50} onClick={() => { setProductDetailId(ele?.Id) }} /> : !productImage.isLoaded ? <LoaderV2 /> :
-                                          productImage.images?.[ele?.ProductCode] ?
-                                            productImage.images[ele?.ProductCode]?.ContentDownloadUrl ?
-                                              <img src={productImage.images[ele?.ProductCode]?.ContentDownloadUrl} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
-                                              : <img src={productImage.images[ele?.ProductCode]} alt="img" width={25} onClick={() => { setProductDetailId(ele?.Id) }} />
-                                            : <img src={Img1} alt="img" onClick={() => { setProductDetailId(ele?.Id) }} />
-                                      }
+                                      <ImageHandler image={{src:ele?.ContentDownloadUrl??ele?.ProductImage??productImage?.images?.[ele?.ProductCode]?.ContentDownloadUrl??productImage.images[ele?.ProductCode]??'dummy.png'}} width={25} onClick={() => { setProductDetailId(ele?.Id) }}  />
+                                     
                                     </div>
                                     <div className={Styles.Mainbox3}>
                                       <h2 onClick={() => { setProductDetailId(ele?.Id) }} style={{ cursor: 'pointer' }}>{ele?.Name}</h2>

@@ -6,6 +6,7 @@ import ModalPage from "../../Modal UI";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
 import { useCart } from "../../../context/CartContext";
+import ImageHandler from "../../loader/ImageHandler";
 
 const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
@@ -163,38 +164,11 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                           return (
                             <tr className={`${styles.ControlTR} w-full `} key={indexed}>
                               <td className={styles.ControlStyle} style={{ cursor: "pointer" }}>
-                                {value.ContentDownloadUrl ? (
-                                  <img
-                                    src={value.ContentDownloadUrl}
-                                    className="zoomInEffect"
-                                    alt="img"
-                                    width={50}
-                                    onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
-                                  />
-                                ) : !productImage.isLoaded ? (
-                                  <LoaderV2 />
-                                ) : productImage.images?.[value?.ProductCode] ? (
-                                  productImage.images[value?.ProductCode]?.ContentDownloadUrl ? (
-                                    <img
-                                      src={productImage.images[value?.ProductCode]?.ContentDownloadUrl}
-                                      className="zoomInEffect"
-                                      alt="img"
-                                      width={35}
-                                      onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
-                                    />
-                                  ) : (
-                                    <img
-                                      src={productImage.images[value?.ProductCode]}
-                                      className="zoomInEffect"
-                                      alt="img"
-                                      width={35}
-                                      onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
-                                    />
-                                  )
-                                ) : (
-                                  <img src={Img1} className="zoomInEffect" alt="img" onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })} width={50} />
-                                )}
-                                {/* {!productImage.isLoaded?<LoaderV2/>:productImage.images[value.ProductCode]?<img src={productImage.images[value.ProductCode]?.ContentDownloadUrl?productImage.images[value.ProductCode]?.ContentDownloadUrl:productImage.images[value.ProductCode]} alt="img" width={35} />:<img src={Img1} alt="img" />} */}
+                                <ImageHandler
+                                  image={{ src: value.ContentDownloadUrl ?? productImage.images[value?.ProductCode]?.ContentDownloadUrl ?? productImage.images[value?.ProductCode] ?? "dummy.png" }}
+                                  width={50}
+                                  onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
+                                />
                               </td>
                               <td
                                 className="text-capitalize linkEffect"
@@ -211,8 +185,8 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                               <td>
                                 <div className="d-flex">
                                   ${(inputPrice || inputPrice == 0) ? <input type="number" value={inputPrice} placeholder={Number(inputPrice).toFixed(2)} className={`${styles.customPriceInput} ms-1`}
-                                  onChange={(e) => { onPriceChangeHander(value.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
-                                  name="limit_input" /> : salesPrice}
+                                    onChange={(e) => { onPriceChangeHander(value.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
+                                    name="limit_input" /> : salesPrice}
                                 </div>
                               </td>
                               <td>{value.Min_Order_QTY__c || 0}</td>

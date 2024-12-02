@@ -1,4 +1,5 @@
 import LZString from 'lz-string';
+import openDatabase from './openDatabase';
 
 const dataStore = {
     listeners: {}, // Store listeners for each pageKey
@@ -28,66 +29,103 @@ const dataStore = {
     // Method to store or update data based on page
     async getPageData(pageKey, fetchData) {
         try {
-            // Check if there's already compressed data in localStorage
-            const cachedData = localStorage.getItem(pageKey);
+            const db = await openDatabase();
+            const transaction = db.transaction('dataStore', 'readonly');
+            const store = transaction.objectStore('dataStore');
+            const request = store.get(pageKey);
 
-            let parsedData = null;
-            if (cachedData) {
-                try {
-                    // Decompress the data before parsing it
-                    const decompressedData = LZString.decompress(cachedData);
-                    parsedData = JSON.parse(decompressedData);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
+            return new Promise((resolve, reject) => {
+                request.onsuccess = async (event) => {
+                    const result = event.target.result;
+                    let parsedData = null;
 
-            // If cached data exists, return it immediately
-            if (parsedData) {
-                // Start background update for fresh data
-                this.update(pageKey, fetchData);
-                return parsedData;
-            }
+                    if (result) {
+                        try {
+                            // Decompress the data before parsing it
+                            const decompressedData = LZString.decompress(result.data);
+                            parsedData = JSON.parse(decompressedData);
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
 
-            // No cached data: fetch fresh data immediately, store it, and return it
-            const data = await fetchData?.();
-            if (data) {
-                // Compress and store the data in localStorage
-                const compressedData = LZString.compress(JSON.stringify(data));
-                localStorage.setItem(pageKey, compressedData);
-                this.notify(pageKey, data); // Notify listeners
-                return data;
-            }
+                    // If cached data exists, return it immediately
+                    if (parsedData) {
+                        // Start background update for fresh data
+                        this.update(pageKey, fetchData);
+                        resolve(parsedData);
+                    } else {
+                        // No cached data: fetch fresh data immediately, store it, and return it
+                        const data = await fetchData?.();
+                        if (data) {
+                            // Compress and store the data in IndexedDB
+                            const compressedData = LZString.compress(JSON.stringify(data));
+                            const transaction = db.transaction('dataStore', 'readwrite');
+                            const store = transaction.objectStore('dataStore');
+                            store.put({ pageKey, data: compressedData });
+
+                            this.notify(pageKey, data); // Notify listeners
+                            resolve(data);
+                        } else {
+                            resolve(null);
+                        }
+                    }
+                };
+
+                request.onerror = (event) => {
+                    console.error('Error retrieving data:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
         } catch (error) {
             console.error('Error in getPageData:', error);
             return null;
         }
     },
 
-    // Retrieve data from localStorage
-    retrieve(pageKey) {
+    // Retrieve data from IndexedDB
+    async retrieve(pageKey) {
         try {
-            const cachedData = localStorage.getItem(pageKey);
-            if (cachedData) {
-                // Decompress the data before parsing it
-                const decompressedData = LZString.decompress(cachedData);
-                return decompressedData ? JSON.parse(decompressedData) : null;
-            }
-            return null;
+            const db = await openDatabase();
+            const transaction = db.transaction('dataStore', 'readonly');
+            const store = transaction.objectStore('dataStore');
+            const request = store.get(pageKey);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = (event) => {
+                    const result = event.target.result;
+                    if (result) {
+                        // Decompress the data before parsing it
+                        const decompressedData = LZString.decompress(result.data);
+                        resolve(decompressedData ? JSON.parse(decompressedData) : null);
+                    } else {
+                        resolve(null);
+                    }
+                };
+
+                request.onerror = (event) => {
+                    console.error('Error retrieving data:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
         } catch (error) {
             console.error('Error retrieving data:', error);
             return null;
         }
     },
 
-    // Update data in cache and localStorage in the background
+    // Update data in cache and IndexedDB in the background
     async update(pageKey, fetchData) {
         try {
             const data = await fetchData?.(); // Fetch new data
             if (data) {
-                // Compress and store the data in localStorage
+                // Compress and store the data in IndexedDB
                 const compressedData = LZString.compress(JSON.stringify(data));
-                localStorage.setItem(pageKey, compressedData);
+                const db = await openDatabase();
+                const transaction = db.transaction('dataStore', 'readwrite');
+                const store = transaction.objectStore('dataStore');
+                store.put({ pageKey, data: compressedData });
+
                 this.notify(pageKey, data); // Notify listeners
                 return data;
             }
@@ -100,9 +138,13 @@ const dataStore = {
     async updateData(pageKey, data) {
         try {
             if (data) {
-                // Compress and store the data in localStorage
+                // Compress and store the data in IndexedDB
                 const compressedData = LZString.compress(JSON.stringify(data));
-                localStorage.setItem(pageKey, compressedData);
+                const db = await openDatabase();
+                const transaction = db.transaction('dataStore', 'readwrite');
+                const store = transaction.objectStore('dataStore');
+                store.put({ pageKey, data: compressedData });
+
                 this.notify(pageKey, data); // Notify listeners
                 return data;
             }
@@ -112,9 +154,12 @@ const dataStore = {
     },
 
     // Clear specific page data
-    clear(pageKey) {
+    async clear(pageKey) {
         try {
-            localStorage.removeItem(pageKey);
+            const db = await openDatabase();
+            const transaction = db.transaction('dataStore', 'readwrite');
+            const store = transaction.objectStore('dataStore');
+            store.delete(pageKey);
             this.notify(pageKey, null); // Notify listeners of deletion
         } catch (error) {
             console.error('Error clearing data:', error);
@@ -122,14 +167,32 @@ const dataStore = {
     },
 
     // Clear all stored data
-    clearAll() {
+    async clearAll() {
         try {
-            localStorage.clear();
-            Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, null)); // Notify all listeners
+            const db = await openDatabase();
+            const transaction = db.transaction('dataStore', 'readwrite');
+            const store = transaction.objectStore('dataStore');
+    
+            // Return a promise that resolves when the clear operation is complete
+            return new Promise((resolve, reject) => {
+                const request = store.clear();
+    
+                request.onsuccess = () => {
+                    console.log("All data cleared successfully.");
+                    Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, true)); // Notify all listeners
+                    resolve(); // Resolve the promise on success
+                };
+    
+                request.onerror = (event) => {
+                    console.error('Error clearing all data:', event.target.error);
+                    reject(event.target.error); // Reject the promise on error
+                };
+            });
         } catch (error) {
             console.error('Error clearing all data:', error);
+            throw error; // Re-throw the error to be caught in the calling function
         }
-    },
-};
+    }
+}
 
 export default dataStore;

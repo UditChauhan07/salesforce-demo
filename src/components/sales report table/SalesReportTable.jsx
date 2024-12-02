@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import styles from "./table.module.css";
 import Loading from "../Loading";
-import { DateConvert } from "../../lib/store";
+import { DateConvert, sortArrayHandler } from "../../lib/store";
+import DynamicTable from "../../utilities/Hooks/DynamicTable";
 
 const SalesReportTable = ({ salesData, year, ownerPermission }) => {
   const currentDate = new Date();
@@ -58,43 +59,49 @@ const SalesReportTable = ({ salesData, year, ownerPermission }) => {
   };
 
   // Function to render table rows
-  const renderRows = () => {
-    return salesData.map((ele, rowIndex) => {
-      return ele.Orders.map((item, index) => {
-        return (
-          <tr key={`${rowIndex}-${index}`}>
-            <td className={`${styles.td} ${styles.stickyFirstColumn}`}>{ele?.ManufacturerName__c}</td>
-            <td className={`${styles.td} ${styles.stickySecondColumn}`}>
-              {ownerPermission ? item?.AccountName : item?.Name}
+  const RenderRows = ({ item }) => {
+    return (
+      <>
+        <td className={`${styles.td} ${styles.stickyFirstColumn}`}>{item?.ManufacturerName__c}</td>
+        <td className={`${styles.td} ${styles.stickySecondColumn}`}>
+          {ownerPermission ? item?.AccountName : item?.Name}
+        </td>
+        <td className={`${styles.td} ${styles.stickyThirdColumn}`}>
+          {item?.AccountRepo ?? "---"}
+        </td>
+        <td className={`${styles.td}`} style={{ maxWidth: "200px", wordWrap: "break-word" }}>
+          {item?.AccountType ?? "---"}
+        </td>
+        <td className={`${styles.td}`} style={{ minWidth: "150px" }}>
+          {DateConvert(item?.DateOpen)}
+        </td>
+        <td className={`${styles.td}`}>{item?.Status ?? "---"}</td>
+        {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
+          (monthName) => (
+            <td key={monthName} className={`${styles.td}`}>
+              {formatAmount(item?.[monthName]?.amount || 0)}
             </td>
-            <td className={`${styles.td} ${styles.stickyThirdColumn}`}>
-              {item?.AccountRepo ?? JSON.parse(localStorage.getItem("Api Data")).data.Name}
-            </td>
-            <td className={`${styles.td}`} style={{ maxWidth: "200px", wordWrap: "break-word" }}>
-              {item?.AccountType ?? "---"}
-            </td>
-            <td className={`${styles.td}`} style={{ minWidth: "150px" }}>
-              {DateConvert(item?.DateOpen)}
-            </td>
-            <td className={`${styles.td}`}>{item?.Status ?? "---"}</td>
-            {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
-              (monthName) => (
-                <td key={monthName} className={`${styles.td}`}>
-                  {formatAmount(item[monthName]?.amount || 0)}
-                </td>
-              )
-            )}
-            <td className={`${styles.td} ${styles.stickySecondLastColumn}`} style={{ maxWidth: "100px" }}>
-              {item?.totalOrders}
-            </td>
-            <td className={`${styles.td} ${styles.stickyLastColumn}`}>
-              {formatAmount(item?.totalorderPrice)}
-            </td>
-          </tr>
-        );
-      });
-    });
+          )
+        )}
+        <td className={`${styles.td} ${styles.stickySecondLastColumn}`} style={{ maxWidth: "100px" }}>
+          {item?.totalOrders}
+        </td>
+        <td className={`${styles.td} ${styles.stickyLastColumn}`}>
+          {formatAmount(item?.totalorderPrice)}
+        </td>
+      </>
+    );
   };
+
+  const saleReportList = useMemo(() => {
+    let report = [];
+    salesData.map((brand) => {
+      brand.Orders.map((order) => {
+        report.push({ ...order, ManufacturerId__c: brand.ManufacturerId__c, ManufacturerName__c: brand.ManufacturerName__c })
+      })
+    })    
+    return sortArrayHandler(report,g=>g.ManufacturerName__c);
+  }, [salesData])
 
   // Function to render footer
   const renderFooter = () => {
@@ -125,43 +132,40 @@ const SalesReportTable = ({ salesData, year, ownerPermission }) => {
       {salesData.length ? (
         <div className={`d-flex p-3 ${styles.tableBoundary} mb-5`}>
           <div style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
-            <table id="salesReportTable" className="table table-responsive" style={{ minHeight: "600px" }}>
-              <thead>
-                <tr>
-                  <th className={`${styles.th} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "170px" }}>
-                    Brand
-                  </th>
-                  <th className={`${styles.th} ${styles.stickySecondColumnHeading}`} style={{ minWidth: "150px" }}>
-                    Retailer
-                  </th>
-                  <th className={`${styles.th} ${styles.stickyThirdColumnHeading}`} style={{ minWidth: "200px" }}>
-                    Sales Rep
-                  </th>
-                  <th className={`${styles.month} ${styles.stickyMonth}`} style={{ maxWidth: "200px" }}>
-                    Retailer Type
-                  </th>
-                  <th className={`${styles.month} ${styles.stickyMonth}`} style={{ minWidth: "150px" }}>
-                    Date Open
-                  </th>
-                  <th className={`${styles.month} ${styles.stickyMonth}`}>Status</th>
-                  {renderMonthColumns()}
-                  <th className={`${styles.th} ${styles.stickySecondLastColumnHeading}`} style={{ maxWidth: "100px" }}>
-                    Total Order
-                  </th>
-                  <th className={`${styles.th} ${styles.stickyLastColumnHeading}`} style={{ maxWidth: "150px" }}>
-                    Total Amount
-                  </th>
-                </tr>
-              </thead>
-              {allOrdersEmpty ? (
+            <DynamicTable mainData={saleReportList} head={<thead>
+              <tr>
+                <th className={`${styles.th} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "170px" }}>
+                  Brand
+                </th>
+                <th className={`${styles.th} ${styles.stickySecondColumnHeading}`} style={{ minWidth: "150px" }}>
+                  Retailer
+                </th>
+                <th className={`${styles.th} ${styles.stickyThirdColumnHeading}`} style={{ minWidth: "200px" }}>
+                  Sales Rep
+                </th>
+                <th className={`${styles.month} ${styles.stickyMonth}`} style={{ maxWidth: "200px" }}>
+                  Retailer Type
+                </th>
+                <th className={`${styles.month} ${styles.stickyMonth}`} style={{ minWidth: "150px" }}>
+                  Date Open
+                </th>
+                <th className={`${styles.month} ${styles.stickyMonth}`}>Status</th>
+                {renderMonthColumns()}
+                <th className={`${styles.th} ${styles.stickySecondLastColumnHeading}`} style={{ maxWidth: "100px" }}>
+                  Total Order
+                </th>
+                <th className={`${styles.th} ${styles.stickyLastColumnHeading}`} style={{ maxWidth: "150px" }}>
+                  Total Amount
+                </th>
+              </tr>
+            </thead>} foot={<tfoot>{renderFooter()}</tfoot>} id="salesReportTable" className="table table-responsive" style={{ minHeight: "600px" }}>
+
+              {(item) => allOrdersEmpty ? (
                 <div className={`${styles.NodataText} flex justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]}`} key="no-data">
                   <p>No data found</p>
                 </div>
-              ) : (
-                <tbody>{renderRows()}</tbody>
-              )}
-              <tfoot>{renderFooter()}</tfoot>
-            </table>
+              ) : <RenderRows item={item} />}
+            </DynamicTable>
           </div>
         </div>
       ) : (

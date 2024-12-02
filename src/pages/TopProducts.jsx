@@ -19,15 +19,15 @@ let months = ["January", "February", "March", "April", "May", "June", "July", "A
 
 const TopProducts = () => {
   const { data: manufacturers } = useManufacturer();
-  const [manufacturerList,setManufacturerList] = useState([]);
-  useEffect(()=>{
-    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
-    if(manufacturers?.data?.length){
-      dataStore.updateData("/brands",manufacturers.data);
+  const [manufacturerList, setManufacturerList] = useState([]);
+  useEffect(() => {
+    dataStore.subscribe("/brands", (data) => setManufacturerList(data));
+    if (manufacturers?.data?.length) {
+      dataStore.updateData("/brands", manufacturers.data);
       setManufacturerList(manufacturers.data)
     }
-    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
-  },[manufacturers?.data])
+    return () => dataStore.unsubscribe("/brands", (data) => setManufacturerList(data));
+  }, [manufacturers?.data])
   const [topProductList, setTopProductList] = useState({ isLoaded: false, data: [], message: null });
   const [monthList, setMonthList] = useState([])
   const d = new Date();
@@ -65,18 +65,36 @@ const TopProducts = () => {
     setTopProductList({ isLoaded: true, data: result, message: products.message })
     if (result.length > 0) {
       let productCode = "";
+      let manuProdutcode = {};
       result?.map((product, index) => {
         productCode += `'${product.ProductCode}'`
         if (result.length - 1 != index) productCode += ', ';
+        manuProdutcode[product.ProductCode] = product.ManufacturerId__c;
       })
       getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
+        console.log({ res });
+
         if (res) {
-          if (data[manufacturerFilter]) {
-            data[manufacturerFilter] = { ...data[manufacturerFilter], ...res }
+          if (manufacturerFilter) {
+            if (data[manufacturerFilter]) {
+              data[manufacturerFilter] = { ...data[manufacturerFilter], ...res }
+            } else {
+              data[manufacturerFilter] = res
+            }
+            ShareDrive(data)
           } else {
-            data[manufacturerFilter] = res
+            if (manuProdutcode) {
+              let ProductCodeList = Object.keys(res);
+              if (ProductCodeList.length) {
+                ProductCodeList.map((code) => {
+                  if (manuProdutcode[code]) {
+                    data[manuProdutcode[code]] = { ...data[manuProdutcode[code]], ...res[code] };
+                  }
+                })
+                ShareDrive(data)
+              }
+            }
           }
-          ShareDrive(data)
           setProductImages({ isLoaded: true, images: res });
           setIsLoaded(true)
         } else {
@@ -91,23 +109,23 @@ const TopProducts = () => {
 
   useEffect(() => {
     dataStore.subscribe("/top-productsnull" + monthIndex + 1, readyTopProducthandle);
-    GetAuthData().then((user)=>{
-      
+    GetAuthData().then((user) => {
+
       dataStore.getPageData(
         `actBndRelated${user.Sales_Rep__c}`,
         () => fetchAccountDetails()).then((res) => {
           setAccountDetails(res.accountDetails);
         }).catch((err) => console.error({ err })
-      );
+        );
     }).catch((err) => console.error({ err }))
     btnHandler({ manufacturerId: null, month: monthIndex + 1 });
     let indexMonth = [];
     let helperArray = [];
     months.map((month, i) => {
       if (i <= monthIndex) {
-        helperArray.push({ label: `${month.slice(0,3)}, 2024`, value: i + 1 })
+        helperArray.push({ label: `${month.slice(0, 3)}, 2024`, value: i + 1 })
       } else {
-        indexMonth.push({ label: `${month.slice(0,3)}, 2023`, value: i + 1 })
+        indexMonth.push({ label: `${month.slice(0, 3)}, 2023`, value: i + 1 })
       }
     })
     let finalArray = indexMonth.concat(helperArray)
@@ -152,7 +170,7 @@ const TopProducts = () => {
     SearchData({ selectedMonth: month, manufacturerFilter: manufacturerId })
   }
 
-  useBackgroundUpdater(()=>SearchData({selectedMonth, manufacturerFilter}),defaultLoadTime)
+  useBackgroundUpdater(() => SearchData({ selectedMonth, manufacturerFilter }), defaultLoadTime)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -166,7 +184,7 @@ const TopProducts = () => {
     fetchData()
   }, [])
 
-  useEffect(()=>{},[accountDetails])
+  useEffect(() => { }, [accountDetails])
 
   return (
     <AppLayout filterNodes={<>

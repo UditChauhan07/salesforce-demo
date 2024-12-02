@@ -14,6 +14,7 @@ import { DeleteIcon } from "../../lib/svg";
 import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
+import ImageHandler from "../loader/ImageHandler";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accountDetails = {} }) {
   const [productData , setProductData] = useState(productList)
   console.log(productList ? 'true' : 'false')
@@ -364,7 +365,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
                               {imageLoading[product.Id] ? (
                                 <LoaderV2 width={100} height={100} />
                               ) : (
-                                <img key={product.Id} src={product.ProductImage ?? "\\assets\\images\\dummy.png"} alt={product.Name} height={212} width={212} onClick={() => {
+                                <ImageHandler image={{src:product.ProductImage ?? "\\assets\\images\\dummy.png",alt:product.Name}} height={212} width={212} onClick={() => {
                                   setProductDetailId(product.Id);
                                 }} onLoad={() => handleImageLoad(product.Id)} />
                               )}

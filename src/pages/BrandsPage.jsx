@@ -8,7 +8,6 @@ import { useNavigate } from "react-router";
 import Page from "./page.module.css";
 import AppLayout from "../components/AppLayout";
 import { CloseButton } from "../lib/svg";
-import { GetAuthData } from "../lib/store";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 const brandsImageMap = {

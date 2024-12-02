@@ -324,11 +324,9 @@ const SalesReport = () => {
 
 
   const paginatedData = useMemo(() => {
-    return filteredSalesReportData?.slice(
-      (currentPage - 1) * PageSize,
-      currentPage * PageSize
-    )
-  }, [filteredSalesReportData, PageSize, currentPage])
+    return filteredSalesReportData
+  }, [filteredSalesReportData])
+  
 
   return (
     <AppLayout
@@ -358,23 +356,6 @@ const SalesReport = () => {
 
             <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
             <div className="d-flex justify-content-end gap-4 col-8">
-              <FilterItem
-                minWidth="220px"
-                label="Pagination"
-                name="Pagination"
-                value={PageSize ? PageSize : false}
-                options={[
-                  {
-                    label: "Paginated",
-                    value: 3,
-                  },
-                  {
-                    label: "Full Report",
-                    value: filteredSalesReportData.length,
-                  },
-                ]}
-                onChange={(value) => setPageSize(value)}
-              />
               {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={salesRepList} onChange={(value) => setSearchBySalesRep(value)} />}
               <FilterItem
                 minWidth="220px"
@@ -477,13 +458,6 @@ const SalesReport = () => {
       {filteredSalesReportData?.length && !isLoading ? (
         <>
           <SalesReportTable salesData={paginatedData} year={yearForTableSort} ownerPermission={ownerPermission} />
-          <Pagination
-            className="pagination-bar"
-            currentPage={currentPage}
-            totalCount={filteredSalesReportData.length}
-            pageSize={PageSize}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
         </>
       ) : filteredSalesReportData.length === 0 && !isLoading ? (
         <div className="flex justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]">No data found</div>

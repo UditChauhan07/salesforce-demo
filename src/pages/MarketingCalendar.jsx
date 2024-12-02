@@ -23,15 +23,15 @@ const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep
 
 const MarketingCalendar = () => {
   const { data: manufacturers } = useManufacturer();
-  const [manufacturerList,setManufacturerList] = useState([]);
-  useEffect(()=>{
-    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
-    if(manufacturers?.data?.length){
-      dataStore.updateData("/brands",manufacturers.data);
+  const [manufacturerList, setManufacturerList] = useState([]);
+  useEffect(() => {
+    dataStore.subscribe("/brands", (data) => setManufacturerList(data));
+    if (manufacturers?.data?.length) {
+      dataStore.updateData("/brands", manufacturers.data);
       setManufacturerList(manufacturers.data)
     }
-    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
-  },[manufacturers?.data])
+    return () => dataStore.unsubscribe("/brands", (data) => setManufacturerList(data));
+  }, [manufacturers?.data])
   const [isAlert, setIsAlert] = useState(false);
   let date = new Date();
   // const [isLoading, setIsLoading] = useState(true);
@@ -42,8 +42,8 @@ const MarketingCalendar = () => {
   const navigate = useNavigate();
   const [selectYear, setSelectYear] = useState()
   const [month, setMonth] = useState("");
+  const currentYear = new Date().getFullYear();
   const yearList = useMemo(() => {
-    const currentYear = new Date().getFullYear();
     return [
       { value: currentYear, label: currentYear },
       { value: currentYear + 1, label: currentYear + 1 },
@@ -79,7 +79,7 @@ const MarketingCalendar = () => {
   //     if(res){
   //       readyCalendarHandle(res);
   //     }
-      
+
   //   } catch (error) {
   //     console.error("Data Fetch Error", error);
   //   }
@@ -109,11 +109,11 @@ const MarketingCalendar = () => {
     try {
       const user = await GetAuthData();
       // Subscribe to the data store for the selected year
-      dataStore.subscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+      dataStore.subscribe(`/marketing-calendar${selectYear??currentYear}`, readyCalendarHandle);
 
       // Fetch data from API
       const res = await dataStore.getPageData(
-        `/marketing-calendar${selectYear}`,
+        `/marketing-calendar${selectYear??currentYear}`,
         () => getMarketingCalendar({ key: user.x_access_token, year: selectYear })
       );
 
@@ -129,7 +129,7 @@ const MarketingCalendar = () => {
   useEffect(() => {
     // Fetch data when the component mounts
     fetchData();
-    
+
     // Scroll to the current month after a delay
     const timeoutId = setTimeout(() => {
       const getMonth = new Date().getMonth();
@@ -141,7 +141,7 @@ const MarketingCalendar = () => {
 
     // Cleanup subscription on unmount
     return () => {
-      dataStore.unsubscribe(`/marketing-calendar${selectYear}`, readyCalendarHandle);
+      dataStore.unsubscribe(`/marketing-calendar${selectYear??currentYear}`, readyCalendarHandle);
       clearTimeout(timeoutId);
     };
   }, [selectYear]); // Fetch data whenever selectYear changes
@@ -150,7 +150,7 @@ const MarketingCalendar = () => {
     setSelectYear(newYear); // Update the selected year
   };
 
-  useBackgroundUpdater(fetchData,defaultLoadTime);
+  useBackgroundUpdater(fetchData, defaultLoadTime);
 
 
   const generatePdfServerSide = (version = 0) => {
