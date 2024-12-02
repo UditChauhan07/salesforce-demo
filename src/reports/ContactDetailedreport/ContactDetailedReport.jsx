@@ -4,6 +4,7 @@ import Styles from "./index.module.css"; // Preserving your original styles
 import { FilterItem } from '../../components/FilterItem';
 import Loading from '../../components/Loading';
 import styles from "../../components/newness report table/table.module.css"; // Preserving your table styles
+import styless from "../../components/Modal UI/Styles.module.css";
 import * as XLSX from 'xlsx';
 import { MdOutlineDownload } from "react-icons/md";
 import { getPermissions } from "../../lib/permission";
@@ -12,11 +13,13 @@ import PermissionDenied from '../../components/PermissionDeniedPopUp/PermissionD
 import { useNavigate } from 'react-router-dom';
 import { fetchAccountDetails } from '../../lib/contactReport';
 import { CloseButton, SearchIcon } from "../../lib/svg";
+import ModalPage from "../../components/Modal UI";
 function ContactDetailedReport() {
     const navigate = useNavigate();
     const [accountManufacturerRecords, setAccountManufacturerRecords] = useState([]);
     const [filteredRecords, setFilteredRecords] = useState([]);
     const [activeAccounts, setActiveAccounts] = useState("Active Account");
+    const [exportToExcelState, setExportToExcelState] = useState(false);
     const [filters, setFilters] = useState({
         accountFilter: '',
         saleRepFilter: '',
@@ -108,8 +111,12 @@ function ContactDetailedReport() {
         });
 
     };
+    const handleExportToExcel1 = () => {
+        setExportToExcelState(true);
+      };
 
     const handleExportToExcel = () => {
+        setExportToExcelState(false)
         const exportData = filteredData.map(record => ({
             'Account Name': record.accountDetails?.Name || '',
             'First Name': record.contact?.FirstName || 'N/A',
@@ -217,13 +224,39 @@ function ContactDetailedReport() {
                         placeholder={"Search by account"}
                         minWidth={"167px"}
                     />
+ {exportToExcelState && (
+        <ModalPage
+          open
+          content={
+            <>
+              <div style={{ maxWidth: "380px" }}>
+                <h1 className={`fs-5 ${styless.ModalHeader}`}>Warning</h1>
+                <p className={` ${styless.ModalContent}`}>Do you want to download Comparison Report?</p>
+                <div className="d-flex justify-content-center gap-3 ">
+                  <button className={`${styless.modalButton}`} onClick={handleExportToExcel}>
+                    OK
+                  </button>
+                  <button className={`${styless.modalButton}`} onClick={() => setExportToExcelState(false)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </>
+          }
+          onClose={() => {
+            setExportToExcelState(false);
+          }}
+        />
+      )}
+
+
                     <div>
                         <button className="border px-2 py-1 leading-tight d-grid" onClick={handleClearFilters}>
                             <CloseButton crossFill={'#fff'} height={20} width={20} />
                             <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
                         </button>
                     </div>
-                    <button className="border px-2 py-1 leading-tight d-grid" onClick={handleExportToExcel}>
+                    <button className="border px-2 py-1 leading-tight d-grid" onClick={handleExportToExcel1}>
                         <MdOutlineDownload size={16} className="m-auto" />
                         <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
                     </button>

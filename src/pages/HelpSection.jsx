@@ -155,49 +155,53 @@ const HelpSection = () => {
           <div className="row d-flex flex-column justify-content-around align-items-center">
             <h1 className={styles.TOPName}>Help Center</h1>
             <div className={`d-flex p-3 ${styles.tableBoundary} mb-5 mt-3`}>
-              {guides.length ? (
-                <>
-                  <div style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: '100%' }}>
-                    <table id="productGuidesTable" className="table table-responsive" style={{ minHeight: "150px", width: '100%' }}>
-                      <thead>
-                        <tr>
-                          <th className={`${styles.month} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "150px" }}>
-                            Category Name
-                          </th>
-                          <th className={`${styles.month} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "150px" }}>
-                            File Name
-                          </th>
-                          <th className={`${styles.month} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "150px" }}>
-                            Show View
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredGuides.map((guide, index) => (
-                          <tr key={index}>
-                            <td className={styles.td}>
-                              {guide.Categoryname}
-                            </td>
-                            <td className={styles.td}>
-                              {guide.filename}
-                            </td>
-                            <td className={styles.td}>
-                              <button className={styles.btn} onClick={() => openModal(guide.Link, guide.Type, guide.filename)}>
-                                <div className="d-flex align-items-center justify-content-between gap-1">
-                                  {guide.Type === "Video" ? <MdSlideshow size={16} /> : <IoMdDocument />} View
-                                </div>
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              ) : (
-                <Loading height={"70vh"} />
-              )}
-            </div>
+  {guides.length > 0 ? (
+    filteredGuides.length > 0 ? (
+      <div style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: '100%' }}>
+        <table id="productGuidesTable" className="table table-responsive" style={{ minHeight: "150px", width: '100%' }}>
+          <thead>
+            <tr>
+              <th className={`${styles.month} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "150px" }}>
+                Category Name
+              </th>
+              <th className={`${styles.month} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "150px" }}>
+                File Name
+              </th>
+              <th className={`${styles.month} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "150px" }}>
+                Show View
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredGuides.map((guide, index) => (
+              <tr key={index}>
+                <td className={styles.td}>
+                  {guide.Categoryname}
+                </td>
+                <td className={styles.td}>
+                  {guide.filename}
+                </td>
+                <td className={styles.td}>
+                  <button className={styles.btn} onClick={() => openModal(guide.Link, guide.Type, guide.filename)}>
+                    <div className="d-flex align-items-center justify-content-between gap-1">
+                      {guide.Type === "Video" ? <MdSlideshow size={16} /> : <IoMdDocument />} View
+                    </div>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: "70vh", width: "100%" }}>
+        <h3 className={styles.TOPName}>No Data </h3>
+      </div>
+    )
+  ) : (
+    <Loading height={"70vh"} />
+  )}
+</div>
           </div>
         </div>
       </div>
