@@ -13,6 +13,7 @@ import { getPermissions } from "../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import ModalPage from "../components/Modal UI";
+import styles from "../components/Modal UI/Styles.module.css";
 import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
@@ -388,7 +389,7 @@ const MarketingCalendar = () => {
               Kindly select 1 brand at time and try to download again.
             </p>
             <div className="d-flex justify-content-around ">
-              <button className="modalButton" onClick={() => setIsAlert(false)}>
+              <button className={styles.modalButton} onClick={() => setIsAlert(false)}>
                 Go Back
               </button>
             </div>

@@ -10,6 +10,7 @@ h1.TopHeading {
   text-transform: uppercase;
   margin-top: 25px;
 }
+
 .ProductImg img {
   height: 85px;
   width: 85px;
@@ -302,8 +303,14 @@ span.ProductQty {
 .EDate {
   gap: 2px !important;
 }
+@media (max-width: 1348px) {
+  .marketing-card{
+    width:70vw !important;
+  }
+}
 
-/* Media Query  */
+
+
 
 @media (min-width: 769.98px) {
   .DateCurrent01 {

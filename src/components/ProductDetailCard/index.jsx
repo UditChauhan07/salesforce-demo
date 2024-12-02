@@ -9,6 +9,7 @@ import { useCart } from "../../context/CartContext";
 import ModalPage from "../Modal UI";
 
 const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
+  console.log({product})
   const { updateProductQty, removeProduct } = useCart();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState();
   const [modalShow,setModalShow]= useState(false);
@@ -33,12 +34,14 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
 
   let discount = 0;
   let selAccount = {};
+ 
   let listPrice = Number(product?.data?.usdRetail__c?.replace("$", "")?.replace(",", ""));
   let salesPrice = 0;
   let listOfAccounts = Object.keys(product?.discount);
   if (listOfAccounts.length) {
     if (listOfAccounts.length == 1) {
       selAccount = product?.discount?.[listOfAccounts[0]];
+     
       if (product?.Category__c === "TESTER") {
         discount = selAccount?.Discount?.testerMargin || 0;
       } else if (product?.Category__c === "Samples") {
@@ -49,7 +52,7 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
     }
   }
   salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
-  
+ 
   return (
     <div className="container mt-4 product-card-element">
       <ModalPage

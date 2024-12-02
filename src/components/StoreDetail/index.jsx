@@ -176,7 +176,7 @@ const StoreDetailCard = ({ account, brandList,memoizedPermissions={} }) => {
                         <div className={Styles.accountTitleHolder}>
                             <p className={Styles.accountLabel}>ACCOUNT NAME</p>
                             <h3 className={Styles.accountNameHolder}>{account.Name}</h3>
-                            {account.Website ? <Link to={account.Website} style={{ color: '#000' }} className={Styles.webLinkHolder}>{account.Website}</Link> : null}
+                            {account.Website ? <Link to={account.Website} style={{ color: '#000', zIndex: '1' }} className={Styles.webLinkHolder}>{account.Website}</Link> : null}
                         </div>
                         <div className="d-flex w-[100%] justify-between pl-2 mt-3">
                             <div className="d-flex gap-4">
@@ -200,15 +200,15 @@ const StoreDetailCard = ({ account, brandList,memoizedPermissions={} }) => {
                         <div className="d-flex mt-4 min-h-[75px]">
                             <div className={`${Styles.infoHolder} d-flex`}>
                                 <p className={Styles.accountDetailerLabel}>Account Details</p>
-                                <p className={`${Styles.webLinkHolder} m-auto`}>More Info</p>
+                                <p style={{zIndex: '1'}} className={`${Styles.webLinkHolder} m-auto`}>More Info</p>
                             </div>
                             <div className={`${Styles.BrandInfoHolder} d-flex flex-column`}>
                                 <p className={Styles.accountLabel}> {memoizedPermissions?.auditReport?.create ?"Brand Audit Report":"Brands"}</p>
 
-                                <div className={`${Styles.brandContainer} d-flex justify-between`}>
+                                <div className={`${Styles.brandContainer} d-flex justify-between`} style={{zIndex: '1'}}>
                                     <OwlCarousel {...options} style={{ position: 'absolute', top: '45px', left: '5%', width: '90%' }}>
                                         {account.Brands.map((element, index) => (
-                                            <p className={Styles.webLinkHolder} onClick={() => {memoizedPermissions?.auditReport?.specify ? AuditHandler(element.ManufacturerId__c, account.Name, element.ManufacturerName__c) : doNothing() }} style={{ textAlign: 'center', color: '#3296ED', textDecoration: 'underline', cursor: 'pointer' }} key={index}>{element.ManufacturerName__c}</p>
+                                            <p  className={Styles.webLinkHolder} onClick={() => {memoizedPermissions?.auditReport?.specify ? AuditHandler(element.ManufacturerId__c, account.Name, element.ManufacturerName__c) : doNothing() }} style={{ textAlign: 'center', color: '#3296ED', textDecoration: 'underline', cursor: 'pointer' , zIndex : '1'}} key={index}>{element.ManufacturerName__c}</p>
                                         ))}
                                     </OwlCarousel>
                                 </div>
@@ -217,14 +217,14 @@ const StoreDetailCard = ({ account, brandList,memoizedPermissions={} }) => {
                             <div className="d-flex mt-4 min-h-[75px]">
                                 <div className={`${Styles.infoHolder} d-flex`}>
                                     <p className={Styles.accountDetailerLabel}>Account Details</p>
-                                    <p className={`${Styles.webLinkHolder} m-auto`}>More Info</p>
+                                    <p style={{zIndex: '1'}} className={`${Styles.webLinkHolder} m-auto`}>More Info</p>
                                 </div>
                                 <div className={`${Styles.BrandInfoHolder} d-flex flex-column`}>
                                     <p className={Styles.accountLabel}>{memoizedPermissions?.auditReport?.create ? "Brand Audit Report":"Brands"}</p>
 
-                                    <div className="m-auto d-flex">
+                                    <div className="m-auto d-flex" style={{zIndex: '1'}}>
                                         {account.Brands.length?account.Brands.map((element, index) => (
-                                            <p className={Styles.webLinkHolder} onClick={() => {memoizedPermissions?.auditReport?.specify ? AuditHandler(element.ManufacturerId__c, account.Name, element.ManufacturerName__c):doNothing()}} style={{ textAlign: 'center', color: '#3296ED', textDecoration: 'underline', marginRight: '2rem' }} key={index}>{element.ManufacturerName__c}</p>
+                                            <p className={Styles.webLinkHolder} onClick={() => {memoizedPermissions?.auditReport?.specify ? AuditHandler(element.ManufacturerId__c, account.Name, element.ManufacturerName__c):doNothing()}} style={{ textAlign: 'center', color: '#3296ED', textDecoration: 'underline', marginRight: '2rem' , zIndex: '1' }} key={index}>{element.ManufacturerName__c}</p>
                                         )):null}
                                     </div>
                                 </div>

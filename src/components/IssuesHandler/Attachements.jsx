@@ -5,25 +5,43 @@ import ModalPage from "../Modal UI";
 import { MdImage } from "react-icons/md";
 import { FaFileExcel } from "react-icons/fa";
 import { AiOutlineFilePdf, AiOutlineVideoCamera } from "react-icons/ai";
-
+import Swal from 'sweetalert2';
 const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,desc=null }) => {
+   
     const [confirm, setConfirm] = useState(false);
     function handleChange(e) {
-        let tempFile = [...files];
-        let reqfiles = e.target.files;
-        if (reqfiles) {
-            if (reqfiles.length > 0) {
-                Object.keys(reqfiles).map((index) => {
-                    let url = URL.createObjectURL(reqfiles[index])
-                    if (url) {
-                        tempFile.push({ preview: url, file: reqfiles[index] });
-                    }
-                    // this thoughing me Failed to execute 'createObjectURL' on 'URL': Overload resolution failed?
-                })
-            }
-        }
-        setFile?.(tempFile);
-    }
+      let tempFile = [...files]; // Copy current files
+      let reqfiles = e.target.files; // Get selected files
+  
+      if (reqfiles && reqfiles.length > 0) {
+          // Iterate through the selected files
+          Object.keys(reqfiles).forEach((index) => {
+              try {
+                  let url = URL.createObjectURL(reqfiles[index]); // Generate file preview URL
+                  if (url) {
+                      tempFile.push({ preview: url, file: reqfiles[index] });
+                  }
+              } catch (error) {
+                  console.error("Error creating object URL:", error.message);
+              }
+          });
+  
+          // Check if the total number of files exceeds 5
+          if (tempFile.length > 5) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Limit Exceeded',
+                  text: 'You cannot add more than 5 files.',
+              }).then(() => {
+                  e.target.value = ''; // Clear the input
+              });
+              return; // Stop further execution
+          }
+      }
+  
+      setFile?.(tempFile); // Update the state
+      console.log(tempFile.length, "temp files");
+  }
     const handleFileChange = (event) => {
         const files = event.target.files;
         const images = [];

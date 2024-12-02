@@ -47,7 +47,7 @@ function LaunchCalendar({ productList, brand, month }) {
       <div className="container">
         <h1 className="TopHeading">Marketing Calendar</h1>
         <div className="row">
-          <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 ">
+          <div className="col-xl-9 col-lg-9 col-md-12 col-sm-12 marketing-card">
             <ul className="timeline mt-4 mr-4" id="CalenerContainer">
               {allOrdersEmpty ? (
                 <div className="NodataContent">No data found</div>
