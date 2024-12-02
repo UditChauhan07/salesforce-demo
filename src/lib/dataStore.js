@@ -172,18 +172,25 @@ const dataStore = {
             const db = await openDatabase();
             const transaction = db.transaction('dataStore', 'readwrite');
             const store = transaction.objectStore('dataStore');
-            const request = store.clear();
     
-            request.onsuccess = () => {
-                Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, true)); // Notify all listeners
-                console.log("All data cleared successfully.");
-            };
+            // Return a promise that resolves when the clear operation is complete
+            return new Promise((resolve, reject) => {
+                const request = store.clear();
     
-            request.onerror = (event) => {
-                console.error('Error clearing all data:', event.target.error);
-            };
+                request.onsuccess = () => {
+                    console.log("All data cleared successfully.");
+                    Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, true)); // Notify all listeners
+                    resolve(); // Resolve the promise on success
+                };
+    
+                request.onerror = (event) => {
+                    console.error('Error clearing all data:', event.target.error);
+                    reject(event.target.error); // Reject the promise on error
+                };
+            });
         } catch (error) {
             console.error('Error clearing all data:', error);
+            throw error; // Re-throw the error to be caught in the calling function
         }
     }
 }

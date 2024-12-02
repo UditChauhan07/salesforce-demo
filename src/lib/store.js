@@ -53,12 +53,20 @@ export function ShareDrive(data, remove = false, keyValue = shareKey) {
     return null;
   }
 }
-export const sortArrayHandler = (arr = [], getter, order = 'asc') =>
-  arr?.sort(
+export const sortArrayHandler = (arr = [], getter, order = 'asc') => {
+  // Check if arr is an array
+  if (!Array.isArray(arr)) {
+    console.warn('Provided input is not an array. Returning an empty array.');
+    return []; // or return arr; if you want to return the original input
+  }
+
+  // Proceed with sorting
+  return arr?.sort(
     order === 'desc'
       ? (a, b) => getter(b).localeCompare(getter(a))
       : (a, b) => getter(a).localeCompare(getter(b))
   );
+};
 
 
 export async function getAttachment(token, caseId) {
@@ -367,27 +375,27 @@ export async function OrderPlaced({ order }) {
 
 export async function DestoryAuth() {
   try {
-      // Start clearing IndexedDB
-      dataStore.clearAll();
+    // Start clearing IndexedDB
+    await dataStore.clearAll();
 
-      // Clear localStorage except for specified keys
-      Object.keys(localStorage).forEach((key) => {
-          if (key !== "passwordB2B" && key !== "emailB2B") {
-              localStorage.removeItem(key);
-          }
-      });
+    // Clear localStorage except for specified keys
+    Object.keys(localStorage).forEach((key) => {
+      if (key !== "passwordB2B" && key !== "emailB2B") {
+        localStorage.removeItem(key);
+      }
+    });
 
-      // Optionally, show a loading indicator here
-      // Example: showLoadingIndicator();
+    // Optionally, show a loading indicator here
+    // Example: showLoadingIndicator();
 
-      // Redirect to the home page immediately
-      window.location.href = window.location.origin;
+    // Redirect to the home page immediately
+    window.location.href = window.location.origin;
 
-      // Note: The clearing of IndexedDB will continue in the background
-      return true;
+    // Note: The clearing of IndexedDB will continue in the background
+    return true;
   } catch (e) {
-      console.error('Error during logout:', e);
-      // Optionally handle the error (e.g., show a message to the user)
+    console.error('Error during logout:', e);
+    // Optionally handle the error (e.g., show a message to the user)
   }
 }
 export async function cartSync({ cart }) {
