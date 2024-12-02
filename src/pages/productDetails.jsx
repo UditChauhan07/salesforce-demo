@@ -49,15 +49,47 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
             .catch((err) => console.error("Error fetching auth data:", err));
     }
     const readyProductDetails = (data) => {
-        const manufacturer = data.data?.ManufacturerId__c;
+        const manufacturer = data.data?.ManufacturerId__c; // ManufacturerId from the product
         setManufacturerId(manufacturer);
         setClickedProduct(data.data);
+    
+        // Logic to handle both cases: with and without AccountId
+        let filteredAccountDetails = accountDetails[manufacturer] || {}; // Default to all accounts under the manufacturer
+        if (AccountId) {
+            if (filteredAccountDetails[AccountId]) {
+                // Filter for specific account if AccountId exists
+                filteredAccountDetails = { [AccountId]: filteredAccountDetails[AccountId] };
+            } else {
+                console.warn(`No account details found for AccountId: ${AccountId}`);
+            }
+        }
+    
+        // Extract discount and calculate prices
+        const accountDiscount = filteredAccountDetails[AccountId]?.Discount || {};
+        const discount = accountDiscount.margin || 0;
+    
+        const listPrice = Number(data.data?.usdRetail__c?.replace("$", "").replace(",", ""));
+        const salesPrice = (listPrice - (discount / 100) * listPrice).toFixed(2);
+    
+        // Update product data with calculated prices and discount
+        data.data.salesPrice = salesPrice;
+        data.data.discount = discount;
+    
+        // Set the product state with the relevant account details
         setProduct({
             isLoaded: true,
             data: data.data,
-            discount: accountDetails[manufacturer] || {},
+            discount: filteredAccountDetails, // Either filtered or the default full data
         });
-    }
+    
+        console.log("Final Product Data:", {
+            isLoaded: true,
+            data: data.data,
+            discount: filteredAccountDetails,
+        });
+    };
+    
+    
     useEffect(() => {
         fetchAccountDetails();
     }, []);
@@ -105,7 +137,7 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                 return;
             }
         }
-    // console.log({accountDetails} )
+   
         if (addProductToAccount) {
             const accountDetails = selectProductDealWith[addProductToAccount] || {};
             const account = {
@@ -333,3 +365,6 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
 };
 
 export default ProductDetails;
+
+
+
