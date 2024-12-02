@@ -68,6 +68,7 @@ function MyBagFinal({ showOrderFor }) {
 
       }
     } else {
+      setIsLoading(false);
       setPONumber(null)
     }
   };
