@@ -23,7 +23,7 @@ const AppLayout = ({ children, filterNodes }) => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }} // Custom ease-in curve
             >
               {children}
             </motion.div>

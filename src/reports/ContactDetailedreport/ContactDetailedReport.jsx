@@ -115,7 +115,7 @@ function ContactDetailedReport() {
     };
     const handleExportToExcel1 = () => {
         setExportToExcelState(true);
-      };
+    };
 
     const handleExportToExcel = () => {
         setExportToExcelState(false)
@@ -226,30 +226,30 @@ function ContactDetailedReport() {
                         placeholder={"Search by account"}
                         minWidth={"167px"}
                     />
- {exportToExcelState && (
-        <ModalPage
-          open
-          content={
-            <>
-              <div style={{ maxWidth: "380px" }}>
-                <h1 className={`fs-5 ${styless.ModalHeader}`}>Warning</h1>
-                <p className={` ${styless.ModalContent}`}>Do you want to download Comparison Report?</p>
-                <div className="d-flex justify-content-center gap-3 ">
-                  <button className={`${styless.modalButton}`} onClick={handleExportToExcel}>
-                    OK
-                  </button>
-                  <button className={`${styless.modalButton}`} onClick={() => setExportToExcelState(false)}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </>
-          }
-          onClose={() => {
-            setExportToExcelState(false);
-          }}
-        />
-      )}
+                    {exportToExcelState && (
+                        <ModalPage
+                            open
+                            content={
+                                <>
+                                    <div style={{ maxWidth: "380px" }}>
+                                        <h1 className={`fs-5 ${styless.ModalHeader}`}>Warning</h1>
+                                        <p className={` ${styless.ModalContent}`}>Do you want to download Comparison Report?</p>
+                                        <div className="d-flex justify-content-center gap-3 ">
+                                            <button className={`${styless.modalButton}`} onClick={handleExportToExcel}>
+                                                OK
+                                            </button>
+                                            <button className={`${styless.modalButton}`} onClick={() => setExportToExcelState(false)}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            }
+                            onClose={() => {
+                                setExportToExcelState(false);
+                            }}
+                        />
+                    )}
 
 
                     <div>
@@ -280,73 +280,73 @@ function ContactDetailedReport() {
                 <>
                     <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
                         <div style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
-                            <DynamicTable mainData={sortArrayHandler(filteredData,g=>g.accountDetails?.Name)} head={<thead>
-                                    <tr>
-                                        <th className={`${styles.th} ${styles.stickyMonth} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "200px" }}>Account Name</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}  ${styles.stickySecondColumnHeading} `} style={{ minWidth: "200px" }}> Sales Rep</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Manufacturer</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Status</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>First Name </th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Last Name</th>
+                            <DynamicTable mainData={sortArrayHandler(filteredData, g => g.accountDetails?.Name)} head={<thead>
+                                <tr>
+                                    <th className={`${styles.th} ${styles.stickyMonth} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "200px" }}>Account Name</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}  ${styles.stickySecondColumnHeading} `} style={{ minWidth: "200px" }}> Sales Rep</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Manufacturer</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Status</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>First Name </th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Last Name</th>
 
 
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Email</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Phone</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Account Number</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Email</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Phone</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Account Number</th>
 
-                                        <th className={`${styles.th} ${styles.stickyMonth} `} style={{ minWidth: "200px" }}>Margin</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Payment Type</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Street</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store City</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store State</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Zip</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Country</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping Street</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping City</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth} `} style={{ minWidth: "200px" }}>Margin</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Payment Type</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Street</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store City</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store State</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Zip</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Store Country</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping Street</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping City</th>
 
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping State</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping  Zip</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping Country</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing street</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing City </th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing State</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing  Zip</th>
-                                        <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing Country</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping State</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping  Zip</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Shipping Country</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing street</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing City </th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing State</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing  Zip</th>
+                                    <th className={`${styles.th} ${styles.stickyMonth}`} style={{ minWidth: "200px" }}>Billing Country</th>
 
 
-                                    </tr>
-                                </thead>} className="table table-responsive" style={{ minHeight: "300px" }}>
-                                    {(items)=>(
-                                            <>
-                                                <td className={`${styles.td} ${styles.stickyFirstColumn}`}>{items.accountDetails?.Name} </td>
-                                                <td className={`${styles.td} ${styles.stickySecondColumn}`}>{items.manufacturers?.salesRep || 'N/A'}</td>
-                                                <td className={styles.td}> {items.manufacturers?.manufacturerName || 'N/A'}</td>
-                                                <td className={styles.td}> {items.accountDetails?.Active_Closed__c || 'N/A'}</td>
-                                                <td className={styles.td}>{items?.contact?.FirstName || 'N/A'}</td>
-                                                <td className={styles.td}>{items.contact?.LastName || 'N/A'}</td>
-                                                <td className={styles.td}>{items.contact?.Email || 'N/A'}</td>
-                                                <td className={styles.td}>{items.contact?.Phone || 'N/A'}</td>
-                                                <td>{items.manufacturers?.accountNumber || 'N/A'}</td>
+                                </tr>
+                            </thead>} className="table table-responsive" style={{ minHeight: "300px" }}>
+                                {(items) => (
+                                    <>
+                                        <td className={`${styles.td} ${styles.stickyFirstColumn}`}>{items.accountDetails?.Name} </td>
+                                        <td className={`${styles.td} ${styles.stickySecondColumn}`}>{items.manufacturers?.salesRep || 'N/A'}</td>
+                                        <td className={styles.td}> {items.manufacturers?.manufacturerName || 'N/A'}</td>
+                                        <td className={styles.td}> {items.accountDetails?.Active_Closed__c || 'N/A'}</td>
+                                        <td className={styles.td}>{items?.contact?.FirstName || 'N/A'}</td>
+                                        <td className={styles.td}>{items.contact?.LastName || 'N/A'}</td>
+                                        <td className={styles.td}>{items.contact?.Email || 'N/A'}</td>
+                                        <td className={styles.td}>{items.contact?.Phone || 'N/A'}</td>
+                                        <td>{items.manufacturers?.accountNumber || 'N/A'}</td>
 
-                                                <td className={styles.td}>{items.manufacturers?.margin || 'N/A'}</td>
-                                                <td className={styles.td}>{items.manufacturers?.paymentType || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.Store_Street__c || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.Store_City__c || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.Store_State__c || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.Store_Zip__c || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.Store_Country__c || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.ShippingStreet || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.ShippingCity || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.ShippingState || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.ShippingPostalCode || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.ShippingCountry || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.BillingStreet || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.BillingCity || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.BillingState || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.BillingPostalCode || 'N/A'}</td>
-                                                <td className={styles.td}>{items.accountDetails?.BillingCountry || 'N/A'}</td>
-                                            </>
-                                    )}
+                                        <td className={styles.td}>{items.manufacturers?.margin || 'N/A'}</td>
+                                        <td className={styles.td}>{items.manufacturers?.paymentType || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.Store_Street__c || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.Store_City__c || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.Store_State__c || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.Store_Zip__c || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.Store_Country__c || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.ShippingStreet || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.ShippingCity || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.ShippingState || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.ShippingPostalCode || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.ShippingCountry || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.BillingStreet || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.BillingCity || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.BillingState || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.BillingPostalCode || 'N/A'}</td>
+                                        <td className={styles.td}>{items.accountDetails?.BillingCountry || 'N/A'}</td>
+                                    </>
+                                )}
                             </DynamicTable>
                         </div>
                     </div>
