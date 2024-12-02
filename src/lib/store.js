@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
 // export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
- export const originAPi = "https://live.beautyfashionsales.com"
+export const originAPi = "https://live.beautyfashionsales.com"
 // export const originAPi = "http://localhost:3001"
 
 export const defaultLoadTime = 1800000;
@@ -19,7 +19,7 @@ const POCount = "woX5MkCSIOlHXkT";
 const support = "AP0HBuNwbNnuhKR";
 const shareKey = "R7Mmw2nG41y6MqI";
 export const salesRepIdKey = "BzQIEAjzCEHmlXc";
-export const admins = ["00530000005AdvsAAC", "0053b00000DgEVEAA3", "0051O00000CvAVTQA3", "0053b00000CwOnLAAV" ,  "0053b00000C75e8AAB" , "0053b00000DgEvqAAF"]; //, "0053b00000CwOnLAAV" ,"0053b00000DgEVEAA3"
+export const admins = ["00530000005AdvsAAC", "0053b00000DgEVEAA3", "0051O00000CvAVTQA3", "0053b00000CwOnLAAV", "0053b00000C75e8AAB", "0053b00000DgEvqAAF"]; //, "0053b00000CwOnLAAV" ,"0053b00000DgEVEAA3"
 
 export const months = [
   "January",
@@ -42,47 +42,47 @@ export function ShareDrive(data, remove = false, keyValue = shareKey) {
     return true;
   }
   if (data) {
-    localStorage.setItem(keyValue,  LZString.compress(JSON.stringify(data)));
+    localStorage.setItem(keyValue, LZString.compress(JSON.stringify(data)));
     return true;
   } else {
     let strData = localStorage.getItem(keyValue);
-    if(strData){
-      strData=LZString.decompress(strData);
+    if (strData) {
+      strData = LZString.decompress(strData);
       return JSON.parse(strData);
     }
     return null;
   }
 }
-export const sortArrayHandler = (arr, getter, order = 'asc') =>
-  arr.sort(
+export const sortArrayHandler = (arr = [], getter, order = 'asc') =>
+  arr?.sort(
     order === 'desc'
       ? (a, b) => getter(b).localeCompare(getter(a))
       : (a, b) => getter(a).localeCompare(getter(b))
   );
 
 
-  export async function getAttachment(token, caseId) {
-    try {
-      console.log(token, caseId, "rawData");
-      const response = await axios.post(
-        originAPi + "/wpVvqb9cSF7hnil/getAttachment",
-        {
-          caseId: caseId,
-          key: token,
-        }
-      );
-      const data =await response.data;
-      console.log(data, "backend attachment");
-      if (data.status === 300) {
-        DestoryAuth();
-      } else {
-        return data;
+export async function getAttachment(token, caseId) {
+  try {
+    console.log(token, caseId, "rawData");
+    const response = await axios.post(
+      originAPi + "/wpVvqb9cSF7hnil/getAttachment",
+      {
+        caseId: caseId,
+        key: token,
       }
-    } catch (error) {
-      console.log(error, "backend get attachment error");
-      return null;
+    );
+    const data = await response.data;
+    console.log(data, "backend attachment");
+    if (data.status === 300) {
+      DestoryAuth();
+    } else {
+      return data;
     }
+  } catch (error) {
+    console.log(error, "backend get attachment error");
+    return null;
   }
+}
 
 
 export async function AuthCheck() {
@@ -171,7 +171,7 @@ export async function POGenerator() {
   try {
 
     let orderDetails = fetchBeg();
-    console.log({orderDetails})
+    console.log({ orderDetails })
     let date = new Date();
 
     //  const response = await fetch( "http://localhost:2611/PoNumber/generatepo"
@@ -219,16 +219,16 @@ export const fetchAccountDetails = async () => {
   let accessToken = data.x_access_token;
 
   try {
-      // Await the axios.post call and return the resolved response
-      let res = await axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
-          salesRepId,
-          accessToken,
-      });
-      console.log({ res }); // Log the response
-      return res.data; // Return the response data
+    // Await the axios.post call and return the resolved response
+    let res = await axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+      salesRepId,
+      accessToken,
+    });
+    console.log({ res }); // Log the response
+    return res.data; // Return the response data
   } catch (error) {
-      console.error("Error", error); // Log error details
-      throw error; // Propagate the error to the caller
+    console.error("Error", error); // Log error details
+    throw error; // Propagate the error to the caller
   }
 };
 
@@ -367,22 +367,27 @@ export async function OrderPlaced({ order }) {
 
 export async function DestoryAuth() {
   try {
-    // localStorage.clear();
-    // localStorage.removeItem("lCpFhWZtGKKejSX")
-    // console.log('All localStorage keys have been removed.');
-    // window.location.href = window.location.origin;
-    // dataStore.clearAll();
-    localStorage.removeItem("lCpFhWZtGKKejSX")
-    for (var key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) {
-        if(key !="passwordB2B"||key!="emailB2B"){
-          localStorage.removeItem(key);
-        }
-      }
-    }
-    window.location.href = window.location.origin;
-    return true;
+      // Start clearing IndexedDB
+      dataStore.clearAll();
+
+      // Clear localStorage except for specified keys
+      Object.keys(localStorage).forEach((key) => {
+          if (key !== "passwordB2B" && key !== "emailB2B") {
+              localStorage.removeItem(key);
+          }
+      });
+
+      // Optionally, show a loading indicator here
+      // Example: showLoadingIndicator();
+
+      // Redirect to the home page immediately
+      window.location.href = window.location.origin;
+
+      // Note: The clearing of IndexedDB will continue in the background
+      return true;
   } catch (e) {
+      console.error('Error during logout:', e);
+      // Optionally handle the error (e.g., show a message to the user)
   }
 }
 export async function cartSync({ cart }) {
@@ -902,7 +907,7 @@ export async function topProduct({ month, manufacturerId }) {
 
   let response = await fetch(url + "v3/dC0mhTDnL9l0mK1", {
     method: "POST",
-    body: JSON.stringify({ month, manufacturerId  , salesRepId}),
+    body: JSON.stringify({ month, manufacturerId, salesRepId }),
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
@@ -1464,7 +1469,7 @@ export async function getOrderDetailsPdf({ key, opportunity_id }) {
   }
 }
 
-export async function getMarketingCalendarPDF({ key, manufacturerId, month,year }) {
+export async function getMarketingCalendarPDF({ key, manufacturerId, month, year }) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -1472,7 +1477,7 @@ export async function getMarketingCalendarPDF({ key, manufacturerId, month,year 
 
   let response = await fetch(originAPi + "/mIRX7B9FlQjmOaf", {
     method: "POST",
-    body: JSON.stringify({ key, manufacturerId, month,year }),
+    body: JSON.stringify({ key, manufacturerId, month, year }),
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
@@ -1484,7 +1489,7 @@ export async function getMarketingCalendarPDF({ key, manufacturerId, month,year 
   }
 }
 
-export async function getMarketingCalendarPDFV2({ key, manufacturerId, month,year }) {
+export async function getMarketingCalendarPDFV2({ key, manufacturerId, month, year }) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -1492,7 +1497,7 @@ export async function getMarketingCalendarPDFV2({ key, manufacturerId, month,yea
 
   let response = await fetch(originAPi + "/mIRX7B9FlQjmOaf/VTOUZjSm8aIm1ve", {
     method: "POST",
-    body: JSON.stringify({ key, manufacturerId, month,year }),
+    body: JSON.stringify({ key, manufacturerId, month, year }),
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
@@ -1504,7 +1509,7 @@ export async function getMarketingCalendarPDFV2({ key, manufacturerId, month,yea
   }
 }
 
-export async function getMarketingCalendarPDFV3({ key, manufacturerId, month,year }) {
+export async function getMarketingCalendarPDFV3({ key, manufacturerId, month, year }) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
@@ -1512,7 +1517,7 @@ export async function getMarketingCalendarPDFV3({ key, manufacturerId, month,yea
 
   let response = await fetch(originAPi + "/mIRX7B9FlQjmOaf/ohSOBafoPQH0NQi", {
     method: "POST",
-    body: JSON.stringify({ key, manufacturerId, month,year }),
+    body: JSON.stringify({ key, manufacturerId, month, year }),
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
@@ -1578,9 +1583,9 @@ export const hexabrand = {
   a0O1O00000XYBvaUAH: "#4B95DD",
   a0ORb000000nDfFMAU: "#073763",
   a0ORb000000nDIiMAM: "#7f6000",
-  a0ORb000001KCNpMAO:"#F7E8D5",
-  a0ORb000001XtrZMAS:"#B8D8BA",
-  a0ORb000001EbK5MAK:"#D0E2EC"
+  a0ORb000001KCNpMAO: "#F7E8D5",
+  a0ORb000001XtrZMAS: "#B8D8BA",
+  a0ORb000001EbK5MAK: "#D0E2EC"
 };
 
 export const hexabrandText = {

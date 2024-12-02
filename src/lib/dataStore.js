@@ -173,18 +173,19 @@ const dataStore = {
             const transaction = db.transaction('dataStore', 'readwrite');
             const store = transaction.objectStore('dataStore');
             const request = store.clear();
-
+    
             request.onsuccess = () => {
-                Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, null)); // Notify all listeners
+                Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, true)); // Notify all listeners
+                console.log("All data cleared successfully.");
             };
-
+    
             request.onerror = (event) => {
                 console.error('Error clearing all data:', event.target.error);
             };
         } catch (error) {
             console.error('Error clearing all data:', error);
         }
-    },
-};
+    }
+}
 
 export default dataStore;
