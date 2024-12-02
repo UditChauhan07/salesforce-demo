@@ -22,7 +22,9 @@
 .sticky-top {
   z-index: 99 !important;
 }
-
+.hidden{
+  display: none!important;
+}
 a {
   text-decoration: none !important;
 }

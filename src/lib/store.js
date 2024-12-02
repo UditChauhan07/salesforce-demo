@@ -1,4 +1,5 @@
 import axios from "axios";
+import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 // export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
  export const originAPi = "https://live.beautyfashionsales.com"
@@ -40,11 +41,15 @@ export function ShareDrive(data, remove = false, keyValue = shareKey) {
     return true;
   }
   if (data) {
-    localStorage.setItem(keyValue, JSON.stringify(data));
+    localStorage.setItem(keyValue,  LZString.compress(JSON.stringify(data)));
     return true;
   } else {
     let strData = localStorage.getItem(keyValue);
-    return JSON.parse(strData);
+    if(strData){
+      strData=LZString.decompress(strData);
+      return JSON.parse(strData);
+    }
+    return null;
   }
 }
 export const sortArrayHandler = (arr, getter, order = 'asc') =>

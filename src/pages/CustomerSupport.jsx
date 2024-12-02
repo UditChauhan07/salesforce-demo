@@ -57,7 +57,7 @@ const CustomerSupport = () => {
           reatilerHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
           brandhandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
           if (admins.includes(user.Sales_Rep__c)) {
-            getSalesRepList({ key: user.x_access_token }).then((repRes) => {
+            dataStore.getPageData("getSalesRepList",()=>getSalesRepList({ key: user.x_access_token })).then((repRes) => {
               setSalesRepList(repRes.data)
             }).catch((repErr) => {
               console.log({ repErr });
