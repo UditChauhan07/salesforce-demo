@@ -419,7 +419,7 @@ const MultiStepForm = () => {
                                 <hr />
                             </h2>
                             {isPreviewHtml.isLoaded ?
-                                <div className={`${Styles.modalContent}`} dangerouslySetInnerHTML={{ __html: isPreviewHtml.preview }} />
+                                <div className={`${Styles.modalContent} max-w-[70vw]`} dangerouslySetInnerHTML={{ __html: isPreviewHtml.preview }} />
                                 : (<Loading height={'55vh'} />)}
                             <div className="d-flex justify-content-around" style={{ position: 'sticky', bottom: '-20px', zIndex: 11, background: '#fff', padding: '1rem 0' }}>
                                 <button className={`${Styles.btn} d-flex align-items-center`} onClick={() => { handleAccordionClick(3); }}>

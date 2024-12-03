@@ -67,8 +67,8 @@ const YearlyComparisonReportTable = ({ comparisonData, status }) => {
       {comparisonData ? (
         <>
           <div className={`d-flex p-3 ${styles.tableBoundary} mb-5`}>
-            <div className="" style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
-              <table id="salesReportTable" className="table table-responsive " style={{ minHeight: "400px" }}>
+            <div className="" style={{ height: "75vh", overflow: "auto", width: "100%" }}>
+              <table id="salesReportTable" className="table table-responsive ">
                 <thead>
                   <tr>
                     <th className={`${styles.th} ${styles.stickyFirstColumnHeading} `} style={{ minWidth: "200px" }}>

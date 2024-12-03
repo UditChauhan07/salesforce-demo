@@ -13,7 +13,6 @@ import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
 import Styles from "./index.module.css";
 import { defaultLoadTime, sortArrayHandler } from "../../lib/store";
-import { GetAuthData } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
