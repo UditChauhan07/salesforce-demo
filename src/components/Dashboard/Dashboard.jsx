@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useMemo, startTransition, Suspense } from "react";
 import Styles from "./Dashboard.module.css";
-// import Chart from "react-apexcharts";
-import { CSSTransition } from 'react-transition-group';
 import img1 from "./Images/Active-1.png";
 import img2 from "./Images/Vector.png";
 import img3 from "./Images/Group.png";
@@ -22,12 +20,13 @@ import { salesRepIdKey } from "../../lib/store";
 import { useSearchParams } from "react-router-dom";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import { useCart } from "../../context/CartContext";
 const GraphHandler=React.lazy(() => import("./GraphHandler"));
 const Chart=React.lazy(() => import("react-apexcharts"));
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function Dashboard() {
-
+  const { fetchCart } = useCart();
   const bgColors = {
     "Kevyn Aucoin Cosmetics": "KevynAucoinCosmeticsBg",
     "Bumble and Bumble": "BumbleandBumbleBg",
@@ -394,7 +393,9 @@ function Dashboard() {
         console.error({ error });
       });
   };
+
   useEffect(() => {
+    fetchCart()
     if (localStorage.getItem("Name")) {
       dataStore.subscribe("/dashboard" + currentMonth + currentYear, readyDashboardHandle);
       // getDataHandler();
