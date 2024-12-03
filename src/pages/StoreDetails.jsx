@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import { useParams } from "react-router-dom";
-import { GetAuthData, getStoreDetails } from "../lib/store";
+import { defaultLoadTime, GetAuthData, getStoreDetails } from "../lib/store";
 import { useNavigate } from "react-router-dom";
 import StoreDetailCard from "../components/StoreDetail";
 import LoaderV3 from "../components/loader/v3";
 import { getPermissions } from "../lib/permission";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
+import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 const StoreDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -18,16 +19,29 @@ const StoreDetails = () => {
   const [memoizedPermissions, setMemoizedPermissions] = useState(null);
   const [selectedSalesRepId, setSelectedSalesRepId] = useState();
   const readyAccountHandle = (data) => {
-    GetAuthData().then((user) => {
-      let brands = []
-      data.Brands.map((element) => {
-        console.log({ element });
-        if (element.Sales_Rep__c == user.Sales_Rep__c) {
-          brands.push(element)
-        }
+    if(data){
+      GetAuthData().then((user) => {
+        let brands = []
+        data.Brands.map((element) => {
+          console.log({ element });
+          if (element.Sales_Rep__c == user.Sales_Rep__c) {
+            brands.push(element)
+          }
+        })
+        setBrandList(brands)
+        setAccount({ isLoaded: true, data: data })
+      }).catch((userErr) => {
+        console.log({ userErr });
       })
-      setBrandList(brands)
-      setAccount({ isLoaded: true, data: data })
+    }
+  }
+  const getStoreData  = (id)=>{
+    GetAuthData().then((user) => {
+      dataStore.getPageData("getStoreDetails" + id, () => getStoreDetails({ key: user.x_access_token, Id: id })).then((actDetails) => {
+        readyAccountHandle(actDetails)
+      }).catch((actErr) => {
+        console.log({ actErr });
+      })
     }).catch((userErr) => {
       console.log({ userErr });
     })
@@ -35,15 +49,7 @@ const StoreDetails = () => {
   useEffect(() => {
     dataStore.subscribe("getStoreDetails" + id, readyAccountHandle)
     if (id) {
-      GetAuthData().then((user) => {
-        dataStore.getPageData("getStoreDetails" + id, () => getStoreDetails({ key: user.x_access_token, Id: id })).then((actDetails) => {
-          readyAccountHandle(actDetails)
-        }).catch((actErr) => {
-          console.log({ actErr });
-        })
-      }).catch((userErr) => {
-        console.log({ userErr });
-      })
+      getStoreData(id);
     } else {
       navigate("/");
     }
@@ -51,6 +57,8 @@ const StoreDetails = () => {
       dataStore.unsubscribe("getStoreDetails" + id, readyAccountHandle)
     }
   }, [id])
+
+  useBackgroundUpdater(()=>getStoreData(id),defaultLoadTime);
   // Fetch user data and permissions
   useEffect(() => {
     const fetchData = async () => {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppLayout from "../../components/AppLayout";
 import Styles from "./index.module.css";
-import { DateConvert, GetAuthData, getRollOver } from "../../lib/store";
+import { DateConvert, defaultLoadTime, GetAuthData, getRollOver, months, sortArrayHandler } from "../../lib/store";
 import Loading from "../../components/Loading";
 import { useManufacturer } from "../../api/useManufacturer";
 import { FilterItem } from "../../components/FilterItem";
@@ -16,14 +16,24 @@ import { CloseButton, SearchIcon } from "../../lib/svg";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
-import Pagination from "../../components/Pagination/Pagination";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import DynamicTable from "../../utilities/Hooks/DynamicTable";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const TargetReport = () => {
-    const[PageSize,setPageSize] = useState(100);
+    const [PageSize, setPageSize] = useState(100);
     const location = useLocation();
     const { state } = location || {};
     const { data: manufacturers } = useManufacturer();
+    const [manufacturerList, setManufacturerList] = useState([]);
+    useEffect(() => {
+        dataStore.subscribe("/brands", (data) => setManufacturerList(data));
+        if (manufacturers?.data?.length) {
+            dataStore.updateData("/brands", manufacturers.data);
+            setManufacturerList(manufacturers.data)
+        }
+        return () => dataStore.unsubscribe("/brands", (data) => setManufacturerList(data));
+    }, [manufacturers?.data])
     const [isLoaded, setIsLoaded] = useState(false);
     const [target, setTarget] = useState({ ownerPermission: false, list: [] });
     const [manufacturerFilter, setManufacturerFilter] = useState();
@@ -44,6 +54,7 @@ const TargetReport = () => {
     // let brandcount = {}
     // let sum = 0;
     const handleTargetReady = (data) => {
+
         if (data) {
             setIsLoaded(true);
         }
@@ -59,6 +70,7 @@ const TargetReport = () => {
         setSearchSaleBy(data.ownerPermission ? state?.salesRepId : null);
     }
     const filteredTargetData = useMemo(() => {
+        setCurrentPage(1);
         let filtered = target.list.filter((ele) => {
             if (!manufacturerFilter || !ele.ManufacturerId.localeCompare(manufacturerFilter)) {
                 return ele;
@@ -90,8 +102,8 @@ const TargetReport = () => {
         })
         return filtered;
     }, [manufacturerFilter, searchBy, searchSaleBy, activeAccounts, isLoaded]);
-    useEffect(() => {
-        dataStore.subscribe("/Target-Report", handleTargetReady)
+
+    const GetTargetData = () => {
         GetAuthData()
             .then((user) => {
                 dataStore.getPageData("/Target-Report", () => getRollOver({ user, year, preOrder }))
@@ -106,10 +118,16 @@ const TargetReport = () => {
             .catch((userErr) => {
                 console.error({ userErr });
             });
+    }
+    useEffect(() => {
+        dataStore.subscribe("/Target-Report", handleTargetReady)
+        GetTargetData();
         return () => {
             dataStore.unsubscribe("/Target-Report", handleTargetReady)
         }
     }, []);
+
+    useBackgroundUpdater(GetTargetData, defaultLoadTime);
 
 
     const resetFilter = () => {
@@ -353,73 +371,7 @@ const TargetReport = () => {
         title += ` ${new Date().toDateString()}`;
         FileSaver.saveAs(data, title + fileExtension);
     };
-    let monthTotalAmount = {
-        Jan: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Feb: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Mar: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Apr: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        May: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Jun: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Jul: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Aug: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Sep: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Oct: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Nov: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Dec: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-        Total: {
-            target: 0,
-            sale: 0,
-            diff: 0,
-        },
-    };
+
 
     let reportStatus = [
         { label: "With Pre-Order", value: true },
@@ -457,31 +409,40 @@ const TargetReport = () => {
         fetchData();
     }, []);
 
+    const { monthTotalAmount, Total } = useMemo(() => {
+        const Total = {
+            target: 0,
+            sale: 0,
+            diff: 0,
+        };
 
+        const monthTotalAmount = Object.fromEntries(
+            months.map(month => [month, { target: 0, sale: 0, diff: 0 }])
+        );
 
+        filteredTargetData.forEach(item => {
+            months.forEach(month => {
+                const staticTarget = Number(item[month]?.staticTarget || 0);
+                const sales = Number(item[month]?.sales || 0);
+                const diff = staticTarget - sales;
+
+                monthTotalAmount[month].target += staticTarget;
+                monthTotalAmount[month].sale += sales;
+                monthTotalAmount[month].diff += diff;
+
+                Total.target += staticTarget;
+                Total.sale += sales;
+                Total.diff += diff;
+            });
+        });
+
+        return { Total, monthTotalAmount };
+    }, [filteredTargetData]);
     return (
         <AppLayout
             filterNodes={
                 <>
-
                     <div className="d-flex justify-content-center gap-3" style={{ width: "99%" }}>
-                    <FilterItem
-                minWidth="220px"
-                label="Pagination"
-                name="Pagination"
-                value={PageSize?PageSize:false}
-                options={[
-                  {
-                    label: "Paginated",
-                    value: 100,
-                  },
-                  {
-                    label: "Full Report",
-                    value: filteredTargetData.length,
-                  },
-                ]}
-                onChange={(value) => setPageSize(value)}
-              />
                         {target.ownerPermission && (
                             <FilterItem
                                 minWidth="220px"
@@ -500,7 +461,7 @@ const TargetReport = () => {
                             minWidth="220px"
                             label="All Manufacturers"
                             value={manufacturerFilter}
-                            options={manufacturers?.data?.map((manufacturer) => ({
+                            options={manufacturerList?.map((manufacturer) => ({
                                 label: manufacturer.Name,
                                 value: manufacturer.Id,
                             }))}
@@ -567,7 +528,7 @@ const TargetReport = () => {
                 />
             )}
             {!isLoaded ? (
-                <Loading />
+                <Loading  height={"70vh"} />
             ) : (
                 <section>
                     {true && (
@@ -583,435 +544,222 @@ const TargetReport = () => {
                     )}
                     <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
                         <div className="" style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
-                            <table id="salesReportTable" className="table table-responsive" style={{ minHeight: "300px" }}>
-                                <thead>
-                                    <tr>
-                                        <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading} `} style={{ minWidth: "170px" }}>
-                                            Sales Rep
-                                        </th>
-                                        <th className={`${Styles.th} ${Styles.stickySecondColumnHeading}`} style={{ minWidth: "150px" }}>
-                                            Account
-                                        </th>
-                                        <th className={`${Styles.th} ${Styles.stickyThirdColumnHeading}`} style={{ minWidth: "200px" }}>
-                                            Brand
-                                        </th>
-                                        <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ minWidth: "200px" }}>
-                                            Status
-                                        </th>
-                                        <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ minWidth: "200px" }}>
-                                            Date Open
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jan Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jan Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jan Diff
-                                        </th>
+                            <DynamicTable mainData={sortArrayHandler(filteredTargetData,g=>g.ManufacturerName)} head={<thead>
+                                <tr>
+                                    <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading} `} style={{ minWidth: "170px" }}>
+                                        Sales Rep
+                                    </th>
+                                    <th className={`${Styles.th} ${Styles.stickySecondColumnHeading}`} style={{ minWidth: "150px" }}>
+                                        Account
+                                    </th>
+                                    <th className={`${Styles.th} ${Styles.stickyThirdColumnHeading}`} style={{ minWidth: "200px" }}>
+                                        Brand
+                                    </th>
+                                    <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ minWidth: "200px" }}>
+                                        Status
+                                    </th>
+                                    <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ minWidth: "200px" }}>
+                                        Date Open
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jan Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jan Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jan Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Feb Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Feb Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Feb Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Feb Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Feb Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Feb Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Mar Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Mar Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Mar Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Mar Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Mar Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Mar Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Apr Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Apr Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Apr Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Apr Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Apr Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Apr Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            May Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            May Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            May Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        May Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        May Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        May Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jun Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jun Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jun Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jun Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jun Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jun Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jul Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jul Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Jul Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jul Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jul Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Jul Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Aug Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Aug Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Aug Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Aug Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Aug Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Aug Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Sep Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Sep Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Sep Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Sep Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Sep Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Sep Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Oct Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Oct Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Oct Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Oct Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Oct Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Oct Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Nov Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Nov Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Nov Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Nov Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Nov Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Nov Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Dec Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Dec Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
-                                            Dec Diff
-                                        </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Dec Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Dec Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyMonth}`} style={{ minWidth: "125px" }}>
+                                        Dec Diff
+                                    </th>
 
-                                        <th className={`${Styles.month} ${Styles.stickyThirdLastColumnHeading}`} style={{ minWidth: "150px" }}>
-                                            Yearly Target
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickySecondLastColumnHeading}`} style={{ minWidth: "150px" }}>
-                                            Yearly Sales
-                                        </th>
-                                        <th className={`${Styles.month} ${Styles.stickyLastColumnHeading}`} style={{ minWidth: "150px" }}>
-                                            Yearly Diff
-                                        </th>
-                                    </tr>
-                                </thead>
-                                {allOrdersEmpty ? (
+                                    <th className={`${Styles.month} ${Styles.stickyThirdLastColumnHeading}`} style={{ minWidth: "150px" }}>
+                                        Yearly Target
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickySecondLastColumnHeading}`} style={{ minWidth: "150px" }}>
+                                        Yearly Sales
+                                    </th>
+                                    <th className={`${Styles.month} ${Styles.stickyLastColumnHeading}`} style={{ minWidth: "150px" }}>
+                                        Yearly Diff
+                                    </th>
+                                </tr>
+                            </thead>} foot={<tfoot>
+                                <tr>
+                                    <td className={`${Styles.lastRow} ${Styles.stickyFirstColumn} ${Styles.stickyLastRow}`}>
+                                        TOTAL
+                                    </td>
+                                    <td className={`${Styles.lastRow}  ${Styles.stickySecondColumn}  ${Styles.stickyLastRow}`} >
+                                    </td>
+                                    <td className={`${Styles.lastRow}  ${Styles.stickyThirdColumn}  ${Styles.stickyLastRow}`} >
+                                    </td>
+                                    <td className={`${Styles.lastRow}  ${Styles.stickyFirstColumn}  ${Styles.stickyLastRow}`} >
+                                    </td>
+                                    <td className={`${Styles.lastRow}  ${Styles.stickyFirstColumn}  ${Styles.stickyLastRow}`} >
+                                    </td>
+                                    {months.map((month) => (
+                                        <>
+                                            <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
+                                                ${formentAcmount(monthTotalAmount?.[month]?.target)}
+                                            </td>
+                                            <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
+                                                ${formentAcmount(monthTotalAmount?.[month]?.sale)}
+                                            </td>
+                                            <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
+                                                ${formentAcmount(monthTotalAmount?.[month]?.diff)}
+                                            </td>
+                                        </>
+                                    ))}
+
+                                    <td className={`${Styles.lastRow} ${Styles.stickyLastRow} ${Styles.stickyThirdLastColumn}`}>
+                                        ${formentAcmount(Total.target)}
+                                    </td>
+                                    <td className={`${Styles.lastRow} ${Styles.stickyLastRow} ${Styles.stickySecondLastColumn}`}>
+                                        ${formentAcmount(Total.sale)}
+                                    </td>
+                                    <td className={`${Styles.lastRow} ${Styles.stickyLastRow} ${Styles.stickyLastColumn}`}>
+                                        ${formentAcmount(Total.diff)}
+                                    </td>
+                                </tr>
+                            </tfoot>} id="salesReportTable" className="table table-responsive" style={{ minHeight: "300px" }}>
+
+                                {(items) => allOrdersEmpty ? (
                                     <div className={`${styles.NodataText} py-4 w-full lg:min-h-[300px] xl:min-h-[380px]`} key="no-data">
                                         <p>No data found</p>
                                     </div>
                                 ) : (
-                                    <tbody>
-                                        {filteredTargetData?.slice(
-                                            (currentPage - 1) * PageSize,
-                                            currentPage * PageSize
-                                        ).map((element, index) => {
-                                            monthTotalAmount.Jan.target += Number(element.January.staticTarget);
-                                            monthTotalAmount.Jan.sale += Number(element.January.sales);
-                                            monthTotalAmount.Jan.diff += Number(element.January.staticTarget - element.January.sales);
-                                            monthTotalAmount.Feb.target += Number(element.February.staticTarget);
-                                            monthTotalAmount.Feb.sale += Number(element.February.sales);
-                                            monthTotalAmount.Feb.diff += Number(element.February.staticTarget - element.February.sales);
-                                            monthTotalAmount.Mar.target += Number(element.March.staticTarget);
-                                            monthTotalAmount.Mar.sale += Number(element.March.sales);
-                                            monthTotalAmount.Mar.diff += Number(element.March.staticTarget - element.March.sales);
-                                            monthTotalAmount.Apr.target += Number(element.April.staticTarget);
-                                            monthTotalAmount.Apr.sale += Number(element.April.sales);
-                                            monthTotalAmount.Apr.diff += Number(element.April.staticTarget - element.April.sales);
-                                            monthTotalAmount.May.target += Number(element.May.staticTarget);
-                                            monthTotalAmount.May.sale += Number(element.May.sales);
-                                            monthTotalAmount.May.diff += Number(element.May.staticTarget - element.May.sales);
-                                            monthTotalAmount.Jun.target += Number(element.June.staticTarget);
-                                            monthTotalAmount.Jun.sale += Number(element.June.sales);
-                                            monthTotalAmount.Jun.diff += Number(element.June.staticTarget - element.June.sales);
-                                            monthTotalAmount.Jul.target += Number(element.July.staticTarget);
-                                            monthTotalAmount.Jul.sale += Number(element.July.sales);
-                                            monthTotalAmount.Jul.diff += Number(element.July.staticTarget - element.July.sales);
-                                            monthTotalAmount.Aug.target += Number(element.August.staticTarget);
-                                            monthTotalAmount.Aug.sale += Number(element.August.sales);
-                                            monthTotalAmount.Aug.diff += Number(element.August.staticTarget - element.August.sales);
-                                            monthTotalAmount.Sep.target += Number(element.September.staticTarget);
-                                            monthTotalAmount.Sep.sale += Number(element.September.sales);
-                                            monthTotalAmount.Sep.diff += Number(element.September.staticTarget - element.September.sales);
-                                            monthTotalAmount.Oct.target += Number(element.October.staticTarget);
-                                            monthTotalAmount.Oct.sale += Number(element.October.sales);
-                                            monthTotalAmount.Oct.diff += Number(element.October.staticTarget - element.October.sales);
-                                            monthTotalAmount.Nov.target += Number(element.November.staticTarget);
-                                            monthTotalAmount.Nov.sale += Number(element.November.sales);
-                                            monthTotalAmount.Nov.diff += Number(element.November.staticTarget - element.November.sales);
-                                            monthTotalAmount.Dec.target += Number(element.December.staticTarget);
-                                            monthTotalAmount.Dec.sale += Number(element.December.sales);
-                                            monthTotalAmount.Dec.diff += Number(element.December.staticTarget - element.December.sales);
-                                            monthTotalAmount.Total.target += Number(element.Total.staticTarget);
-                                            monthTotalAmount.Total.sale += Number(element.Total.sales);
-                                            monthTotalAmount.Total.diff += Number(element.Total.staticTarget - element.Total.sales);
-                                            return (
-                                                <tr key={index}>
-                                                    <td className={`${Styles.td} ${Styles.stickyFirstColumn}`}>{element?.salesRepName}</td>
-                                                    <td className={`${Styles.td} ${Styles.stickySecondColumn}`}><Link style={{ color: '#000' }} to={'/store/' + element.AccountId}>{element?.AccountName}</Link></td>
-                                                    <td className={`${Styles.td} ${Styles.stickyThirdColumn}`}><Link to={'/Brand/' + element.ManufacturerId} style={{ color: '#000' }}>{element.ManufacturerName}</Link></td>
-                                                    <td className={`${Styles.td}`}>{element.Status}</td>
-                                                    <td className={`${Styles.td}`}>{DateConvert(element?.DateOpen)}</td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.January.staticTarget)}
-                                                        {/* {element.January.totalRoll ? (element.January.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.January.totalRoll)}</small>+{formentAcmount(element.January.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.January.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.January.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.January.sales)}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${element.January.staticTarget - element.January.sales >= 0 ? formentAcmount(element.January.staticTarget - element.January.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.January.staticTarget - element.January.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.February.staticTarget)}
-                                                        {/* {element.February.totalRoll ? (element.February.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.February.totalRoll)}</small>+{formentAcmount(element.February.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.February.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.February.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.February.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.February.staticTarget - element.February.sales >= 0 ? formentAcmount(element.February.staticTarget - element.February.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.February.staticTarget - element.February.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.March.staticTarget)}
-                                                        {/* {element.March.totalRoll ? (element.March.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.March.totalRoll)}</small>+{formentAcmount(element.March.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.March.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.March.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.March.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.March.staticTarget - element.March.sales >= 0 ? formentAcmount(element.March.staticTarget - element.March.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.March.staticTarget - element.March.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.April.staticTarget)}
-                                                        {/* {element.April.totalRoll ? (element.April.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.April.totalRoll)}</small>+{formentAcmount(element.April.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.April.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.April.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.April.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.April.staticTarget - element.April.sales >= 0 ? formentAcmount(element.April.staticTarget - element.April.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.April.staticTarget - element.April.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.May.staticTarget)}
-                                                        {/* {element.May.totalRoll ? (element.May.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.May.totalRoll)}</small>+{formentAcmount(element.May.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.May.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.May.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.May.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.May.staticTarget - element.May.sales >= 0 ? formentAcmount(element.May.staticTarget - element.May.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.May.staticTarget - element.May.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.June.staticTarget)}
-                                                        {/* {element.June.totalRoll ? (element.June.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.June.totalRoll)}</small>+{formentAcmount(element.June.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.June.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.June.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.June.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.June.staticTarget - element.June.sales >= 0 ? formentAcmount(element.June.staticTarget - element.June.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.June.staticTarget - element.June.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.July.staticTarget)}
-                                                        {/* {element.July.totalRoll ? (element.July.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.July.totalRoll)}</small>+{formentAcmount(element.July.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.July.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.July.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.July.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.July.staticTarget - element.July.sales >= 0 ? formentAcmount(element.July.staticTarget - element.July.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.July.staticTarget - element.July.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.August.staticTarget)}
-                                                        {/* {element.August.totalRoll ? (element.August.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.August.totalRoll)}</small>+{formentAcmount(element.August.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.August.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.August.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.August.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.August.staticTarget - element.August.sales >= 0 ? formentAcmount(element.August.staticTarget - element.August.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.August.staticTarget - element.August.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.September.staticTarget)}
-                                                        {/* {element.September.totalRoll ? (element.September.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.September.totalRoll)}</small>+{formentAcmount(element.September.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.September.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.September.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.September.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.September.staticTarget - element.September.sales >= 0 ? formentAcmount(element.September.staticTarget - element.September.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.September.staticTarget - element.September.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.October.staticTarget)}
-                                                        {/* {element.October.totalRoll ? (element.October.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.October.totalRoll)}</small>+{formentAcmount(element.October.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.October.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.October.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.October.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.October.staticTarget - element.October.sales >= 0 ? formentAcmount(element.October.staticTarget - element.October.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.October.staticTarget - element.October.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.November.staticTarget)}
-                                                        {/* {element.November.totalRoll ? (element.November.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.November.totalRoll)}</small>+{formentAcmount(element.November.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.November.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.November.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.November.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.November.staticTarget - element.November.sales >= 0 ? formentAcmount(element.November.staticTarget - element.November.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.November.staticTarget - element.November.sales))}</b>}</td>
-
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.December.staticTarget)}
-                                                        {/* {element.December.totalRoll ? (element.December.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(element.December.totalRoll)}</small>+{formentAcmount(element.December.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(element.December.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-element.December.totalRoll)}</small></p></> : null) : null} */}
-                                                    </td>
-                                                    <td className={`${Styles.td}`}>${formentAcmount(element.December.sales)}</td>
-                                                    <td className={`${Styles.td}`}>${element.December.staticTarget - element.December.sales >= 0 ? formentAcmount(element.December.staticTarget - element.December.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(element.December.staticTarget - element.December.sales))}</b>}</td>
-                                                    <td className={`${Styles.td} ${Styles.stickyThirdLastColumn}`}>${formentAcmount(element.Total.staticTarget)}</td>
-                                                    <td className={`${Styles.td} ${Styles.stickySecondLastColumn}`}>${formentAcmount(element.Total.sales)}</td>
-                                                    <td className={`${Styles.td} ${Styles.stickyLastColumn}`}>${formentAcmount(element.Total.staticTarget - element.Total.sales)}</td>
-                                                </tr>
-                                            );
-                                        })}
-
-                                    </tbody>
+                                    <>
+                                        <td className={`${Styles.td} ${Styles.stickyFirstColumn}`}>{items?.salesRepName}</td>
+                                        <td className={`${Styles.td} ${Styles.stickySecondColumn}`}><Link style={{ color: '#000' }} to={'/store/' + items.AccountId}>{items?.AccountName}</Link></td>
+                                        <td className={`${Styles.td} ${Styles.stickyThirdColumn}`}><Link to={'/Brand/' + items.ManufacturerId} style={{ color: '#000' }}>{items.ManufacturerName}</Link></td>
+                                        <td className={`${Styles.td}`}>{items.Status}</td>
+                                        <td className={`${Styles.td}`}>{DateConvert(items?.DateOpen)}</td>
+                                        {months.map((month) => (
+                                        <>
+                                        <td className={`${Styles.td}`}>${formentAcmount(items?.[month]?.staticTarget)}
+                                            {/* {items?.[month]?.totalRoll ? (items?.[month]?.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(items?.[month]?.totalRoll)}</small>+{formentAcmount(items?.[month]?.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(items?.[month]?.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-items?.[month]?.totalRoll)}</small></p></> : null) : null} */}
+                                        </td>
+                                        <td className={`${Styles.td}`}>${formentAcmount(items?.[month]?.sales)}
+                                        </td>
+                                        <td className={`${Styles.td}`}>${items?.[month]?.staticTarget - items?.[month]?.sales >= 0 ? formentAcmount(items?.[month]?.staticTarget - items?.[month]?.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(items?.[month]?.staticTarget - items?.[month]?.sales))}</b>}</td>
+                                        </>
+                                    ))}
+                                       
+                                        <td className={`${Styles.td} ${Styles.stickyThirdLastColumn}`}>${formentAcmount(items.Total.staticTarget)}</td>
+                                        <td className={`${Styles.td} ${Styles.stickySecondLastColumn}`}>${formentAcmount(items.Total.sales)}</td>
+                                        <td className={`${Styles.td} ${Styles.stickyLastColumn}`}>${formentAcmount(items.Total.staticTarget - items.Total.sales)}</td>
+                                    </>
                                 )}
-                                <tfoot>
-                                    <tr>
-                                        <td className={`${Styles.lastRow} ${Styles.stickyFirstColumn} ${Styles.stickyLastRow}`}>
-                                            TOTAL
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.stickySecondColumn}  ${Styles.stickyLastRow}`} >
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.stickyThirdColumn}  ${Styles.stickyLastRow}`} >
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.stickyFirstColumn}  ${Styles.stickyLastRow}`} >
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.stickyFirstColumn}  ${Styles.stickyLastRow}`} >
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jan.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jan.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jan.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Feb.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Feb.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Feb.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Mar.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Mar.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Mar.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Apr.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Apr.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Apr.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.May.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.May.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.May.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jun.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jun.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jun.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jul.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jul.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Jul.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Aug.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Aug.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Aug.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Sep.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Sep.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Sep.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Oct.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Oct.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Oct.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Nov.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Nov.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Nov.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Dec.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Dec.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow}  ${Styles.lastRowMonth}  ${Styles.stickyLastRow}`}>
-                                            ${formentAcmount(monthTotalAmount.Dec.diff)}
-                                        </td>
-                                        <td className={`${Styles.lastRow} ${Styles.stickyLastRow} ${Styles.stickyThirdLastColumn}`}>
-                                            ${formentAcmount(monthTotalAmount.Total.target)}
-                                        </td>
-                                        <td className={`${Styles.lastRow} ${Styles.stickyLastRow} ${Styles.stickySecondLastColumn}`}>
-                                            ${formentAcmount(monthTotalAmount.Total.sale)}
-                                        </td>
-                                        <td className={`${Styles.lastRow} ${Styles.stickyLastRow} ${Styles.stickyLastColumn}`}>
-                                            ${formentAcmount(monthTotalAmount.Total.diff)}
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+
+                            </DynamicTable>
                         </div>
-                    </div>
-                    <div className="d-flex justify-content-center">
-                        <Pagination
-                            className="pagination-bar"
-                            currentPage={currentPage}
-                            totalCount={filteredTargetData.length}
-                            pageSize={PageSize}
-                            onPageChange={(page) => setCurrentPage(page)}
-                        />
                     </div>
                 </section>
             )}

@@ -3,14 +3,13 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate from react
 import Styles from "./style.module.css";
 import { CloseButton } from "../../../lib/svg";
 
-const SelectBrandModel = ({ brands, onClose = null, onChange = null }) => {
+const SelectBrandModel = ({ brands=[], onClose = null, onChange = null }) => {
+  
   const [selectedBrand, setSelectedBrand] = useState(null); // State to store selected brand
-  const navigate = useNavigate(); // Initialize navigate function
 
   const handleBrandChange = (brand) => {
     setSelectedBrand(brand); // Set selected brand when a brand is chosen
     if (onChange) { onChange(brand) }
-   
   };
 
   return (
@@ -29,6 +28,7 @@ const SelectBrandModel = ({ brands, onClose = null, onChange = null }) => {
           <div className={Styles.BrandInRadio}>
             <div className={Styles.ModalResponsive}>
               {brands?.map((brand, index) => (
+                (brand?.ManufacturerName__c || brand?.Name)&&
                 <div className={Styles.BrandName} key={index}>
                   <input
                     type="radio"

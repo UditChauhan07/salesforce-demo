@@ -1,8 +1,7 @@
 import CustomerSupportLayout from "./components/customerSupportLayout";
 import Filters from "./components/OrderList/Filters";
 import Styles from "./components/OrderList/style.module.css";
-import AppLayout from "./components/AppLayout";
-import { GetAuthData, admins, getOrderCustomerSupport, getOrderList, getSalesRepList } from "./lib/store";
+import { GetAuthData, admins, getOrderCustomerSupport, getSalesRepList } from "./lib/store";
 import Loading from "./components/Loading";
 import Pagination from "./components/Pagination/Pagination";
 import OrderListContent from "./components/OrderList/OrderListContent";
@@ -42,7 +41,7 @@ const OrderStatusIssues = () => {
     };
 
     function sortingList(data) {
-        data.sort(function (a, b) {
+        data?.sort(function (a, b) {
             return new Date(b.CreatedDate) - new Date(a.CreatedDate);
         });
         return data;
@@ -116,13 +115,29 @@ const OrderStatusIssues = () => {
                 })
         );
     }, [filterValue, orders, searchShipBy]);
+    const getOrderlIsthandler = ({ key, Sales_Rep__c }) => {
+        dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
+            user: {
+                key,
+                Sales_Rep__c,
+            }
+        }))
+            .then((order) => {
+                    let sorting = sortingList(order||[]);
+                    setOrders(sorting);
+                setLoaded(true);
+            })
+            .catch((error) => {
+                console.log({ error });
+            });
+    }
 
     useEffect(() => {
         setLoaded(false);
         GetAuthData()
             .then((response) => {
                 dataStore.subscribe("/orderList" + selectedSalesRepId ?? response.Sales_Rep__c, (data) => {
-                    let sorting = sortingList(data);
+                    let sorting = sortingList(data||[]);
                     setOrders(sorting);
                     setLoaded(true);
                 })
@@ -138,7 +153,7 @@ const OrderStatusIssues = () => {
                 }
                 return () => {
                     dataStore.unsubscribe("/orderList" + selectedSalesRepId ?? response.Sales_Rep__c, (data) => {
-                        let sorting = sortingList(data);
+                        let sorting = sortingList(data||[]);
                         setOrders(sorting);
                         setLoaded(true);
                     })
@@ -153,22 +168,7 @@ const OrderStatusIssues = () => {
         setShipByText(searchShipBy);
     }, [searchShipBy]);
 
-    const getOrderlIsthandler = ({ key, Sales_Rep__c }) => {
-        dataStore.getPageData("/orderList" + Sales_Rep__c, () => getOrderCustomerSupport({
-            user: {
-                key,
-                Sales_Rep__c,
-            }
-        }))
-            .then((order) => {
-                let sorting = sortingList(order);
-                setOrders(sorting);
-                setLoaded(true);
-            })
-            .catch((error) => {
-                console.log({ error });
-            });
-    }
+
     const orderListBasedOnRepHandler = (value) => {
         setSelectedSalesRepId(value)
         setLoaded(false)

@@ -257,17 +257,27 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
             let confimationStatus = true;
             if (reason != "Charges") {
                 error.map((id) => {
+                    console.log({reason});
+                    
                     if ((errorList[id].issue == 0 || !errorList[id].issue) || (reason != "Product Overage" && errorList[id].issue > errorList[id].Quantity)) {
                         confimationStatus = false;
                         const myElement = document.getElementById(`oP${id}`);
                         if (myElement) {
-                            console.warn({ myElement });
+                            let msg;
+                            console.log({errorList});
+                            
+                            if(errorList[id].issue == 0){
+                                msg = `Please enter issue quantity`;
+                            }else{
+                                msg = `You have entered more than the allowed quantity`;
+                            }
                             myElement.scrollIntoView({ behavior: "smooth", block: "center" });
                             myElement.style.borderBottom = "1px solid red";
                             shakeHandler(`oP${id}`)
                             Swal.fire({
-                                title: `${reason}!`,
-                                text: `You have entered more than the allowed quantity`,
+                                // title: `${reason}!`,
+                                title:"Error",
+                                text: msg,
                                 icon: 'error',
                                 confirmButtonText: 'Ok',
                                 confirmButtonColor: '#000'
@@ -374,8 +384,8 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                                     <thead>
                                         <tr>
                                             <th style={{ width: '225px' }}>Name</th>
-                                            <th style={{ width: '75px' }}>Code</th>
-                                            <th style={{ width: '75px' }}>Qty</th>
+                                            <th style={{ width: '100px' }}>Code</th>
+                                            <th style={{ width: '50px' }}>Qty</th>
                                             <th style={{ width: '75px' }}>Price</th>
                                         </tr>
                                     </thead>
@@ -480,8 +490,8 @@ const OrderCardHandler = ({ orders, setOrderId, orderId, reason, orderConfirmedS
                                                                     <thead>
                                                                         <tr>
                                                                             <th style={{ width: '225px' }}>Name</th>
-                                                                            <th style={{ width: '75px' }}>Code</th>
-                                                                            <th style={{ width: '75px' }}>Qty</th>
+                                                                            <th style={{ width: '100px' }}>Code</th>
+                                                                            <th style={{ width: '50px' }}>Qty</th>
                                                                             <th style={{ width: '75px' }}>Price</th>
                                                                             {reason && reason != "Charges" && <th>{reason}</th>}
                                                                         </tr>

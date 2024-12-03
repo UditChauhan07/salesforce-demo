@@ -13,6 +13,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const [errorOnlist, setErrorOnList] = useState(0);
+  const [emptyList,setEmptyList]= useState(0);
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
   const [alert, setAlert] = useState('-');
@@ -31,6 +32,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
       let productDetails = getProductData(item["Product Code"] || item["ProductCode"] || null);
 
       if (item?.Quantity) {
+        
         let error = !item?.Quantity || !Number.isInteger(item?.Quantity) || item?.Quantity < (productDetails.Min_Order_QTY__c || 0) || !productDetails?.Name || (productDetails.Min_Order_QTY__c > 0 && item?.Quantity % productDetails.Min_Order_QTY__c !== 0);
         if (orderType === "preorder") {
           if (error === false) {
@@ -60,8 +62,9 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
     } else {
       setLimitCheck(false)
     }
+    
     if (totalQty == data.length) {
-      setErrorOnList(totalQty);
+      setEmptyList(totalQty);
     } else {
       setErrorOnList(errorCount);
     }
@@ -217,9 +220,9 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
               product.price = salesPrice;
               product.qty = element["Quantity"];
               product.orderType = orderType;
-              console.log(product , "product")
+              // console.log(product , "product")
               manufacturer.name = product.ManufacturerName__c
-              manufacturer.id = product.Id
+              manufacturer.id = localStorage.getItem("ManufacturerId__c")
 
               createOrderList.push(product)
 
@@ -248,6 +251,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
     }
     CheckError(data);
   }, [errorOnlist, orderType]);
+  
   if (!showTable) {
     return (
       <div>
@@ -316,7 +320,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
         <div>{errorOnlist > 0 && errorOnlist !== data.length && <p className="text-start mt-2 text-danger">Highlighted rows have issues in their given quantity. Upload Again or Move further with correct rows.</p>}</div>
         <div>{errorOnlist > 0 && errorOnlist === data.length && <p className="text-start mt-2 text-danger">No Data Found.</p>}</div>
         <div>
-          {openModal && errorOnlist === data.length ? (
+          {openModal && errorOnlist > 0 &&errorOnlist === data.length ? (
             <ModalPage
               open
               content={
@@ -398,8 +402,7 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
                 })}
               </tbody>
             </table>
-            {console.log({ errorOnlist })}
-            {errorOnlist && data.length > 0 && errorOnlist == data.length ? (
+            {emptyList>0&&emptyList && data.length > 0 && emptyList == data.length ? (
               <div className="flex flex-column justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]">
                 <div>Products with zero quantity are uploaded! </div>
                 <div className="mt-3">No Data Found.</div>

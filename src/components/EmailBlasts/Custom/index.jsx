@@ -24,8 +24,7 @@ const MultiStepForm = () => {
     const [callBackError, setCallbackError] = useState(false);
     const [callBackErrorMsg, setCallbackErrorMsg] = useState();
     const [isSubmit, setIsSubmit] = useState(false)
-    const [isSchedule, setIsSchedule] = useState(false)
-    const [isUserSelected, setIsUserSelected] = useState(false);
+    const [isSchedule, setIsSchedule] = useState(false);
     const [isPreview, setIsPreview] = useState();
     const [isPreviewHtml, setIsPreviewHtml] = useState({ isLoaded: false, preview: null });
     const [loading, setLoading] = useState(true);
@@ -130,7 +129,6 @@ const MultiStepForm = () => {
 
     const handleChange = (e) => {
         const { value, name } = e.target;
-        console.log({ name, value, formData });
 
         if (name === "brand") {
             setFormData((prevFormData) => {
@@ -362,7 +360,6 @@ const MultiStepForm = () => {
             <CalenderIcon fill='#000' />
         </button>
     ));
-    console.log({formData});
     
 
     return (
@@ -414,7 +411,7 @@ const MultiStepForm = () => {
                     /> : null}
                     {currentStep == 4 ? <ModalPage
                         open={(currentStep == 4) ?? false}
-                        styles={{ width: '90%', position: 'fixed', bottom: 0 }}
+                        styles={{ position: 'fixed', bottom: 0 }}
                         classes={` ${Styles.maxHeightNinty}`}
                         content={<div className="d-flex flex-column gap-3">
                             <h2 className='text-start' style={{ position: 'sticky', top: '-20px', background: '#fff', zIndex: '111', paddingTop: '20px' }}>
@@ -422,7 +419,7 @@ const MultiStepForm = () => {
                                 <hr />
                             </h2>
                             {isPreviewHtml.isLoaded ?
-                                <div className={`${Styles.modalContent}`} dangerouslySetInnerHTML={{ __html: isPreviewHtml.preview }} />
+                                <div className={`${Styles.modalContent} max-w-[70vw]`} dangerouslySetInnerHTML={{ __html: isPreviewHtml.preview }} />
                                 : (<Loading height={'55vh'} />)}
                             <div className="d-flex justify-content-around" style={{ position: 'sticky', bottom: '-20px', zIndex: 11, background: '#fff', padding: '1rem 0' }}>
                                 <button className={`${Styles.btn} d-flex align-items-center`} onClick={() => { handleAccordionClick(3); }}>
@@ -437,7 +434,7 @@ const MultiStepForm = () => {
                     /> : null}
                     {showErrorList ? <ModalPage
                         open={showErrorList ?? false}
-                        styles={{ width: '80vw' }}
+                        styles={{ width: '100%' }}
                         content={<div className="d-flex flex-column gap-3">
                             <h2>
                                 Warning!!!

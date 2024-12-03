@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "../styles.module.css";
 import Accordion from "react-bootstrap/Accordion";
+import CollapsibleRow from "../../CollapsibleRow";
+import classNames from "classnames";
 
 function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, productTypeFilter, setProductTypeFilter, setSortBy, sortBy }) {
   const [activeIndex1, setActiveIndex1] = useState(0);
@@ -9,6 +11,7 @@ function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, 
     setActiveIndex1(index === activeIndex1 ? null : index);
   };
 
+  const [showCat, setShowCat] = useState(true);
 
   return (
     <div>
@@ -32,158 +35,98 @@ function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, 
           </svg>
           Discount Offer: {data?.discount?.margin || 0}%
         </h2>
-        {productTypeFilter=="Wholesale"?
-        <div className="mt-4">
-          <div className="pt-1 pb-1">
-            <input type="radio" name="catType" checked={productTypeFilter == "Wholesale" ? categoryFilters?.length == 0 ? true : false : false} onClick={(e) => { setCategoryFilters([]) }} id="catType1"/><label for="catType1" className="ml-2 text-uppercase cursor-pointer">All</label>
-          </div>
-          <div className="pt-1 pb-1">
-            <input type="radio" name="catType" checked={productTypeFilter == "Wholesale" ? categoryFilters?.includes("Samples") ? true : false : false} onClick={(e) => { setCategoryFilters(["Samples"]) }} id="catType2"/><label for="catType2" className="ml-2 text-uppercase cursor-pointer">Samples</label>
-          </div>
-          <div className="pt-1 pb-1">
-            <input type="radio" name="catType" checked={productTypeFilter == "Wholesale" ? categoryFilters?.includes("TESTER") ? true : false : false} onClick={(e) => { setCategoryFilters(["TESTER"]) }} id="catType3"/><label for="catType3" className="ml-2 text-uppercase cursor-pointer">Testers</label>
-          </div>
-        </div>:null}
+        {productTypeFilter == "Wholesale" ?
+          <div className="mt-4">
+            <div className="pt-1 pb-1">
+              <input type="radio" name="catType" checked={productTypeFilter == "Wholesale" ? categoryFilters?.length == 0 ? true : false : false} onClick={(e) => { setCategoryFilters([]) }} id="catType1" /><label for="catType1" className="ml-2 text-uppercase cursor-pointer">All</label>
+            </div>
+            <div className="pt-1 pb-1">
+              <input type="radio" name="catType" checked={productTypeFilter == "Wholesale" ? categoryFilters?.includes("Samples") ? true : false : false} onClick={(e) => { setCategoryFilters(["Samples"]) }} id="catType2" /><label for="catType2" className="ml-2 text-uppercase cursor-pointer">Samples</label>
+            </div>
+            <div className="pt-1 pb-1">
+              <input type="radio" name="catType" checked={productTypeFilter == "Wholesale" ? categoryFilters?.includes("TESTER") ? true : false : false} onClick={(e) => { setCategoryFilters(["TESTER"]) }} id="catType3" /><label for="catType3" className="ml-2 text-uppercase cursor-pointer">Testers</label>
+            </div>
+          </div> : null}
         {/* dropDown */}
 
-        {/* <div className={styles.Filterdropdownsection}>
-          <Accordion className={styles.AccoMain} defaultActiveKey="0">
-            <Accordion.Item className={styles.AcciIten} eventKey="0">
-              <Accordion.Header className={styles.HeaderAccor}>Sort By: {sortBy}</Accordion.Header>
-              <Accordion.Body className={styles.bodyAccor}>
-                <div className={styles.accordion} key={"price"}>
-                  <div className={styles.Content}>
-                    {["Price: High To Low", "Price: Low To High"]?.map((key) => (
-                      <div className={styles.accordion}>
-                        <div className={`${styles.title} ${styles.borderRad} `}>
-                          <input
-                            type="radio"
-                            onChange={() => {
-                              setSortBy(key);
-                            }}
-                            checked={sortBy === key}
-                            readOnly
-                            name="sort-by"
-                            id={`sort-by-${key}`}
-                          />
-                          <label htmlFor={`sort-by-${key}`}>{key}</label>
-
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
-        </div> */}
 
         <div className={styles.Lastfilter}>
-          {/* <div className={styles.lastFill}>
-            <h5>Filter</h5>
-            <button
-              onClick={() => {
-                setCategoryFilters([]);
-                setProductTypeFilter("Wholesale");
-                setSortBy(null);
-              }}
+          <div className={styles.AcciIten} eventKey="cat">
+            <div className={`${styles.HeaderAccor} d-flex justify-content-between`} style={{
+              fontFamily: 'inherit', fontSize: 'inherit',
+              lineHeight: 'inherit', fontWeight: 'inherit'
+            }} onClick={() => { setShowCat(!showCat) }}>Category <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="29"
+              height="28"
+              viewBox="0 0 29 28"
+              fill="none"
+              className={classNames("ml-4", {
+                "rotate-180": showCat,
+              })}
             >
-              Clear All
-            </button>
-          </div> */}
+                <path d="M7.71484 10.8534L14.8098 17.7119L21.9048 10.8534" stroke="#403A35" strokeWidth={"2"} />
+              </svg></div>
+            <div className={` overflow-x-auto ${styles.bodyAccor}`} style={{ height: "44vh" }}>
+              {showCat ? categoryFilters?.includes("Samples") || categoryFilters?.includes("TESTER") ? <>
+                <div className={`${styles.title} ${styles.borderRad} text-uppercase text-[11px]`}> No Category</div>
+              </> : <>
 
-          <Accordion className={styles.AccoMain} defaultActiveKey="0">
-            {/* <Accordion.Item className={styles.AcciIten} eventKey="0" key={"category"}>
-              <Accordion.Header className={styles.HeaderAccor}>Product Type</Accordion.Header>
-              <Accordion.Body className={styles.bodyAccor}>
-                <div className={styles.accordion} >
-                  <div className={styles.Content}>
-                    {["Wholesale", "Pre-order"]?.map((key) => (
-                      <div className={styles.accordion}>
-                        <div className={`${styles.title} ${styles.borderRad} `} onClick={() => onTitleClick1(0)}>
-                          <input
-                            type="radio"
-                            checked={productTypeFilter === key}
-                            readOnly
-                            onChange={() => {
-                              setProductTypeFilter(key);
-                            }}
-                            id={`product-type-${key}`}
-                            name="product-type"
-                          />
-                          <label htmlFor={`product-type-${key}`}>{key}</label>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Accordion.Body>
-            </Accordion.Item> */}
-
-            <Accordion.Item className={styles.AcciIten} eventKey="0">
-              <Accordion.Header className={styles.HeaderAccor}>Category</Accordion.Header>
-              <Accordion.Body className={` overflow-auto ${styles.bodyAccor}`} style={{ height: "44vh" }}>
-                {categoryFilters?.includes("Samples") || categoryFilters?.includes("TESTER") ? <>
-                  <div className={`${styles.title} ${styles.borderRad} text-uppercase text-[11px]`}> No Category</div>
-                </> : <>
-
-                  {Object.keys(formattedData)
-                    // ?.filter((category) => category !== "PREORDER")
-                    ?.filter((category) => {
-                      if (productTypeFilter === 'Pre-order') {
-                        // Return only categories that include 'PREORDER'
-                        return category.includes('EVENT') || category.includes('PREORDER');
-                        // } else if (productTypeFilter === 'TESTER') {
-                        //   // Return only categories that include 'TESTER'
-                        //   return category.includes('TESTER');
-                        // }
-                        // else if (productTypeFilter === 'Samples') {
-                        //   // Return only categories that include 'EVENT'
-                        //   return category.includes('Samples');
+                {Object.keys(formattedData)
+                  // ?.filter((category) => category !== "PREORDER")
+                  ?.filter((category) => {
+                    if (productTypeFilter === 'Pre-order') {
+                      // Return only categories that include 'PREORDER'
+                      return category.includes('EVENT') || category.includes('PREORDER');
+                      // } else if (productTypeFilter === 'TESTER') {
+                      //   // Return only categories that include 'TESTER'
+                      //   return category.includes('TESTER');
+                      // }
+                      // else if (productTypeFilter === 'Samples') {
+                      //   // Return only categories that include 'EVENT'
+                      //   return category.includes('Samples');
+                    }
+                    else if (productTypeFilter === 'Wholesale') {
+                      // Remove categories that include 'PREORDER', 'TESTER', or 'EVENT'
+                      if (!category.includes('PREORDER') && !category.includes('EVENT') && !category.includes('Samples') && !category.includes('TESTER')) {
+                        return true;
                       }
-                      else if (productTypeFilter === 'Wholesale') {
-                        // Remove categories that include 'PREORDER', 'TESTER', or 'EVENT'
-                        if (!category.includes('PREORDER') && !category.includes('EVENT') && !category.includes('Samples') && !category.includes('TESTER')) {
-                          return true;
-                        }
-                      }
-                    })
-                    ?.map((key, index) => (
-                      <div className={styles.accordion} key={index}>
-                        <div className={styles.Content}>
-                          <div className={styles.accordion}>
-                            <div className={`${styles.title} ${styles.borderRad} `} onClick={() => onTitleClick1(0)}>
-                              <input
-                                type="checkbox"
-                                checked={categoryFilters?.includes(key)}
-                                readOnly
-                                value={key}
-                                onChange={(e) => {
-                                  console.log({ key });
+                    }
+                  })
+                  ?.map((key, index) => (
+                    <div className={styles.accordion} key={index}>
+                      <div className={styles.Content}>
+                        <div className={styles.accordion}>
+                          <div className={`${styles.title} ${styles.borderRad} `} onClick={() => onTitleClick1(0)}>
+                            <input
+                              type="checkbox"
+                              checked={categoryFilters?.includes(key)}
+                              readOnly
+                              value={key}
+                              onChange={(e) => {
+                                console.log({ key });
 
-                                  setCategoryFilters((prev) => {
-                                    let newFilters = [...prev];
-                                    if (e.target.checked) {
-                                      newFilters.push(key);
-                                    } else {
-                                      newFilters = newFilters?.filter((val) => val !== key);
-                                    }
-                                    return newFilters;
-                                  });
-                                }}
-                                id={`category-${key}`}
-                              />
-                              <label htmlFor={`category-${key}`} className="text-uppercase">{key != "null" ? key : "No Category"}</label>
-                            </div>
+                                setCategoryFilters((prev) => {
+                                  let newFilters = [...prev];
+                                  if (e.target.checked) {
+                                    newFilters.push(key);
+                                  } else {
+                                    newFilters = newFilters?.filter((val) => val !== key);
+                                  }
+                                  return newFilters;
+                                });
+                              }}
+                              id={`category-${key}`}
+                            />
+                            <label htmlFor={`category-${key}`} style={{width:'84%',wordWrap:'break-word'}} className="text-uppercase">{key != "null" ? key : "No Category"}</label>
                           </div>
                         </div>
                       </div>
-                    ))}
-                </>}
-
-              </Accordion.Body>
-            </Accordion.Item>
-          </Accordion>
+                    </div>
+                  ))}
+              </> : null}
+            </div>
+          </div>
         </div>
       </div>
     </div>

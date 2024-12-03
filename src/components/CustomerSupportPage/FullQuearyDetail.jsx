@@ -16,6 +16,27 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
     const [btnAct, setBtnAct] = useState(true)
     const [token, setUsertoken] = useState(null);
     const [showFullUserDesc, setShowFullUserDesc] = useState(false);
+    const [userDesc, setUserDesc] = useState("");
+    const [issueDesc, setIssueDesc] = useState("");
+    useEffect(() => {
+        const description = data.Description || "";
+      
+        // Attempt to extract User Desc if "User Desc:" is present
+        const userDescMatch = description.includes("User Desc:")
+          ? description.split("User Desc:")[1]?.split("Issue Desc:")[0]?.trim()
+          : description;
+      
+        // Attempt to extract Issue Desc if "Issue Desc:" is present
+        const issueDescMatch = description.includes("Issue Desc:")
+          ? description.split("Issue Desc:")[1]?.trim()
+          : "";
+      
+        // Set the extracted descriptions or empty strings if not found
+        setUserDesc(userDescMatch || "");
+        setIssueDesc(issueDescMatch || "");
+      }, [data.Description]);
+      
+      
     function formatAMPM(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
@@ -113,6 +134,38 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
             ? truncated
             : truncated.slice(0, lastSpaceIndex) + ".....";
     };
+    const GetDescriptionContent = () => {
+        return (
+            <div>
+                <div>
+                    {issueDesc && (
+                        <div className={Detail.descriptionMarginTop}>
+                            <b>Issue Description : </b> {issueDesc}
+                        </div>
+                    )}
+
+                    {userDesc && (
+                        <div
+                            className={`${Detail.UserDescWrapper} ${showFullUserDesc ? Detail.ShowFullDesc : ""
+                                }`}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <b>User Description : </b>
+                            <span className={Detail.UserDescContent}>
+                                {userDesc
+                                    ? showFullUserDesc
+                                        ? userDesc
+                                        : truncateAtLastWord(userDesc, 180)
+                                    : "No user description provided."}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div>
             {orderStatus?.status ? (
@@ -149,10 +202,10 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             <div className={Detail.LeftMainTopBox}>
                                 <p>
                                     <UserChecked />
-                                    <span>{data.Account?.Name}</span>&nbsp; raised this on {DateConvert(data.Date_Opened__c)}
+                                    <span><Link style={{color:'#000'}} to={'/store/'+data.AccountId}>{data.Account?.Name}</Link></span>&nbsp; raised this on {DateConvert(data.Date_Opened__c)}
                                 </p>
                             </div>
-                            <div
+                            {/* <div
                                 className={`${Detail.UserDescWrapper} ${showFullUserDesc ? Detail.ShowFullDesc : ""
                                     }`}
                                 onMouseEnter={handleMouseEnter}
@@ -165,6 +218,9 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                                             : truncateAtLastWord(data.Description, 180)
                                         : "No user description provided."}
                                 </span>
+                            </div> */}
+                            <div className={Detail.MainDescDiv}>
+                                <GetDescriptionContent />
                             </div>
 
                             <h6>Activity</h6>
@@ -243,7 +299,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             </div> */}
                             {data.ManufacturerName__c && <div className={Detail.ManufactureID}>
                                 <h3>Manufacture ID</h3>
-                                <p>{data.ManufacturerName__c}</p>
+                                <p><Link style={{color:'#000'}} to={'/Brand/'+data.ManufacturerId__c}>{data.ManufacturerName__c}</Link></p>
                             </div>}
                             <div className={Detail.CaseNumber}>
                                 <h3>Case Number</h3>
@@ -259,7 +315,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             </div>}
                             <div className={Detail.RecordType}>
                                 <h3>Record Type</h3>
-                                <p>{data.RecordType.Name}</p>
+                                <p>{data.RecordType?.Name}</p>
                             </div>
                             {attachmentUrls && attachmentUrls?.length > 0 && (
                                 <div className={Detail.RecordType}>
@@ -288,10 +344,10 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                                                     }}
                                                     className={Detail.DownloadLink}
                                                     onClick={() =>
-                                                        downloadFile(attachment.id, attachment.name)
+                                                        downloadFile(attachment.id, attachment?.name)
                                                     }
                                                 >
-                                                    {attachment.name}
+                                                    {attachment?.name}
                                                 </a>
                                             </li>
                                         ))}

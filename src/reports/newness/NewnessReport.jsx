@@ -40,13 +40,18 @@ const NewnessReport = () => {
   const [filter, setFilter] = useState(initialValues);
   const originalApiData = useNewnessReport();
   const { data: manufacturers, isLoading, error } = useManufacturer();
+  const [manufacturerList,setManufacturerList] = useState([]);
+  useEffect(()=>{
+    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
+    if(manufacturers?.data?.length){
+      dataStore.updateData("/brands",manufacturers.data);
+      setManufacturerList(manufacturers.data)
+    }
+    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
+  },[manufacturers?.data])
   const [newnessData, setNewnessData] = useState({});
   const [loading, setLoading] = useState(false);
   const [status, setstatus] = useState(1)
-  const [selectedSalesRepId, setSelectedSalesRepId] = useState();
-  const [userData, setUserData] = useState({});
-  const [hasPermission, setHasPermission] = useState(null);
-  const [permissions, setPermissions] = useState(null);
   // if (manufacturers?.status !== 200) {
   //   // DestoryAuth();
   // }
@@ -199,10 +204,6 @@ const NewnessReport = () => {
   }, []);
   const readyNewnessReady = (data) => {
     let short = data.AccountList.filter(item => status == 1 ? item.Active_Closed__c !== "Closed Account" : item)
-    setFilter((prev) => ({
-      ...prev,
-      dataDisplay: dataDisplayHandler,
-    }));
     let temp = {
       status: data.status,
       header: data.header,
@@ -213,6 +214,10 @@ const NewnessReport = () => {
   }
   const sendApiCall = async () => {
     setLoading(true);
+    setFilter((prev) => ({
+      ...prev,
+      dataDisplay: dataDisplayHandler,
+    }));
     const result = await dataStore.getPageData("/newness-report" + JSON.stringify({ ...filter, dataDisplay: null }), () => originalApiData.fetchNewnessApiData(filter));
     if (result) {
       readyNewnessReady(result);
@@ -234,8 +239,6 @@ const NewnessReport = () => {
       try {
 
         const userPermissions = await getPermissions();
-        setPermissions(userPermissions);
-        setHasPermission(userPermissions?.modules?.reports?.newnessReport?.view);
 
         // If no permission, redirect to dashboard
         if (userPermissions?.modules?.reports?.newnessReport?.view === false) {
@@ -250,21 +253,16 @@ const NewnessReport = () => {
 
     fetchData();
   }, []);
-
-  // Memoize permissions to avoid unnecessary re-calculations
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
   return (
     <AppLayout
       filterNodes={
         <>
-
-
           <FilterItem
             minWidth="200px"
             label="All Manufacturers"
             name="AllManufacturers12"
             value={filter.ManufacturerId__c}
-            options={manufacturers?.data?.map((manufacturer) => ({
+            options={manufacturerList?.map((manufacturer) => ({
               label: manufacturer.Name,
               value: manufacturer.Id,
             }))}

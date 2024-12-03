@@ -115,20 +115,20 @@ console.log({accountId});
                   <div className={Styles.poNumb1}>
                     <h3>PO Number</h3>
                     <Link to="/orderDetails">
-                      <p onClick={() => MyBagId(item.Id)}>{item.PO_Number__c}</p>
+                      <p onClick={() => MyBagId(item.Id)}>{item.PO_Number__c??'NA'}</p>
                     </Link>
                   </div>
                   <div className={Styles.poNumb1}>
                     <h3>Brand</h3>
                     <Link to={'/Brand/' + item.ManufacturerId__c} style={{ color: '#000' }}>
-                      <p>{item.ManufacturerName__c}</p>
+                      <p>{item.ManufacturerName__c??'NA'}</p>
                     </Link>
                   </div>
 
                   <div className={Styles.PoOrderLast}>
                     <h3>Ship To </h3>
                     <Link to={'/store/' + item.AccountId} style={{ color: '#000' }}>
-                      <p>{item.AccountName}</p>
+                      <p>{item.AccountName??'NA'}</p>
                     </Link>
                   </div>
                 </div>

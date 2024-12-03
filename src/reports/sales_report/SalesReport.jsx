@@ -13,17 +13,16 @@ import { MdOutlineDownload } from "react-icons/md";
 import ModalPage from "../../components/Modal UI";
 import styles from "../../components/Modal UI/Styles.module.css";
 import { CloseButton, SearchIcon } from "../../lib/svg";
-import { defaultLoadTime, GetAuthData } from "../../lib/store";
+import { defaultLoadTime } from "../../lib/store";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
-import Pagination from "../../components/Pagination/Pagination";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 
 const SalesReport = () => {
-  const[PageSize,setPageSize] = useState(3);
+  const [PageSize, setPageSize] = useState(3);
   const [manufacturers, setManufacturers] = useState([]);
   const [yearFor, setYearFor] = useState(2024);
   const salesReportApi = useSalesReport();
@@ -38,15 +37,13 @@ const SalesReport = () => {
   const [salesRepList, setSalesRepList] = useState([]);
   const [yearForTableSort, setYearForTableSort] = useState(2024);
   const [exportToExcelState, setExportToExcelState] = useState(false);
-  const [selectedSalesRepId, setSelectedSalesRepId] = useState();
-  const [userData, setUserData] = useState({});
-  const [hasPermission, setHasPermission] = useState(null);
   const [permissions, setPermissions] = useState(null);
   const [dateFilter, setDateFilter] = useState("Created-Date");
   const [currentPage, setCurrentPage] = useState(1);
 
 
   const filteredSalesReportData = useMemo(() => {
+    setCurrentPage(1);
     let filtered = salesReportData.filter((ele) => {
       return !manufacturerFilter || !ele.ManufacturerName__c.localeCompare(manufacturerFilter);
     });
@@ -76,11 +73,6 @@ const SalesReport = () => {
         };
       });
     }
-    // if (activeAccounts === "Active Account") {
-    //   filtered = filtered?.filter((ele) =>
-    //     ele.Orders.find((item) => item.Status === "Active Account"));
-    //   // i need only active account in this function but is not working?
-    // }
 
     if (activeAccounts === "Active Account") {
       filtered = filtered?.map((ele) => {
@@ -230,16 +222,12 @@ const SalesReport = () => {
   };
   const navigate = useNavigate();
 
-
-  // Memoize permissions to avoid unnecessary re-calculations
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
-
-
   const readyReportHandler = (data) => {
     let salesListName = [];
     let salesList = [];
     let manuIds = [];
     let manufacturerList = [];
+    if(data){
     data?.data?.data?.map((manu) => {
       if (!manuIds.includes(manu.ManufacturerId__c)) {
         manuIds.push(manu.ManufacturerId__c);
@@ -262,6 +250,7 @@ const SalesReport = () => {
         });
       }
     });
+  }
     setManufacturers(manufacturerList)
     setSalesRepList(salesList);
     setSalesReportData(data?.data?.data);
@@ -272,7 +261,6 @@ const SalesReport = () => {
 
   // 
   const getSalesData = async (yearFor, dateFilter) => {
-    setIsLoading(true);
     setYearForTableSort(yearFor);
     const result = await dataStore.getPageData("/sales-report" + JSON.stringify({ yearFor, dateFilter }), () => salesReportApi.salesReportData({ yearFor, dateFilter }));
     setCurrentPage(1);
@@ -281,6 +269,7 @@ const SalesReport = () => {
     }
   };
   useEffect(() => {
+    setIsLoading(true);
     dataStore.subscribe("/sales-report" + JSON.stringify({ yearFor, dateFilter }), readyReportHandler);
     const userData = localStorage.getItem("Name");
     if (userData) {
@@ -297,11 +286,6 @@ const SalesReport = () => {
   const sendApiCall = () => {
     setManufacturerFilter(null);
     setSearchBySalesRep("");
-    // setManufacturerFilter(null);
-    // setHighestOrders(true);
-    // getSalesData(yearFor);
-    // setSearchBy("");
-    // setSearchBySalesRep("");
     getSalesData(yearFor, dateFilter);
   };
   let yearList = [
@@ -324,7 +308,6 @@ const SalesReport = () => {
 
         const userPermissions = await getPermissions();
         setPermissions(userPermissions);
-        setHasPermission(userPermissions?.modules?.reports?.salesReport?.view);
 
         // If no permission, redirect to dashboard
         if (userPermissions?.modules?.reports?.salesReport?.view === false) {
@@ -341,7 +324,10 @@ const SalesReport = () => {
   }, []);
 
 
-  console.log({ filteredSalesReportData });
+  const paginatedData = useMemo(() => {
+    return filteredSalesReportData
+  }, [filteredSalesReportData])
+  
 
   return (
     <AppLayout
@@ -371,24 +357,7 @@ const SalesReport = () => {
 
             <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
             <div className="d-flex justify-content-end gap-4 col-8">
-            <FilterItem
-                minWidth="220px"
-                label="Pagination"
-                name="Pagination"
-                value={PageSize?PageSize:false}
-                options={[
-                  {
-                    label: "Paginated",
-                    value: 3,
-                  },
-                  {
-                    label: "Full Report",
-                    value: filteredSalesReportData.length,
-                  },
-                ]}
-                onChange={(value) => setPageSize(value)}
-              />
-              {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={salesRepList} onChange={(value) => setSearchBySalesRep(value)} />}
+              {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={[{label:"All Sales Rep", value:null},...salesRepList]} onChange={(value) => setSearchBySalesRep(value)} />}
               <FilterItem
                 minWidth="220px"
                 label="All Brands"
@@ -449,8 +418,6 @@ const SalesReport = () => {
               </button>
             </div>
           </div>
-
-
         </>
       }
     >
@@ -486,57 +453,12 @@ const SalesReport = () => {
           </h2>
         </div>
         <div>
-          {false && <div className={`d-flex align-items-center ${Styles.InputControll}`}>
-            <select onChange={(e) => setYearFor(e.target.value)}>
-              <option value={2015} selected={yearFor == 2015 ? true : false}>
-                2015
-              </option>
-              <option value={2016} selected={yearFor == 2016 ? true : false}>
-                2016
-              </option>
-              <option value={2017} selected={yearFor == 2017 ? true : false}>
-                2017
-              </option>
-              <option value={2018} selected={yearFor == 2018 ? true : false}>
-                2018
-              </option>
-              <option value={2019} selected={yearFor == 2019 ? true : false}>
-                2019
-              </option>
-              <option value={2020} selected={yearFor == 2020 ? true : false}>
-                2020
-              </option>
-              <option value={2021} selected={yearFor == 2021 ? true : false}>
-                2021
-              </option>
-              <option value={2022} selected={yearFor == 2022 ? true : false}>
-                2022
-              </option>
-              <option value={2023} selected={yearFor == 2023 ? true : false}>
-                2023
-              </option>
-              <option value={2024} selected={yearFor == 2024 ? true : false}>
-                2024
-              </option>
-            </select>
-            <button onClick={() => sendApiCall()}>Search Sales</button>
-          </div>}
         </div>
       </div>
 
       {filteredSalesReportData?.length && !isLoading ? (
         <>
-          <SalesReportTable salesData={filteredSalesReportData?.slice(
-            (currentPage - 1) * PageSize,
-            currentPage * PageSize
-          )} year={yearForTableSort} ownerPermission={ownerPermission} />
-          <Pagination
-            className="pagination-bar"
-            currentPage={currentPage}
-            totalCount={filteredSalesReportData.length}
-            pageSize={PageSize}
-            onPageChange={(page) => setCurrentPage(page)}
-          />
+          <SalesReportTable salesData={paginatedData} year={yearForTableSort} ownerPermission={ownerPermission} />
         </>
       ) : filteredSalesReportData.length === 0 && !isLoading ? (
         <div className="flex justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]">No data found</div>

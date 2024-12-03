@@ -49,6 +49,8 @@ const CartProvider = ({ children }) => {
             const user = await GetAuthData();
             const getOrder = { CreatedBy: user?.Sales_Rep__c };
             const cart = await cartSync({ cart: getOrder });
+            
+            
             // Validate if the fetched cart has essential content like Account and Manufacturer
             if (cart.id && cart.Account?.id && cart.Manufacturer?.id) {
                 setOrder(cart); // Set the fetched cart if valid
@@ -201,7 +203,6 @@ const CartProvider = ({ children }) => {
         };
     };
 
-    console.log({ order });
 
     const addOrder = async (product, account, manufacturer) => {
         // let status = await fetchCart();
@@ -238,10 +239,10 @@ const CartProvider = ({ children }) => {
             // Check if testerInclude or sampleInclude is false and we're adding the wrong type
             const hasTesterInCart = order.items.some(item => item.Category__c === "TESTER");
             const hasSampleInCart = order.items.some(item => item.Category__c?.toUpperCase() === "SAMPLES");
-            console.log({ hasTesterInCart, testerInclude: account.discount.testerInclude, isTester });
+            console.log({ hasTesterInCart, testerInclude: account.discount?.testerInclude, isTester });
 
             // **Fix: Only trigger alert when testerInclude or sampleInclude is false**
-            if ((!account.discount.testerInclude && isTester && !hasTesterInCart) || (!account.discount.sampleInclude && isSample && !hasSampleInCart)) {
+            if ((!account.discount?.testerInclude && isTester && !hasTesterInCart) || (!account.discount?.sampleInclude && isSample && !hasSampleInCart)) {
                 let msg = `This brand requires you to add ${isTester ? "Tester" : "Sample"} products in a separate order. You cannot mix it with other products.`;
 
                 let status = await confirmReplaceCart(isAccountMatch, isManufacturerMatch, isOrderTypeMatch, msg);
@@ -273,8 +274,8 @@ const CartProvider = ({ children }) => {
             }
 
             // **Fix: Ensure this block is only triggered when testerInclude or sampleInclude is false**
-            if ((hasTesterInCart && !account.discount.testerInclude && !isTester) ||
-                (hasSampleInCart && !account.discount.sampleInclude && !isSample)) {
+            if ((hasTesterInCart && !account.discount?.testerInclude && !isTester) ||
+                (hasSampleInCart && !account.discount?.sampleInclude && !isSample)) {
                 let msg = `You already have ${hasTesterInCart ? "Tester" : "Sample"} products in your cart. You cannot add other types of products.`;
 
                 let status = await confirmReplaceCart(isAccountMatch, isManufacturerMatch, isOrderTypeMatch, msg);
@@ -371,7 +372,66 @@ const CartProvider = ({ children }) => {
         }
     };
 
-
+    const updateProductPrice = (productId, price = 0) => {
+        // Convert price to a number and validate
+        const numericPrice = parseFloat(price);
+    
+        if (isNaN(numericPrice) || numericPrice < 0) {
+            Swal.fire({
+                title: "Invalid Price!",
+                text: "Please provide a valid non-negative number for the price.",
+                icon: "warning",
+                confirmButtonColor: "#000", // Black
+            });
+            return; // Stop further execution for invalid input
+        }
+    
+        // Format the price to 2 decimal places
+        const formattedPrice = parseFloat(numericPrice.toFixed(2));
+        
+    
+        setOrder((prevOrder) => {
+            const product = prevOrder.items.find((item) => item.Id === productId);
+            if (!product) {
+                Swal.fire({
+                    title: "Product Not Found!",
+                    text: `No product found with ID: ${productId}`,
+                    icon: "error",
+                    confirmButtonColor: "#000", // Black
+                });
+                return prevOrder; // No product found
+            }
+    
+            // Calculate the updated total
+            const updatedItems = prevOrder.items.map((item) =>
+                item.Id === productId
+                    ? { ...item, price: formattedPrice } // Update price for matching product
+                    : item
+            );
+            
+            const updatedTotal =
+                prevOrder.total -
+                product.price * product.qty +
+                formattedPrice * product.qty;
+    
+            // Return the updated order state
+            return {
+                ...prevOrder,
+                items: updatedItems,
+                total: parseFloat(updatedTotal.toFixed(2)), // Ensure total is also formatted
+            };
+        });
+    
+        // Optional success message (uncomment if needed)
+        // Swal.fire({
+        //     title: "Price Updated!",
+        //     text: `The price for the product with ID: ${productId} has been successfully updated.`,
+        //     icon: "success",
+        //     confirmButtonColor: "#000", // Black
+        // });
+    };
+    
+    
 
     // Update product quantity
     const updateProductQty = (productId, qty) => {
@@ -504,7 +564,6 @@ const CartProvider = ({ children }) => {
 
         return false;
     };
-    console.log({ order });
 
 
     const contentApiFunction = async (productList, account, manufacturer, ordertype = 'wholesale') => {
@@ -587,7 +646,8 @@ const CartProvider = ({ children }) => {
         contentApiFunction,
         keyBasedUpdateCart,
         fetchCart,
-        deleteCartForever
+        deleteCartForever,
+        updateProductPrice
     };
 
     return <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>;

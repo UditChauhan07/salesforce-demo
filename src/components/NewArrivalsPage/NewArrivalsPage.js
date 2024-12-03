@@ -14,13 +14,12 @@ import { DeleteIcon } from "../../lib/svg";
 import { useNavigate } from "react-router-dom";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
-function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , accountDetails={}}) {
-  console.log({brand});
-  
+import ImageHandler from "../loader/ImageHandler";
+function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accountDetails = {} }) {
+
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
-  useEffect(()=>{},[productList])
-  const [products, setProducts] = useState([]);
+  useEffect(() => { }, [productList])
   const [modalShow, setModalShow] = useState(false);
   const [productDetailId, setProductDetailId] = useState();
   const [productBrandId, setProductBrandId] = useState();
@@ -33,7 +32,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
 
   const [dealAccountList, setDealAccountList] = useState([]);
   const [selectAccount, setSelectAccount] = useState();
-  
+
   const [AccountId, setAccount] = useState();
   const [accountList, setAccountList] = useState([]);
   const [accountSelectCheck, setAccountSelectCheck] = useState(false)
@@ -49,6 +48,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
       const startIndex = (currentPage - 1) * PageSize;
       const endIndex = currentPage * PageSize;
       const newValues = filterData.flatMap((month) => month?.content).slice(startIndex, endIndex);
+
       setPagination([{ content: newValues }]);
     } else {
       setPagination([{ content: [] }]);
@@ -57,26 +57,24 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null , acco
 
   useEffect(() => {
     let temp = true;
-    products.forEach((month) => {
+    productList.forEach((month) => {
       month.content.forEach((item) => {
-        if (!brand || brand === item.brand||brand == item.ManufacturerId__c) {
+        if (!brand || brand === item.brand || brand == item.ManufacturerId__c) {
           temp = false;
         }
       });
     });
     setIsEmpty(temp);
-  }, [brand, products]);
-useEffect(()=>{
-     setProducts(productList);
-},[])
+  }, [brand, productList]);
+
   useEffect(() => {
     if (loadEffect) setLoaded(true);
     let newFilterData;
 
     if (!month) {
-      newFilterData = products;
+      newFilterData = productList;
     } else {
-      newFilterData = products.map((months) => {
+      newFilterData = productList.map((months) => {
         const filteredContent = months.content.filter((item) => {
           if (month) {
             if (brand && brand !== "All") {
@@ -84,7 +82,6 @@ useEffect(()=>{
             }
             return item.date.toLowerCase().includes(month.toLowerCase());
           }
-          return true;
         });
         return { ...months, content: filteredContent };
       }).filter(months => months.content.length > 0); // Remove months with no content
@@ -96,7 +93,7 @@ useEffect(()=>{
     setTimeout(() => {
       setLoaded(false);
     }, 500);
-  }, [month, brand,products]);
+  }, [month, brand, productList]);
 
   const [imageLoading, setImageLoading] = useState({});
   const handleImageLoad = (imageId) => {
@@ -166,13 +163,13 @@ useEffect(()=>{
         } else {
           discount = selectAccount?.Discount?.margin || 0;
         }
-        let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
+        let salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice)?.toFixed(2);
         element.price = salesPrice;
         element.qty = element.Min_Order_QTY__c;
         let cartStatus = addOrder(element, account, manufacturer);
       }
     }
-  }  
+  }
   const accountSelectionHandler = () => {
     onQuantityChange(replaceCartProduct.product, replaceCartProduct.quantity, replaceCartProduct.salesPrice)
     accountSelectionCloseHandler();
@@ -204,7 +201,7 @@ useEffect(()=>{
         textTransform: "uppercase",
       },
     };
-  
+
     // Custom styles for react-select
     const customSelectStyles = {
       option: (provided, state) => ({
@@ -228,7 +225,7 @@ useEffect(()=>{
         overflowY: "auto", // Adds vertical scrolling
       }),
     };
-  
+
     return (
       <div style={styles.holder}>
         <p style={styles.title}>{title}</p>
@@ -243,7 +240,7 @@ useEffect(()=>{
     );
   };
 
-
+ if (isLoaded) return <Loading height={"70vh"} />
   return (
     <>
       <ModalPage
@@ -253,8 +250,8 @@ useEffect(()=>{
             <h2>Alert!</h2>
             <p>
               You have multi store with deal with this Brand.<br /> can you please select you create order for
-              <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
             </p>
+              <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
             <div className="d-flex justify-content-around ">
               <button className={`${StylesModal.modalButton}`} onClick={accountSelectionHandler}>
                 OK
@@ -274,8 +271,8 @@ useEffect(()=>{
             <div style={{ maxWidth: "309px" }}>
               <h1 className={`fs-5 ${StylesModal.ModalHeader}`}>Attention!</h1>
               <p>
-              Please select store you want to order for
-            </p>
+                Please select store you want to order for
+              </p>
               <Select options={accountList?.map((account) => ({ label: account.Name, value: account.Id }))} />
               <div className="d-flex justify-content-center">
                 <button
@@ -322,9 +319,9 @@ useEffect(()=>{
       ) : null}
       <section id="newArrivalsSection">
         <div>
-          <div className={!isEmpty ? Styles.dGrid : null} id="dGridHolder">
+          <div className={(!isEmpty) ? Styles.dGrid : null} id="dGridHolder">
             {!isEmpty ? (
-              pagination?.map((month, _i) => {
+              pagination?.map((month, _i) => {              
                 if (month.content?.length) {
                   if (month.content.length < 5) {
                     let div = document.getElementById("dGridHolder");
@@ -336,7 +333,7 @@ useEffect(()=>{
                     let ProductInCart = isProductCarted(product.Id);
                     if (true) {
                       let listPrice = Number(product?.usdRetail__c?.replace("$", "")?.replace(",", ""));
-                      if(isNaN(listPrice)){
+                      if (isNaN(listPrice)) {
                         listPrice = product?.usdRetail__c;
                       }
                       let salesPrice = 0;
@@ -366,7 +363,7 @@ useEffect(()=>{
                               {imageLoading[product.Id] ? (
                                 <LoaderV2 width={100} height={100} />
                               ) : (
-                                <img key={product.Id} src={product.ProductImage ?? "\\assets\\images\\dummy.png"} alt={product.Name} height={212} width={212} onClick={() => {
+                                <ImageHandler image={{src:product.ProductImage ?? "\\assets\\images\\dummy.png",alt:product.Name}} height={212} width={212} onClick={() => {
                                   setProductDetailId(product.Id);
                                 }} onLoad={() => handleImageLoad(product.Id)} />
                               )}
@@ -381,68 +378,68 @@ useEffect(()=>{
                           >
                             {product?.Name?.substring(0, 15)}...
                           </p>
-                          {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> :ProductInCart?<small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
-                          <p className={Styles.priceHolder}> 
-                          {(!isNaN(salesPrice)&&!isNaN(listPrice)) ?salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div>:ProductInCart?<div className={Styles.priceCrossed}>{listPrice ? '$'+listPrice?.toFixed(2):null}</div>:null:null}
-                          &nbsp;
-                            <div>${ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price).toFixed(2)}</Link> : !isNaN(salesPrice)?salesPrice.toFixed(2):listPrice ?? "-- . --"}</div>
-                            </p>
-                            <div className={Styles.linkHolder}>
-                              {ProductInCart ? (
-                                <>
+                          {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> : ProductInCart ? <small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
+                          <p className={Styles.priceHolder}>
+                            {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div> : ProductInCart ? <div className={Styles.priceCrossed}>{listPrice ? '$' + listPrice?.toFixed(2) : null}</div> : null : null}
+                            &nbsp;
+                            <div>{ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price)?.toFixed(2)}</Link> : !isNaN(salesPrice) ? "$"+salesPrice?.toFixed(2) : listPrice+"" ?? "-- . --"}</div>
+                          </p>
+                          <div className={Styles.linkHolder}>
+                            {ProductInCart ? (
+                              <>
 
-                                  {/* <b className={Styles.priceHolder}>{inputPrice * orders[product?.Id]?.quantity}</b> */}
-                                  <div className="d-flex">
-                                    <QuantitySelector
-                                      min={product?.Min_Order_QTY__c || 0}
-                                      value={ProductInCart?.items?.qty}
-                                      onChange={(quantity) => {
-                                        updateProductQty(
-                                          product.Id,
-                                          quantity
-                                        );
-                                      }}
-                                    />
-                                    <button
-                                      className="ml-4"
-                                      onClick={() =>
-                                        removeProduct(product.Id)
-                                      }
-                                    >
-                                      <DeleteIcon fill="red" />
-                                    </button>
-                                  </div>
-                                </>
-                              ) : (
-                                
-                                <p className={Styles.btnHolder} onClick={() => {
-                                  if (product.ProductUPC__c && product.ProductCode && product.IsActive && (product?.PricebookEntries?.records?.length && product?.PricebookEntries?.records?.[0]?.IsActive)&&(!isNaN(salesPrice)&&!isNaN(listPrice))&&isDateEqualOrGreaterThanToday(product.Launch_Date__c)) {
-                                    onQuantityChange(
-                                      product,
-                                      product?.Min_Order_QTY__c || 1,
-                                    )
-                                  } else {
-                                    setModalShow(true)
-                                  }
-                                  
+                                {/* <b className={Styles.priceHolder}>{inputPrice * orders[product?.Id]?.quantity}</b> */}
+                                <div className="d-flex">
+                                  <QuantitySelector
+                                    min={product?.Min_Order_QTY__c || 0}
+                                    value={ProductInCart?.items?.qty}
+                                    onChange={(quantity) => {
+                                      updateProductQty(
+                                        product.Id,
+                                        quantity
+                                      );
+                                    }}
+                                  />
+                                  <button
+                                    className="ml-4"
+                                    onClick={() =>
+                                      removeProduct(product.Id)
+                                    }
+                                  >
+                                    <DeleteIcon fill="red" />
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+
+                              <p className={Styles.btnHolder} onClick={() => {
+                                if (product.ProductUPC__c && product.ProductCode && product.IsActive && (product?.PricebookEntries?.records?.length && product?.PricebookEntries?.records?.[0]?.IsActive) && (!isNaN(salesPrice) && !isNaN(listPrice)) && isDateEqualOrGreaterThanToday(product.Launch_Date__c)) {
+                                  onQuantityChange(
+                                    product,
+                                    product?.Min_Order_QTY__c || 1,
+                                  )
+                                } else {
+                                  setModalShow(true)
                                 }
+
+                              }
                               }>
-                                  add to Bag {!product.ProductUPC__c || !product.ProductCode || !product.IsActive || (!product?.PricebookEntries?.records?.length || !product?.PricebookEntries?.records?.[0]?.IsActive&&(!isNaN(salesPrice)&&!isNaN(listPrice))||!isDateEqualOrGreaterThanToday(product.Launch_Date__c))?<small className={Styles.soonHolder}>coming soon</small>:null}
-                                </p>)}
-                            </div>
+                                add to Bag {!product.ProductUPC__c || !product.ProductCode || !product.IsActive || (!product?.PricebookEntries?.records?.length || !product?.PricebookEntries?.records?.[0]?.IsActive && (!isNaN(salesPrice) && !isNaN(listPrice)) || !isDateEqualOrGreaterThanToday(product.Launch_Date__c)) ? <small className={Styles.soonHolder}>coming soon</small> : null}
+                              </p>)}
+                          </div>
                         </div>
 
                       );
                     }
                   });
-                }else{
-                //   return <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]">
-                //   <div className="col-4">
-                //     <p className="m-0 fs-2 text-center font-[Montserrat-400] text-[14px] tracking-[2.20px] text-center">
-                //       No data found
-                //     </p>
-                //   </div>
-                // </div>
+                } else {
+                    return <div className="row d-flex flex-column justify-content-center align-items-center lg:min-h-[300px] xl:min-h-[400px]" style={{width : '100vw'}}>
+                    <div className="col-4">
+                      <p className="m-0 fs-2 text-center font-[Montserrat-400] text-[14px] tracking-[2.20px] text-center">
+                        No data found
+                      </p>
+                    </div>
+                  </div>
                 }
               })
             ) : (

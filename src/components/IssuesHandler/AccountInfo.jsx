@@ -8,7 +8,9 @@ import { useEffect, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { uploadFileSupport } from "../../lib/store";
 import ModalPage from "../Modal UI";
+import Swal from "sweetalert2";
 const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, setSubmitForm,salesRepId }) => {
+    console.log("hello")
     const navigate = useNavigate();
     const [contactList, setContactList] = useState([]);
     const [brandList, setBrandList] = useState([]);
@@ -44,6 +46,7 @@ const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, se
             />
         );
     };
+    
     const SearchableSelect1 = (FieldProps) => {
         return (
             <Select
@@ -111,28 +114,38 @@ const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, se
             });
     }
     function handleChange(e) {
-        let tempFile = [...files];
-        let reqfiles = e.target.files;
+        let tempFile = [...files]; // Existing files
+        let reqfiles = e.target.files; // Newly selected files
+    
         if (reqfiles) {
-            if (reqfiles.length > 0) {
-                Object.keys(reqfiles).map((index) => {
-                    let url = URL.createObjectURL(reqfiles[index])
-                    if (url) {
-                        tempFile.push({ preview: url, file: reqfiles[index] });
-                    }
-                    // this thoughing me Failed to execute 'createObjectURL' on 'URL': Overload resolution failed?
-                })
+            Array.from(reqfiles).forEach((file) => {
+                let url = URL.createObjectURL(file); // Create a preview URL
+                tempFile.push({ preview: url, file });
+            });
+              // Check if the total number of files exceeds 5
+              if (tempFile.length > 5) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Limit Exceeded',
+                    text: 'You cannot add more than 5 files.',
+                    confirmButtonColor: '#000',
+                }).then(() => {
+                    e.target.value = ''; // Clear the input
+                });
+                return; // Stop further execution
             }
+            setFile(tempFile); // Update state with valid files
+            console.log(`Total files selected: ${tempFile.length}`); // Log the total number of files
         }
-        setFile(tempFile);
     }
+
 
     const fileRemoveHandler = (index) => {
         let tempFile = [...files];
         tempFile.splice(index, 1)
         setFile(tempFile);
     }
-
+console.log(files , "files")
     return (
         <>
         <ModalPage

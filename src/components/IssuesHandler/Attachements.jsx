@@ -5,25 +5,44 @@ import ModalPage from "../Modal UI";
 import { MdImage } from "react-icons/md";
 import { FaFileExcel } from "react-icons/fa";
 import { AiOutlineFilePdf, AiOutlineVideoCamera } from "react-icons/ai";
-
-const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler }) => {
+import Swal from 'sweetalert2';
+const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,desc=null }) => {
+   
     const [confirm, setConfirm] = useState(false);
     function handleChange(e) {
-        let tempFile = [...files];
-        let reqfiles = e.target.files;
-        if (reqfiles) {
-            if (reqfiles.length > 0) {
-                Object.keys(reqfiles).map((index) => {
-                    let url = URL.createObjectURL(reqfiles[index])
-                    if (url) {
-                        tempFile.push({ preview: url, file: reqfiles[index] });
-                    }
-                    // this thoughing me Failed to execute 'createObjectURL' on 'URL': Overload resolution failed?
-                })
-            }
-        }
-        setFile(tempFile);
-    }
+      let tempFile = [...files]; // Copy current files
+      let reqfiles = e.target.files; // Get selected files
+  
+      if (reqfiles && reqfiles.length > 0) {
+          // Iterate through the selected files
+          Object.keys(reqfiles).forEach((index) => {
+              try {
+                  let url = URL.createObjectURL(reqfiles[index]); // Generate file preview URL
+                  if (url) {
+                      tempFile.push({ preview: url, file: reqfiles[index] });
+                  }
+              } catch (error) {
+                  console.error("Error creating object URL:", error.message);
+              }
+          });
+  
+          // Check if the total number of files exceeds 5
+          if (tempFile.length > 5) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Limit Exceeded',
+                  text: 'You cannot add more than 5 files.',
+                  confirmButtonColor: '#000',
+              }).then(() => {
+                  e.target.value = ''; // Clear the input
+              });
+              return; // Stop further execution
+          }
+      }
+  
+      setFile?.(tempFile); // Update the state
+      console.log(tempFile.length, "temp files");
+  }
     const handleFileChange = (event) => {
         const files = event.target.files;
         const images = [];
@@ -52,7 +71,7 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler }
     const fileRemoveHandler = (index) => {
         let tempFile = [...files];
         tempFile.splice(index, 1)
-        setFile(tempFile);
+        setFile?.(tempFile);
     }
     const UploadFileCards = () => {
         return files.map((file, index) => {
@@ -159,11 +178,15 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler }
             <div className={Styles.attachContainer}>
                 <div className={Styles.dFlex}>
                     <div className={Styles.descholder}>
-                        <p className={Styles.subTitle}>Describe you Problem</p>
-                        <textarea name="desc" id="" className={Styles.textAreaPut} onKeyUp={(e) => setDesc(e.target.value)}></textarea>
+                        <p className={Styles.subTitle}>Describe your Problem</p>
+                        <textarea name="desc" id="" className={Styles.textAreaPut} 
+                                     value={desc}
+                                     onChange={(e) => setDesc(e.target.value)} 
+                                     onKeyUp={(e) => setDesc(e.target.value)}
+                        ></textarea>
                     </div>
                     <div className={Styles.attachHolder}>
-                        <p className={Styles.subTitle}>upload some Attachements</p>
+                        <p className={Styles.subTitle}>upload some Attachments</p>
                         <label className={Styles.attachLabel} for="attachement"><div><div className={Styles.attachLabelDiv}><BiUpload /></div></div></label>
                         <input type="file" style={{ width: 0, height: 0 }} id="attachement" onChange={handleChange} multiple accept="image/*" />
                         <div className={Styles.imgHolder}>

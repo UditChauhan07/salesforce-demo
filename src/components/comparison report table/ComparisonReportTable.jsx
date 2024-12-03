@@ -13,7 +13,7 @@ const ComparisonReportTable = ({ comparisonData }) => {
       {comparisonData ? (
         <>
           <div className={`d-flex p-3 ${styles.tableBoundary} mb-5`}>
-            <div className="table-responsive overflow-scroll position-relative" style={{ maxHeight: "60vh", minHeight: "40vh", width: "100vw", }}>
+            <div className="table-responsive overflow-x-auto position-relative" style={{ maxHeight: "60vh", minHeight: "40vh", width: "100vw", }}>
               <table id="salesReportTable" className="table table-responsive">
                 <thead>
                   <tr>

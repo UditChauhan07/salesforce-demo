@@ -10,13 +10,14 @@ import { Link } from "react-router-dom";
 import ContentLoader from "react-content-loader";
 import ProductDetails from "../../pages/productDetails";
 import dataStore from "../../lib/dataStore";
+import ImageHandler from "../loader/ImageHandler";
 
 const BrandDetailCard = ({ brandId }) => {
     const brand = brandDetails[brandId];
-    console.log(brand , "brand")
     const [topProducts, setTopProduct] = useState({ isLoaded: false, data: [] })
     const [productImages, setProductImages] = useState({ isLoaded: false, images: {} });
     const [productId, setProductId] = useState()
+    const [errorImage, setErrorImg] = useState(false);
     const d = new Date();
     let monthIndex = d.getMonth();
     useEffect(() => {
@@ -36,26 +37,28 @@ const BrandDetailCard = ({ brandId }) => {
         }
         GetAuthData().then((user) => {
             dataStore.getPageData("/top-products" + brandId, () => topProduct({ manufacturerId: brandId })).then((products) => {
-                setTopProduct({ isLoaded: true, data: products.data })
-                let productCode = "";
-                products.data?.map((product, index) => {
-                    productCode += `'${product.ProductCode}'`
-                    if (products.data.length - 1 != index) productCode += ', ';
-                })
-                getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
-                    console.log({ res });
-                    if (res) {
-                        if (data[brandId]) {
-                            data[brandId] = { ...data[brandId], ...res }
-                        } else {
-                            data[brandId] = res
+                setTopProduct({ isLoaded: true, data: products?.data || [] })
+                if (products) {
+
+                    let productCode = "";
+                    products.data?.map((product, index) => {
+                        productCode += `'${product.ProductCode}'`
+                        if (products.data.length - 1 != index) productCode += ', ';
+                    })
+                    getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
+                        if (res) {
+                            if (data[brandId]) {
+                                data[brandId] = { ...data[brandId], ...res }
+                            } else {
+                                data[brandId] = res
+                            }
+                            ShareDrive(data)
                         }
-                        ShareDrive(data)
-                    }
-                    setProductImages({ isLoaded: true, images: res ?? {} });
-                }).catch((err) => {
-                    console.log({ aaa111: err });
-                })
+                        setProductImages({ isLoaded: true, images: res ?? {} });
+                    }).catch((err) => {
+                        console.log({ aaa111: err });
+                    })
+                }
             }).catch((productErr) => {
                 console.log({ productErr });
             })
@@ -107,7 +110,8 @@ const BrandDetailCard = ({ brandId }) => {
                     <div className="col-xl-8 col-lg-8 col-md-12 col-sm-12 m-auto ">
                         <div className="row">
                             <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
-                                <img className={`img-fluid ${Styles.brandLogoHolder}`} src={`${originAPi}/brandImage/${brandId}.png`} />
+                                {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0].ManufacturerName__c : null}</p> :
+                                    <img style={{ width: '65%' }} className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
                             </div>
                             {brand?.tagLine ?
                                 <div className="col-xl-5 col-lg-6 col-md-12 col-sm-12 m-auto ">
@@ -136,17 +140,8 @@ const BrandDetailCard = ({ brandId }) => {
                                                 <Link to={'/my-retailers?manufacturerId=' + brandId}>
                                                     Shop The Collection
                                                 </Link>
-                                                <div className="fitContent" onClick={() => setProductId(item.Id)}>
-                                                    {(productImages?.isLoaded || item.ProductImage) ? (
-                                                        <img className="zoomInEffect"
-                                                            style={{ maxHeight: '320px', width: 'auto', margin: '10px auto' }}
-                                                            src={item.ProductImage ? item.ProductImage : productImages?.images?.[item.ProductCode]?.ContentDownloadUrl ?? "\\assets\\images\\dummy.png"}
-                                                        />
-                                                    ) : (
-                                                        <div className="d-grid place-content-center" style={{ height: '300px', margin: 'auto' }}>
-                                                            <LoaderV2 mods={{ height: '150px', width: '150px' }} />
-                                                        </div>
-                                                    )}
+                                                <div className="fitContent d-flex justify-content-center align-items-center" onClick={() => setProductId(item.Id)}>
+                                                    <ImageHandler image={{ src: item.ProductImage ?? productImages?.images?.[item.ProductCode]?.ContentDownloadUrl ?? productImages?.images?.[item.ProductCode] ?? "dummy.png" }} />
                                                 </div>
                                             </div>
                                         </div>

@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
 import { FilterItem } from "../../components/FilterItem";
 import FilterSearch from "../../components/FilterSearch";
+import dataStore from "../../lib/dataStore";
 // Styling
 const styles = {
     optionContainer: {
@@ -68,15 +69,20 @@ const styles = {
 const AuditReport = () => {
     const [isShowBrandModal, setIsShowBrandModal] = useState(false);
     const { data: manufacturers, isLoading, error } = useManufacturer();
+    const [manufacturerList, setManufacturerList] = useState([]);
+    useEffect(() => {
+        dataStore.subscribe("/brands", (data) => setManufacturerList(data));
+        if (manufacturers?.data?.length) {
+            dataStore.updateData("/brands", manufacturers.data);
+            setManufacturerList(manufacturers.data)
+        }
+        return () => dataStore.unsubscribe("/brands", (data) => setManufacturerList(data));
+    }, [manufacturers?.data])
     const [isPdfGenerated, setIsPdfGenerated] = useState(false)
     const [brandSelect, setbrandSelected] = useState();
     const [brandStep, setBrandStep] = useState(0);
     const [brandPages, setBrandPages] = useState({ isLoaded: false, value: 0 });
     const [totalAccount, setTotalAccount] = useState();
-    const [currentFileName, setCurrentFileName] = useState('');
-    const [selectedSalesRepId, setSelectedSalesRepId] = useState();
-    const [userData, setUserData] = useState({});
-    const [hasPermission, setHasPermission] = useState(null);
     const navigate = useNavigate()
     const [manufacturerFilter, setManufacturerFilter] = useState();
     const [searchBy, setSearchBy] = useState("");
@@ -100,10 +106,10 @@ const AuditReport = () => {
         fetchPermissions(); // Fetch permissions on mount
     }, []);
     useEffect(() => {
+        dataStore.subscribe("/audit", (data) => setAuditReport({ isLoaded: true, data: data }))
         GetAuthData().then((user) => {
             setToken(user.x_access_token);
-            getAuditReportView({ key: user.x_access_token }).then((reportRes) => {
-                console.log({ reportRes });
+            dataStore.getPageData("/audit", () => getAuditReportView({ key: user.x_access_token })).then((reportRes) => {
                 setAuditReport({ isLoaded: true, data: reportRes })
 
             }).catch((reportErr) => {
@@ -114,6 +120,7 @@ const AuditReport = () => {
             console.log({ userErr });
 
         })
+        return () => dataStore.unsubscribe("/audit", (data) => setAuditReport({ isLoaded: true, data: data }))
     }, [])
 
     const onCloseModal = () => {
@@ -187,7 +194,7 @@ const AuditReport = () => {
             }
         };
 
-        
+
 
 
         return (
@@ -260,7 +267,7 @@ const AuditReport = () => {
                             {brandPages.isLoaded ? <small className="d-block w-[100%] text-right mb-2">Total Accounts: <b>{totalAccount}</b></small> : null}
                             <ReportDownloadComparison /></section></div>
                     : brandStep == 0 ?
-                        <SelectBrandModel brands={manufacturers?.data} onChange={BrandPaginateHanlder} onClose={onCloseModal} />
+                        <SelectBrandModel brands={manufacturerList} onChange={BrandPaginateHanlder} onClose={onCloseModal} />
                         :
                         null}
             </>
@@ -272,26 +279,26 @@ const AuditReport = () => {
         if (!searchBy && !manufacturerFilter) {
             return auditReport.data;
         }
-    
+
         return auditReport.data?.map((report) => {
             let matchesSearch = true;
             let filteredBrands = report.Brands || []; // Ensure we handle the case where there are no brands
-    
+
             // Check if searchBy matches Name or Owner.Name
             if (searchBy) {
                 matchesSearch =
                     report?.Name?.toLowerCase().includes(searchBy.toLowerCase()) ||
                     report?.Owner?.Name?.toLowerCase().includes(searchBy.toLowerCase());
             }
-            
-    
+
+
             // Filter Brands based on manufacturerFilter
             if (manufacturerFilter) {
                 filteredBrands = filteredBrands.filter(
                     (brand) => brand.ManufacturerId__c === manufacturerFilter
                 );
             }
-    
+
             // If the report matches the search or has filtered brands, return the report
             if (matchesSearch && (filteredBrands.length > 0 || !manufacturerFilter)) {
                 return {
@@ -299,26 +306,26 @@ const AuditReport = () => {
                     Brands: filteredBrands.length > 0 ? filteredBrands : report.Brands,  // Return filtered brands or all brands if no manufacturerFilter
                 };
             }
-    
+
             return null; // Return null if neither search nor manufacturer filter matches
         }).filter(report => report); // Remove any null reports
     }, [auditReport, manufacturerFilter, searchBy]);
-    
-        useEffect(()=>{},[searchBy])
-        const reset = ()=>{
-            setSearchBy(""); setManufacturerFilter();
-        }
+
+    useEffect(() => { }, [searchBy])
+    const reset = () => {
+        setSearchBy(""); setManufacturerFilter();
+    }
 
 
     return (<AppLayout
         filterNodes={
             <div className="d-flex justify-content-between m-auto" style={{ width: '99%' }}>
-                {permissions?.modules?.reports?.auditReport.create?
-                <button className="border px-2 py-1 leading-tight d-flex" onClick={() => setIsShowBrandModal(true)}>
+                {permissions?.modules?.reports?.auditReport.create ?
+                    <button className="border px-2 py-1 leading-tight d-flex" onClick={() => setIsShowBrandModal(true)}>
 
-                    <MdOutlineDownload size={16} className="m-auto" />
-                    <small style={{ fontSize: '9px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Brand <br />Report</small>
-                </button>:<p></p>}
+                        <MdOutlineDownload size={16} className="m-auto" />
+                        <small style={{ fontSize: '9px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Brand <br />Report</small>
+                    </button> : <p></p>}
                 <div>
                     <div className="d-flex gap-4">
                         <FilterItem
@@ -326,7 +333,7 @@ const AuditReport = () => {
                             label="All Brands"
                             name="AllManufacturers1"
                             value={manufacturerFilter}
-                            options={manufacturers?.data?.map((manufacturer) => ({
+                            options={manufacturerList?.map((manufacturer) => ({
                                 label: manufacturer.Name,
                                 value: manufacturer.Id,
                             })) || []}
@@ -352,7 +359,7 @@ const AuditReport = () => {
                 {isPdfGenerated ? <><img src="https://i.giphy.com/7jtU9sxHNLZuv8HZCa.webp" width="480" height="480" /><p className="text-center mt-2">{`Creating PDF Audit Report for ${brandSelect?.Name}`}</p></> :
                     auditReport.isLoaded ?
                         <div style={{ width: '90vw', margin: '2rem auto' }}><AuditReportTable auditReport={filteredData || []} /></div>
-                        : <div className="col-12"><Loading height={'50vh'}/></div>
+                        : <div className="col-12"><Loading height={'50vh'} /></div>
                 }
 
             </div></>}

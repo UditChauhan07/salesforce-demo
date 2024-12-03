@@ -57,6 +57,7 @@ function App() {
   return (
     <UserProvider>
       <BagProvider>
+      
         <BrowserRouter>
           <Routes>
             <Route path="/sales-report" element={<SalesReport />}></Route>

@@ -9,7 +9,7 @@ import Loading from "../Loading";
 import { FilterItem } from "../FilterItem";
 import FilterSearch from "../FilterSearch";
 import ModalPage from "../Modal UI";
-import { GetAuthData, ShareDrive, fetchBeg, getProductImageAll, getProductList, salesRepIdKey, sortArrayHandler } from "../../lib/store";
+import { GetAuthData, ShareDrive, defaultLoadTime, fetchBeg, getProductImageAll, getProductList, salesRepIdKey, sortArrayHandler } from "../../lib/store";
 import Styles from "../Modal UI/Styles.module.css";
 import { BackArrow, CloseButton } from "../../lib/svg";
 import AppLayout from "../AppLayout";
@@ -19,6 +19,7 @@ import SpreadsheetUploader from "./OrderForm";
 import { CSVLink } from "react-csv";
 import { useCart } from "../../context/CartContext";
 import dataStore from "../../lib/dataStore";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const groupBy = function (xs, key) {
@@ -30,7 +31,6 @@ const groupBy = function (xs, key) {
 
 function Product() {
   const [emptyBag, setEmptyBag] = useState(false);
-
   const { user } = useAuth();
   const [categoryFilters, setCategoryFilters] = useState([]);
   const [productTypeFilter, setProductTypeFilter] = useState("Wholesale");
@@ -182,16 +182,16 @@ function Product() {
     if (!(localStorage.getItem("ManufacturerId__c") && localStorage.getItem("AccountId__c"))) {
       setRedirect(true);
     }
-    let productData = productRes.data.records || []
+    let productData = productRes?.data?.records || []
     productData.map((element) => {
       if (element.AttachedContentDocuments) {
-        console.log({ element });
+  
       }
     })
-    let discount = productRes.discount;
+    let discount = productRes?.discount||{};
 
 
-    setProductCartSchema({ testerInclude: productRes.discount?.testerInclude, sampleInclude: productRes.discount?.sampleInclude })
+    setProductCartSchema({ testerInclude: productRes?.discount?.testerInclude, sampleInclude: productRes?.discount?.sampleInclude })
     setProductlist({ data: productData, isLoading: true, discount })
 
     //version 1
@@ -230,8 +230,7 @@ function Product() {
     })
   }
 
-  useEffect(() => {
-
+  const getProductListData = () => {
     GetAuthData().then((user) => {
       let rawData = {
         key: user.access_token,
@@ -239,32 +238,44 @@ function Product() {
         Manufacturer: localStorage.getItem("ManufacturerId__c"),
         AccountId__c: localStorage.getItem("AccountId__c"),
       }
-      dataStore.subscribe("/product" + JSON.stringify({
-        Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
-        Manufacturer: localStorage.getItem("ManufacturerId__c"),
-        AccountId__c: localStorage.getItem("AccountId__c"),
-      }), readyProductListHandle)
-      setSalesrepid(localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c)
       dataStore.getPageData("/product" + JSON.stringify({
         Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
         Manufacturer: localStorage.getItem("ManufacturerId__c"),
         AccountId__c: localStorage.getItem("AccountId__c"),
       }), () => getProductList({ rawData })).then((productRes) => {
         readyProductListHandle(productRes);
-        return () => {
-          dataStore.unsubscribe("/product" + JSON.stringify({
-            Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
-            Manufacturer: localStorage.getItem("ManufacturerId__c"),
-            AccountId__c: localStorage.getItem("AccountId__c"),
-          }), readyProductListHandle)
-        }
       }).catch((errPro) => {
         console.log({ errPro });
       })
     }).catch((err) => {
       console.log({ err });
     })
+  }
+
+  useEffect(() => {
+
+    GetAuthData().then((user) => {
+      dataStore.subscribe("/product" + JSON.stringify({
+        Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
+        Manufacturer: localStorage.getItem("ManufacturerId__c"),
+        AccountId__c: localStorage.getItem("AccountId__c"),
+      }), readyProductListHandle)
+      setSalesrepid(localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c)
+      getProductListData();
+      return () => {
+        dataStore.unsubscribe("/product" + JSON.stringify({
+          Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
+          Manufacturer: localStorage.getItem("ManufacturerId__c"),
+          AccountId__c: localStorage.getItem("AccountId__c"),
+        }), readyProductListHandle)
+      }
+
+    }).catch((err) => {
+      console.log({ err });
+    })
   }, []);
+
+  useBackgroundUpdater(getProductListData,defaultLoadTime);
 
 
   const redirecting = () => {
@@ -340,7 +351,6 @@ function Product() {
     const { getOrderTotal } = useCart();
     return Number(getOrderTotal() || 0).toFixed(2);
   }
-
 
   return (
     <>
@@ -449,7 +459,7 @@ function Product() {
                         orderData={{ accountName: localStorage.getItem("Account"), accountId: localStorage.getItem("AccountId__c"), brandId: localStorage.getItem("ManufacturerId__c") }}
                         btnClassName={Styles.modalButton}
                         setOrderFromModal={setOrderFromModal}
-                        salesRepId = {salesRepId}
+                        salesRepId={salesRepId}
                       />
                     </div>
                     <div className="d-flex justify-content-center">
@@ -574,7 +584,7 @@ function Product() {
                         </div>
                         <div className={`${styles.TotalSide} `}>
                           <div className="d-flex align-items-start flex-column">
-                            <h4>Total Number of Products : <OrderQuantity /></h4>
+                            <h4>Total Number of Products in Bag : <OrderQuantity /></h4>
                             <h4>Total Price : $<OrderPrice /></h4>
                           </div>
                           <button

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { GetAuthData, admins, formatNumber, getTierReportHandler, salesRepIdKey } from "../../lib/store"
+import { GetAuthData, admins, formatNumber, getTierReportHandler, } from "../../lib/store"
 import Loading from "../../components/Loading";
 import AppLayout from "../../components/AppLayout";
 import Styles from "./index.module.css";
@@ -13,6 +13,8 @@ import MapGenerator from "../../components/Map";
 import classNames from "classnames";
 import { getPermissions } from "../../lib/permission";
 import PermissionDenied from "../../components/PermissionDeniedPopUp/PermissionDenied";
+import dataStore from "../../lib/dataStore";
+import DynamicTable from "../../utilities/Hooks/DynamicTable";
 const center = {
     lat: 38,
     lng: -97
@@ -28,9 +30,32 @@ const Tier = () => {
     const [ext, setExt] = useState(false);
     const [year, setYear] = useState(dYear)
     const [tier, setTier] = useState({ isLoad: false, data: [], getSalesHolder: {}, currentYearRevenue: 0, previousYearRevenue: 0 });
-    const [permissions, setPermissions] = useState(null);
+
+    const TierReady = (data) => {
+        if (data) {
+            let currentYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
+            let previousYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year - 1], 0);
+            setTier({ isLoad: true, data: data?.salesArray ?? [], getSalesHolder: data?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
+        }
+    }
+    const GetDataHandler = () => {
+        GetAuthData().then((user) => {
+            if (admins.includes(user.Sales_Rep__c)) {
+                dataStore.getPageData("/TierStanding", () => getTierReportHandler({ token: user.x_access_token, year: year })).then((res) => {
+                    TierReady(res)
+
+                }).catch((resErr) => {
+                    console.log({ resErr });
+                })
+            } else {
+
+            }
+        })
+    }
     useEffect(() => {
+        dataStore.subscribe("/TierStanding", TierReady)
         GetDataHandler()
+        return () => dataStore.unsubscribe("/TierStanding", TierReady)
     }, [])
     //define marker
     const MarkLocations = useMemo(() => {
@@ -95,22 +120,7 @@ const Tier = () => {
         return response;
     }, [tier?.data])
 
-    const GetDataHandler = () => {
-        GetAuthData().then((user) => {
-            if (admins.includes(user.Sales_Rep__c)) {
-                getTierReportHandler({ token: user.x_access_token, year: year }).then((res) => {
-                    let currentYearRevenue = res?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
-                    let previousYearRevenue = res?.salesArray.reduce((acc, curr) => acc + curr[year - 1], 0);
-                    setTier({ isLoad: true, data: res?.salesArray ?? [], getSalesHolder: res?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
 
-                }).catch((resErr) => {
-                    console.log({ resErr });
-                })
-            } else {
-                
-            }
-        })
-    }
 
     const excelExportHandler = () => {
         const ws = XLSX.utils.json_to_sheet(csvData());
@@ -147,33 +157,30 @@ const Tier = () => {
     }
 
 
-useEffect(()=>{
-    const fetchData = async()=>{
-        try {
-            const userPermissions = await getPermissions()
-            setPermissions(userPermissions);
-        if(userPermissions?.modules?.reports?.accountTier?.view=== false){ 
-            navigate('/dashboard');  PermissionDenied();
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userPermissions = await getPermissions()
+                if (userPermissions?.modules?.reports?.accountTier?.view === false) {
+                    navigate('/dashboard'); PermissionDenied();
+                }
+            } catch (error) {
+                console.log("Permission Error ", error)
+            }
         }
-        } catch (error) {
-           console.log("Permission Error " , error) 
-        }
-    }
-    fetchData()
-} , [])
+        fetchData()
+    }, [])
 
-
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
     return (
         <AppLayout
             filterNodes={
                 <>
-            
-                <button className="border px-2 d-grid py-1 leading-tight d-grid" onClick={excelExportHandler}>
-                <MdOutlineDownload size={16} className="m-auto" />
-                <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
-            </button>
-               
+
+                    <button className="border px-2 d-grid py-1 leading-tight d-grid" onClick={excelExportHandler}>
+                        <MdOutlineDownload size={16} className="m-auto" />
+                        <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>export</small>
+                    </button>
+
                 </>}
         >
             <section>
@@ -288,38 +295,35 @@ useEffect(()=>{
                 <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
                     <div className="" style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
                         {isLoad ?
-                            <table>
-                                <thead>
-                                    <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading}`}>Account</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`}>Store Street</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`}>City</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`}>State</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`}>Zip</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`}>Brand</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`}>Sales Rep</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ width: '150px' }}>{year - 1} revenue</th>
-                                    <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ width: '150px' }}>{year} revenue</th>
-                                    <th className={`${Styles.th} ${Styles.stickySecondLastColumnHeading}`} style={{ width: '150px' }}>Existing Tier</th>
-                                    <th className={`${Styles.th} ${Styles.stickyLastColumnHeading}`} style={{ width: '150px' }}>Suggested Tier</th>
-                                </thead>
-                                <tbody>
-                                    {data.map((item, key) => (
-                                        <tr key={key}>
-                                            <td className={`${Styles.td} ${Styles.stickyFirstColumn}`}>{item.Name}</td>
-                                            <td className={`${Styles.td}`}>{item.StoreStreet ?? 'NA'}</td>
-                                            <td className={`${Styles.td}`}>{item.StoreCity ?? 'NA'}</td>
-                                            <td className={`${Styles.td}`}>{item.StoreState ?? 'NA'}</td>
-                                            <td className={`${Styles.td}`}>{item.StoreZip ?? 'NA'}</td>
-                                            <td className={`${Styles.td}`}>{item.BrandName}</td>
-                                            <td className={`${Styles.td}`}>{item.SalesRepName}</td>
-                                            <td className={`${Styles.td}`}>${formentAcmount(item[2023])}</td>
-                                            <td className={`${Styles.td}`}>${formentAcmount(item[2024])}</td>
-                                            <td className={`${Styles.td} ${Styles.stickySecondLastColumn}`}>{item.Tier ?? 'NA'}</td>
-                                            <td className={`${Styles.td} ${Styles.stickyLastColumn}`}>{item.Suggested}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            <DynamicTable mainData={data} head={<thead>
+                                <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading}`}>Account</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`}>Store Street</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`}>City</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`}>State</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`}>Zip</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`}>Brand</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`}>Sales Rep</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ width: '150px' }}>{year - 1} revenue</th>
+                                <th className={`${Styles.th} ${Styles.stickyMonth}`} style={{ width: '150px' }}>{year} revenue</th>
+                                <th className={`${Styles.th} ${Styles.stickySecondLastColumnHeading}`} style={{ width: '150px' }}>Existing Tier</th>
+                                <th className={`${Styles.th} ${Styles.stickyLastColumnHeading}`} style={{ width: '150px' }}>Suggested Tier</th>
+                            </thead>}>
+                                {(item) => (
+                                    <>
+                                        <td className={`${Styles.td} ${Styles.stickyFirstColumn}`}>{item.Name}</td>
+                                        <td className={`${Styles.td}`}>{item.StoreStreet ?? 'NA'}</td>
+                                        <td className={`${Styles.td}`}>{item.StoreCity ?? 'NA'}</td>
+                                        <td className={`${Styles.td}`}>{item.StoreState ?? 'NA'}</td>
+                                        <td className={`${Styles.td}`}>{item.StoreZip ?? 'NA'}</td>
+                                        <td className={`${Styles.td}`}>{item.BrandName}</td>
+                                        <td className={`${Styles.td}`}>{item.SalesRepName}</td>
+                                        <td className={`${Styles.td}`}>${formentAcmount(item[2023])}</td>
+                                        <td className={`${Styles.td}`}>${formentAcmount(item[2024])}</td>
+                                        <td className={`${Styles.td} ${Styles.stickySecondLastColumn}`}>{item.Tier ?? 'NA'}</td>
+                                        <td className={`${Styles.td} ${Styles.stickyLastColumn}`}>{item.Suggested}</td>
+                                    </>
+                                )}
+                            </DynamicTable>
                             : <Loading height={'50vh'} />}
                     </div>
                 </div>

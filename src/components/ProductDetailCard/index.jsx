@@ -9,8 +9,8 @@ import { useCart } from "../../context/CartContext";
 import ModalPage from "../Modal UI";
 
 const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
-  const { updateProductQty, removeProduct } = useCart();
   console.log({product})
+  const { updateProductQty, removeProduct } = useCart();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState();
   const [modalShow,setModalShow]= useState(false);
   if (!product) {
@@ -28,18 +28,20 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
 
   let fakeProductSlider = [
     {
-      icon: "<svg id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 122.88 114.58'><title>product</title><path d='M118.13,9.54a3.25,3.25,0,0,1,2.2.41,3.28,3.28,0,0,1,2,3l.57,78.83a3.29,3.29,0,0,1-1.59,3L89.12,113.93a3.29,3.29,0,0,1-2,.65,3.07,3.07,0,0,1-.53,0L3.11,105.25A3.28,3.28,0,0,1,0,102V21.78H0A3.28,3.28,0,0,1,2,18.7L43.89.27h0A3.19,3.19,0,0,1,45.63,0l72.5,9.51Zm-37.26,1.7-24.67,14,30.38,3.88,22.5-14.18-28.21-3.7Zm-29,20L50.75,64.62,38.23,56.09,25.72,63.17l2.53-34.91L6.55,25.49V99.05l77.33,8.6V35.36l-32-4.09Zm-19.7-9.09L56.12,8,45.7,6.62,15.24,20l16.95,2.17ZM90.44,34.41v71.12l25.9-15.44-.52-71.68-25.38,16Z'/></svg>",
-    },
+      src: "\\assets\\images\\dummy.png",
+    }
   ];
 
   let discount = 0;
   let selAccount = {};
+ 
   let listPrice = Number(product?.data?.usdRetail__c?.replace("$", "")?.replace(",", ""));
   let salesPrice = 0;
   let listOfAccounts = Object.keys(product?.discount);
   if (listOfAccounts.length) {
     if (listOfAccounts.length == 1) {
       selAccount = product?.discount?.[listOfAccounts[0]];
+     
       if (product?.Category__c === "TESTER") {
         discount = selAccount?.Discount?.testerMargin || 0;
       } else if (product?.Category__c === "Samples") {
@@ -50,7 +52,7 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
     }
   }
   salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
-  
+ 
   return (
     <div className="container mt-4 product-card-element">
       <ModalPage
@@ -109,9 +111,9 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
           <div className="text-start">
             {selAccount?.Name ? <small>Price for <b>{selAccount?.Name}</b></small> : orders ? <small>Price for <b>{orders.Account.name}</b></small> : null}
           </div>
-          <p className={`${Styles.priceHolder} d-flex`}>
-            {salesPrice != listPrice ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : orders ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : null}
-            <b>${orders ? <Link to={"/my-bag"}>{Number(orders?.items?.price).toFixed(2)}</Link> : salesPrice}</b>
+          <p className={`${Styles.priceHolder} d-flex mt-2`}>
+            {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : orders ? <p className={Styles.crossed}>{!isNaN(listPrice) ? "$"+listPrice.toFixed(2):listPrice}&nbsp;</p> : null:null}
+            <b>{orders ? <Link to={"/my-bag"}>${Number(orders?.items?.price).toFixed(2)}</Link> : !isNaN(listPrice)?'$'+salesPrice:product.data.usdRetail__c??"NA"}</b>
           </p>
           {!product.data.ProductUPC__c || !product.data.ProductCode || !product.data.IsActive || (!product.data?.PricebookEntries?.length || !product?.data?.PricebookEntries?.[0]?.IsActive && (!isNaN(salesPrice) && !isNaN(listPrice)) || !isDateEqualOrGreaterThanToday(product.data.Launch_Date__c)) ? <button
             className={`${Styles.button}`}

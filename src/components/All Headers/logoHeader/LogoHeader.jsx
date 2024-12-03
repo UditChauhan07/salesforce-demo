@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData } from "../../../lib/store";
+import { defaultLoadTime, GetAuthData } from "../../../lib/store";
 import { getPermissions } from "../../../lib/permission";
 import PermissionDenied from "../../PermissionDeniedPopUp/PermissionDenied";
 import styles from "../topNav/index.module.css";
@@ -12,6 +12,8 @@ import { FaStore } from "react-icons/fa";
 import { CustomerServiceIcon, OrderIcon } from "../../../lib/svg";
 import Loading from "../../Loading";
 import "./style.css";
+import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
+import { useLocation } from 'react-router-dom';
 const LogoHeader = () => {
   const navigate = useNavigate();
   const [permissions, setPermissions] = useState(null);
@@ -20,11 +22,14 @@ const LogoHeader = () => {
   const [key, setKey] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef(null);
-  const { getOrderQuantity } = useCart();
+  const { getOrderQuantity,fetchCart } = useCart();
   const [cartQty, setCartQty] = useState(0);
   useEffect(() => {
     setCartQty(getOrderQuantity() ?? 0)
   }, [getOrderQuantity])
+  useEffect(()=>{
+    fetchCart();
+  },[useLocation])
   const handleInputChange = (e) => setSearchTerm(e.target.value);
   useEffect(() => {
     async function fetchPermissions() {
@@ -48,7 +53,7 @@ const LogoHeader = () => {
     PermissionDenied();
   };
 
-
+useBackgroundUpdater(fetchCart,defaultLoadTime);
 
   const searchAccounts = async (term) => {
     if (term.length <= 2) return setSuggestions([]);
@@ -96,8 +101,11 @@ const LogoHeader = () => {
     const delayDebounceFn = setTimeout(() => searchAccounts(searchTerm), 300);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
-
   const handleSuggestionClick = (id, manufacturerId, type, opportunityId) => {
+    
+    setSearchTerm("");
+    setSuggestions([]);
+  
     if (type === "account") {
       navigate(`/store/${id}`);
     } else if (type === "Account_Manufacturer__c") {
@@ -106,12 +114,12 @@ const LogoHeader = () => {
       navigate(`/productPage/${id}`);
     } else if (type === "case") {
       navigate(`/CustomerSupportDetails?id=${id}`);
-    } else if (type == "order") {
+    } else if (type === "order") {
       localStorage.setItem("OpportunityId", JSON.stringify(opportunityId));
       window.location.href = "/orderDetails";
     }
   };
-
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -196,7 +204,7 @@ const LogoHeader = () => {
           {/* Dashboard */}
           <p className={`m-0 w-[100px] ${styles.language} flex search-bar`}>
             <div className="search-container" ref={searchRef}>
-              <input className="search expandright" id="searchright" type="search" placeholder="Search..." value={searchTerm} onChange={handleInputChange} />
+              <input className="search expandright" id="searchright" type="search" autoComplete="off" placeholder="Search..." value={searchTerm} onChange={handleInputChange} />
               <label className="button searchbutton" htmlFor="searchright">
                 <span className="searchCode">Search...</span>
                 <span className="mglass">

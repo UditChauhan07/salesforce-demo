@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, startTransition, Suspense } from "react";
 import Styles from "./Dashboard.module.css";
-import Chart from "react-apexcharts";
 import img1 from "./Images/Active-1.png";
 import img2 from "./Images/Vector.png";
 import img3 from "./Images/Group.png";
 import img4 from "./Images/Group1.png";
 import { PieChart, Pie, Cell } from "recharts";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthCheck, GetAuthData, admins, formatNumber, getDashboardata, hexabrand, refreshTargetRollOver } from "../../lib/store";
+import { AuthCheck, GetAuthData, admins, defaultLoadTime, formatNumber, getDashboardata, hexabrand, refreshTargetRollOver } from "../../lib/store";
 import { getRandomColors } from "../../lib/color";
 import ContentLoader from "react-content-loader";
 import SelectBrandModel from "../My Retailers/SelectBrandModel/SelectBrandModel";
@@ -20,59 +19,12 @@ import { getPermissions } from "../../lib/permission";
 import { salesRepIdKey } from "../../lib/store";
 import { useSearchParams } from "react-router-dom";
 import dataStore from "../../lib/dataStore";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+const GraphHandler=React.lazy(() => import("./GraphHandler"));
+const Chart=React.lazy(() => import("react-apexcharts"));
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const monthList = [
-  {
-    name: "January - 2024",
-    value: "2024|1",
-  },
-  {
-    name: "February - 2024",
-    value: "2024|2",
-  },
-  {
-    name: "March - 2024",
-    value: "2024|3",
-  },
-  {
-    name: "April - 2024",
-    value: "2024|4",
-  },
-  {
-    name: "May - 2024",
-    value: "2024|5",
-  },
-  {
-    name: "June - 2024",
-    value: "2024|6",
-  },
-  {
-    name: "July - 2024",
-    value: "2024|7",
-  },
-  {
-    name: "August - 2024",
-    value: "2024|8",
-  },
-  {
-    name: "September - 2024",
-    value: "2024|9",
-  },
-  {
-    name: "October - 2024",
-    value: "2024|10",
-  },
-  {
-    name: "November - 2024",
-    value: "2024|11",
-  },
-  {
-    name: "December - 2024",
-    value: "2024|12",
-  },
-];
 
-function Dashboard({ dashboardData }) {
+function Dashboard() {
 
   const bgColors = {
     "Kevyn Aucoin Cosmetics": "KevynAucoinCosmeticsBg",
@@ -85,38 +37,7 @@ function Dashboard({ dashboardData }) {
     "RMS Beauty": "RMSBeautyBg",
     "ESTEE LAUDER": "esteeLauderBg",
   };
-
   const [dataa, setDataa] = useState({
-    series: [
-      {
-        name: "Diptyque",
-        data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-      },
-      {
-        name: "Byredo",
-        data: [76, 85, 87, 98, 87, 97, 91, 74, 94],
-      },
-      {
-        name: "Bobbi Brown",
-        data: [16, 25, 37, 48, 57, 67, 73, 84, 94],
-      },
-      {
-        name: "By Terry",
-        data: [6, 15, 23, 35, 41, 53, 66, 74, 87],
-      },
-      {
-        name: "Revive",
-        data: [2, 12, 21, 30, 33, 42, 37, 41, 54],
-      },
-      {
-        name: "Kevyn Aucoin",
-        data: [71, 88, 83, 91, 82, 99, 61, 70, 98],
-      },
-      {
-        name: "Smashbox",
-        data: [10, 12, 14, 11, 16, 20, 24, 29, 32],
-      },
-    ],
     options: {
       chart: {
         type: "area",
@@ -176,6 +97,19 @@ function Dashboard({ dashboardData }) {
   const [Yearlydataa, setYearlydata] = useState({ isLoaded: false, data: [] });
   const [accountPerformance, setAccountPerformance] = useState({ isLoaded: false, data: [] });
   const [leadsbybrand, setleadsbtbrand] = useState({ isLoaded: false, data: [] });
+  const monthList = useMemo(() => {
+    const months = [];
+    for (let month = 1; month <= 12; month++) {
+      const monthName = new Date(currentYear, month - 1)
+        .toLocaleString('default', { month: 'long' })
+        .slice(0, 3); // Get the first 3 letters of the month name
+      months.push({
+        name: `${monthName} - ${currentYear}`,
+        value: `${currentYear}|${month}`,
+      });
+    }
+    return months;
+  }, [currentYear]);
   const [salesByBrandData, setSalesByBrandData] = useState({
 
     series: [],
@@ -311,36 +245,6 @@ function Dashboard({ dashboardData }) {
             colorArray.push(hexabrand[value.id]);
           })
           setDataa({
-            series: [
-              {
-                name: "Diptyque",
-                data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-              },
-              {
-                name: "Byredo",
-                data: [76, 85, 87, 98, 87, 97, 91, 74, 94],
-              },
-              {
-                name: "Bobbi Brown",
-                data: [16, 25, 37, 48, 57, 67, 73, 84, 94],
-              },
-              {
-                name: "By Terry",
-                data: [6, 15, 23, 35, 41, 53, 66, 74, 87],
-              },
-              {
-                name: "Revive",
-                data: [2, 12, 21, 30, 33, 42, 37, 41, 54],
-              },
-              {
-                name: "Kevyn Aucoin",
-                data: [71, 88, 83, 91, 82, 99, 61, 70, 98],
-              },
-              {
-                name: "Smashbox",
-                data: [10, 12, 14, 11, 16, 20, 24, 29, 32],
-              },
-            ],
             options: {
               chart: {
                 type: "area",
@@ -476,7 +380,7 @@ function Dashboard({ dashboardData }) {
         if (admins.includes(user.Sales_Rep__c)) {
           setSalesRepAdmin(true)
         }
-        dataStore.getPageData("/dashboard"+headers.month??currentMonth+headers.year??currentYear,()=>getDashboardata({ user, saleRepId }))
+        dataStore.getPageData("/dashboard" + headers.month ?? currentMonth + headers.year ?? currentYear, () => getDashboardata({ user, saleRepId }))
           .then((dashboard) => {
             readyDashboardHandle(dashboard)
           })
@@ -512,7 +416,7 @@ function Dashboard({ dashboardData }) {
 
   let lowPerformanceArray = accountPerformance?.data?.slice(0)?.reverse()?.map((ele) => ele);
 
-
+  useBackgroundUpdater(() => getDataHandler({ month: selectMonth, year: selectYear }), defaultLoadTime);
   const changeMonthHandler = (value) => {
     setIsLoading(false);
     setleadsbtbrand({ isLoaded: false, data: [] })
@@ -537,14 +441,6 @@ function Dashboard({ dashboardData }) {
   const oR = 100;
   const [value, setValue] = useState((box.REVENUE / box.TARGET * 100) <= 100 ? box.REVENUE / box.TARGET * 100 : 100)
   const needle = (value, data, cx, cy, iR, oR, color) => {
-    let total = 0;
-    // needle_data.forEach((v) => {
-    //   total += v.value;
-    // });
-    // let ang = 180.0 * (1 - value / total);
-    // if(value == 0 &&value < total){
-    //   ang = 0;
-    // }
     let ang = 180 - ((value / 100) * 180);
     if (value == 0) {
       ang = 180;
@@ -566,7 +462,6 @@ function Dashboard({ dashboardData }) {
   useEffect(() => {
     async function fetchPermissions() {
       try {
-        const user = await GetAuthData(); // Fetch user data
         const userPermissions = await getPermissions(); // Fetch permissions
         setPermissions(userPermissions); // Set permissions in state
       } catch (err) {
@@ -648,7 +543,6 @@ function Dashboard({ dashboardData }) {
     <AppLayout
       filterNodes={
         <>
-
           <FilterItem
             minWidth="220px"
             label="Month-Year"
@@ -662,8 +556,6 @@ function Dashboard({ dashboardData }) {
             }}
             name={"dashboard-manu"}
           />
-
-
         </>
       }
     >
@@ -674,15 +566,10 @@ function Dashboard({ dashboardData }) {
               {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Sales By Rep
                 {permissions?.modules?.godLevel ?
                   <span>{Monthlydataa.isLoaded ?
-
-
                     <BiRefresh className="cursor-pointer" size={25} onClick={targeetRollReferesh} title="Click here for Refresh" />
-
                     : null}</span>
                   : null
                 }
-
-
               </p> : <p className={Styles.Tabletext}>Month to date(MTD): Sales By Rep</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className="">
@@ -1113,10 +1000,9 @@ function Dashboard({ dashboardData }) {
               {!isLoading ? (
                 <ContentLoader />
               ) : (
-                <>
-
+                <Suspense fallback={<ContentLoader />}>
                   <Chart options={salesByBrandData.options} series={salesByBrandData.series} type="donut" className={Styles.donutchart} width="90%" height="400px" />
-                </>
+                </Suspense >
               )}
             </div>
           </div>
@@ -1211,15 +1097,9 @@ function Dashboard({ dashboardData }) {
             </div>
           </div>
         </div>
-
-        <div className="row mt-5">
-          <div className="">
-            <p className={Styles.Tabletext}>Total Sale By Brand</p>
-            <div className={`${Styles.graphmain} cardShadowHover`}>
-              <Chart options={dataa.options} series={manufacturerSalesYear} type="area" width="100%" height="100%" />
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={<ContentLoader />}>
+            <GraphHandler options={dataa.options} manufacturerSalesYear={manufacturerSalesYear} Styles={Styles} />
+        </Suspense>
       </div>
     </AppLayout>
   );
