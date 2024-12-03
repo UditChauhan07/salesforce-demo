@@ -110,7 +110,7 @@ const MyRetailersPage = () => {
 
   // Memoize permissions to avoid unnecessary re-calculations
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
-
+localStorage.setItem('selectedSalesrepId' , JSON.stringify(selectedSalesRepId))
   return (
     <AppLayout
       filterNodes={
