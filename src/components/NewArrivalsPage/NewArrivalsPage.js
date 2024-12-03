@@ -16,9 +16,6 @@ import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { isDateEqualOrGreaterThanToday } from "../../lib/store";
 import ImageHandler from "../loader/ImageHandler";
 function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accountDetails = {} }) {
-  const [productData , setProductData] = useState(productList)
-  console.log(productList ? 'true' : 'false')
-  
 
   const navigate = useNavigate();
   const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
@@ -50,8 +47,8 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
     if (filterData && filterData.length > 0) {
       const startIndex = (currentPage - 1) * PageSize;
       const endIndex = currentPage * PageSize;
-      const newValues = filterData.flatMap((month) => month?.content);
-      //.slice(startIndex, endIndex)
+      const newValues = filterData.flatMap((month) => month?.content).slice(startIndex, endIndex);
+
       setPagination([{ content: newValues }]);
     } else {
       setPagination([{ content: [] }]);
@@ -385,7 +382,7 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
                           <p className={Styles.priceHolder}>
                             {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div> : ProductInCart ? <div className={Styles.priceCrossed}>{listPrice ? '$' + listPrice?.toFixed(2) : null}</div> : null : null}
                             &nbsp;
-                            <div>${ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price)?.toFixed(2)}</Link> : !isNaN(salesPrice) ? salesPrice?.toFixed(2) : listPrice ?? "-- . --"}</div>
+                            <div>{ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price)?.toFixed(2)}</Link> : !isNaN(salesPrice) ? "$"+salesPrice?.toFixed(2) : listPrice+"" ?? "-- . --"}</div>
                           </p>
                           <div className={Styles.linkHolder}>
                             {ProductInCart ? (
