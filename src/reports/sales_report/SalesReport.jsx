@@ -357,7 +357,7 @@ const SalesReport = () => {
 
             <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
             <div className="d-flex justify-content-end gap-4 col-8">
-              {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={salesRepList} onChange={(value) => setSearchBySalesRep(value)} />}
+              {ownerPermission && <FilterItem minWidth="220px" label="All Sales Rep" name="AllSalesRep" value={searchBySalesRep} options={[{label:"All Sales Rep", value:null},...salesRepList]} onChange={(value) => setSearchBySalesRep(value)} />}
               <FilterItem
                 minWidth="220px"
                 label="All Brands"
