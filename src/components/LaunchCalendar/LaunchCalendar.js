@@ -11,34 +11,60 @@ function LaunchCalendar({ productList, brand, month }) {
   const products = productList;
   const [productDetailId, setProductDetailId] = useState();
 
-  const filterData = useMemo(() => {
-    if (!month || month === "") {
-      return products; // Return all products if no month is selected
-    }
+  // const filterData = useMemo(() => {
+  //   if (!month || month === "") {
+  //     return products; // Return all products if no month is selected
+  //   }
 
+  //   return products?.map((months) => {
+  //     const filteredContent = months.content?.filter((item) => {
+  //       const shipDateParts = item.Ship_Date__c.split("-");
+  //       const shipMonth = parseInt(shipDateParts[1]) - 1; // Get month index (0-11)
+  //       const shipDay = parseInt(shipDateParts[2]);
+
+  //       if (brand) {
+  //         if (brand !== item.ManufacturerId__c) {
+  //           return false; // Filter out items that don't match the brand
+  //         }
+  //       }
+
+  //       if (month === "TBD") {
+  //         return shipDay === 15; // Special case for "TBD"
+  //       } else {
+  //         return monthNames[shipMonth].toLowerCase() === month.toLowerCase();
+  //       }
+  //     });
+  //     console.log({filteredContent,months});
+      
+
+  //     // Create a new object with filtered content
+  //     return { ...months, content: filteredContent };
+  //   });
+  // }, [products, month, brand]); // Dependencies for useMemo
+
+  const filterData = useMemo(() => {
     return products?.map((months) => {
       const filteredContent = months.content?.filter((item) => {
         const shipDateParts = item.Ship_Date__c.split("-");
         const shipMonth = parseInt(shipDateParts[1]) - 1; // Get month index (0-11)
         const shipDay = parseInt(shipDateParts[2]);
-
-        if (brand) {
-          if (brand !== item.ManufacturerId__c) {
-            return false; // Filter out items that don't match the brand
-          }
-        }
-
-        if (month === "TBD") {
-          return shipDay === 15; // Special case for "TBD"
-        } else {
-          return monthNames[shipMonth].toLowerCase() === month.toLowerCase();
-        }
+        const monthName = monthNames[shipMonth].toLowerCase();
+  
+        // Check if the month matches
+        const monthMatches = month ? monthName === month.toLowerCase() : true;
+  
+        // Check if the brand matches
+        const brandMatches = brand ? brand === item.ManufacturerId__c : true;
+  
+        // Return true if both month and brand match
+        return monthMatches && brandMatches;
       });
-
+  
       // Create a new object with filtered content
       return { ...months, content: filteredContent };
     });
   }, [products, month, brand]); // Dependencies for useMemo
+
   const allOrdersEmpty = filterData?.every((item) => item.content.length <= 0);
 
 
@@ -143,7 +169,7 @@ function LaunchCalendar({ productList, brand, month }) {
           </div>
         </div>
       </div>
-      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} isAddtoCart={false} />
+      {productDetailId?<ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} isAddtoCart={false} />:null}
     </div>
   );
 }

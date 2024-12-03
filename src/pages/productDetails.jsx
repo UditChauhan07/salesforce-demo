@@ -24,12 +24,11 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     const [accountDetails, setAccountDetails] = useState();
     const [manufacturerId, setManufacturerId] = useState();
     const [clickedProduct, setClickedProduct] = useState(null);
-   
+    
     const fetchAccountDetails = async () => {
         const data = await GetAuthData();
         let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
          salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
-         console.log(salesRepId , "salesrepid")
         try {
             const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {  salesRepId
                 
@@ -52,6 +51,7 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
             .catch((err) => console.error("Error fetching auth data:", err));
     }
     const readyProductDetails = (data) => {
+        if(data){
         const manufacturer = data.data?.ManufacturerId__c; // ManufacturerId from the product
         setManufacturerId(manufacturer);
         setClickedProduct(data.data);
@@ -84,14 +84,8 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
             data: data.data,
             discount: filteredAccountDetails, // Either filtered or the default full data
         });
-    
-        console.log("Final Product Data:", {
-            isLoaded: true,
-            data: data.data,
-            discount: filteredAccountDetails,
-        });
+    }
     };
-    console.log(selectedsalesRep , "salesRepId selected ----")
     
     useEffect(() => {
         fetchAccountDetails();
@@ -110,9 +104,9 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     }, [productId, isPopUp, accountDetails]);
 
     useBackgroundUpdater(fetchProductDetailHandler, defaultLoadTime);
-
     if (!productId) return null;
 
+    
     const onQuantityChange = (element, quantity) => {
         const listPrice = Number(element?.usdRetail__c?.replace("$", "").replace(",", ""));
         const selectProductDealWith = product?.discount || {};
