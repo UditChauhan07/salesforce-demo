@@ -376,24 +376,27 @@ export async function OrderPlaced({ order }) {
 export async function DestoryAuth() {
   try {
     // Start clearing IndexedDB
-    let status =await dataStore.clearAll();
+    let status = await dataStore.clearAll();
+    console.log({ status });
 
-    if(status){
-    // Clear localStorage except for specified keys
-    Object.keys(localStorage).forEach((key) => {
-      if (key !== "passwordB2B" && key !== "emailB2B") {
-        localStorage.removeItem(key);
-      }
-    });
+    if (status) {
+      // Clear localStorage except for specified keys
+      Object.keys(localStorage).forEach((key) => {
+        if (key !== "passwordB2B" && key !== "emailB2B") {
+          localStorage.removeItem(key);
+        }
+      });
+      console.log("gclear");
+      
 
-    // Optionally, show a loading indicator here
-    // Example: showLoadingIndicator();
+      // Optionally, show a loading indicator here
+      // Example: showLoadingIndicator();
 
-    // Redirect to the home page immediately
+      // Redirect to the home page immediately
       window.location.href = window.location.origin;
 
-    // Note: The clearing of IndexedDB will continue in the background
-    return true;
+      // Note: The clearing of IndexedDB will continue in the background
+      return true;
     }
   } catch (e) {
     console.error('Error during logout:', e);
