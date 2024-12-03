@@ -53,7 +53,7 @@ const DynamicTable = ({ mainData=[], itemsPerPage = 100, children, head = null, 
   
 
   return (
-    <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+    <div style={{ height: "75vh", overflowY: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse" }} {...props}>
         {head ? head : null}
         <tbody>

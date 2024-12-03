@@ -134,7 +134,7 @@ const SalesReportTable = ({ salesData, year, ownerPermission }) => {
     <>
       {salesData.length ? (
         <div className={`d-flex p-3 ${styles.tableBoundary} mb-5`}>
-          <div style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
+          <div style={{ overflow: "auto", width: "100%" }}>
             <DynamicTable mainData={saleReportList} head={<thead>
               <tr>
                 <th className={`${styles.th} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "170px" }}>
@@ -161,7 +161,7 @@ const SalesReportTable = ({ salesData, year, ownerPermission }) => {
                   Total Amount
                 </th>
               </tr>
-            </thead>} foot={<tfoot>{renderFooter()}</tfoot>} id="salesReportTable" className="table table-responsive" style={{ minHeight: "600px" }}>
+            </thead>} foot={<tfoot>{renderFooter()}</tfoot>} id="salesReportTable" className="table table-responsive">
 
               {(item) => allOrdersEmpty ? (
                 <div className={`${styles.NodataText} flex justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]}`} key="no-data">

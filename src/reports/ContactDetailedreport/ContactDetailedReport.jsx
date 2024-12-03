@@ -279,7 +279,7 @@ function ContactDetailedReport() {
             ) : (
                 <>
                     <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
-                        <div style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
+                        <div style={{ overflow: "auto", width: "100%" }}>
                             <DynamicTable mainData={sortArrayHandler(filteredData, g => g.accountDetails?.Name)} head={<thead>
                                 <tr>
                                     <th className={`${styles.th} ${styles.stickyMonth} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "200px" }}>Account Name</th>

@@ -7,7 +7,7 @@ const AuditReportTable = ({auditReport}) => {
       }
     return (
         <div className={`d-flex p-3 ${styles.tableBoundary} mb-5`}>
-            <div className={`${styles.WidthTable} table-responsive overflow-scroll `} style={{ maxHeight: "67vh", minHeight: "40vh" }}>
+            <div className={`${styles.WidthTable} table-responsive overflow-scroll `} style={{ height: "75vh" }}>
     <table id="auditReportTable" className="table table-responsive">
         <thead>
             <tr>
