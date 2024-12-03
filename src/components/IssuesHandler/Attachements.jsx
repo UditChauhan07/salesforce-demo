@@ -32,6 +32,7 @@ const Attachements = ({ files, setFile, setDesc, orderConfirmed, SubmitHandler,d
                   icon: 'error',
                   title: 'Limit Exceeded',
                   text: 'You cannot add more than 5 files.',
+                  confirmButtonColor: '#000',
               }).then(() => {
                   e.target.value = ''; // Clear the input
               });

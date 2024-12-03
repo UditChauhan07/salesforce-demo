@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { uploadFileSupport } from "../../lib/store";
 import ModalPage from "../Modal UI";
+import Swal from "sweetalert2";
 const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, setSubmitForm,salesRepId }) => {
     console.log("hello")
     const navigate = useNavigate();
@@ -121,7 +122,18 @@ const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, se
                 let url = URL.createObjectURL(file); // Create a preview URL
                 tempFile.push({ preview: url, file });
             });
-    
+              // Check if the total number of files exceeds 5
+              if (tempFile.length > 5) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Limit Exceeded',
+                    text: 'You cannot add more than 5 files.',
+                    confirmButtonColor: '#000',
+                }).then(() => {
+                    e.target.value = ''; // Clear the input
+                });
+                return; // Stop further execution
+            }
             setFile(tempFile); // Update state with valid files
             console.log(`Total files selected: ${tempFile.length}`); // Log the total number of files
         }
