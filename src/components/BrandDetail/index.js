@@ -37,26 +37,28 @@ const BrandDetailCard = ({ brandId }) => {
         }
         GetAuthData().then((user) => {
             dataStore.getPageData("/top-products" + brandId, () => topProduct({ manufacturerId: brandId })).then((products) => {
-                setTopProduct({ isLoaded: true, data: products.data })
-                let productCode = "";
-                products.data?.map((product, index) => {
-                    productCode += `'${product.ProductCode}'`
-                    if (products.data.length - 1 != index) productCode += ', ';
-                })
-                getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
-                    console.log({ res });
-                    if (res) {
-                        if (data[brandId]) {
-                            data[brandId] = { ...data[brandId], ...res }
-                        } else {
-                            data[brandId] = res
+                setTopProduct({ isLoaded: true, data: products?.data || [] })
+                if (products) {
+
+                    let productCode = "";
+                    products.data?.map((product, index) => {
+                        productCode += `'${product.ProductCode}'`
+                        if (products.data.length - 1 != index) productCode += ', ';
+                    })
+                    getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
+                        if (res) {
+                            if (data[brandId]) {
+                                data[brandId] = { ...data[brandId], ...res }
+                            } else {
+                                data[brandId] = res
+                            }
+                            ShareDrive(data)
                         }
-                        ShareDrive(data)
-                    }
-                    setProductImages({ isLoaded: true, images: res ?? {} });
-                }).catch((err) => {
-                    console.log({ aaa111: err });
-                })
+                        setProductImages({ isLoaded: true, images: res ?? {} });
+                    }).catch((err) => {
+                        console.log({ aaa111: err });
+                    })
+                }
             }).catch((productErr) => {
                 console.log({ productErr });
             })
@@ -102,14 +104,14 @@ const BrandDetailCard = ({ brandId }) => {
                 <div className="row">
                     <div className="col-xl-4 col-lg-4 col-md-12 col-sm-12 m-auto">
                         <div className={`${Styles.BnadLogo} w-100`}>
-                            <img  className={`img-fluid ${Styles.brandLogoHolder}`} src={brand?.img?.src || "/assets/images/dummy.png"} />
+                            <img className={`img-fluid ${Styles.brandLogoHolder}`} src={brand?.img?.src || "/assets/images/dummy.png"} />
                         </div>
                     </div>
                     <div className="col-xl-8 col-lg-8 col-md-12 col-sm-12 m-auto ">
                         <div className="row">
                             <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
                                 {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0].ManufacturerName__c : null}</p> :
-                                    <img style={{width: '65%'}}  className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
+                                    <img style={{ width: '65%' }} className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
                             </div>
                             {brand?.tagLine ?
                                 <div className="col-xl-5 col-lg-6 col-md-12 col-sm-12 m-auto ">

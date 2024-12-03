@@ -9,6 +9,7 @@ import Loading from "../Loading"
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
 import { BackArrow } from "../../lib/svg"
+import dataStore from "../../lib/dataStore"
 
 let PageSize = 10;
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
@@ -29,8 +30,17 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
     const [checked, setChecked] = useState(false)
     const [checkAll, setCheckedAll] = useState(false);
 
+
+    const reportReady = (data) => {
+        let contactList = JSON.parse(data || "[]")
+        // let contactList = sortArrayHandler(JSON.parse(list || "[]") || [], g => g?.updatedAt, 'desc')
+
+        setContactList({ isLoaded: true, data: contactList })
+    }
     useEffect(() => {
-        getDataHandler()
+        dataStore.subscribe("/report" + month + day + year, reportReady);
+        getDataHandler();
+        return ()=>dataStore.unsubscribe("/report" + month + day + year, reportReady);
     }, [day, month, year])
 
     const resentHandler = () => {
@@ -92,15 +102,10 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
         GetAuthData().then((user) => {
             if (admins.includes(user.Sales_Rep__c)) {
                 setUser(user)
-                getEmailBlast({ key: user.access_token, Id: user.Sales_Rep__c, month, day, year, newsletter }).then((list) => {
-                    console.log({list});
-                    
+                dataStore.getPageData("/report" + month + day + year, () => getEmailBlast({ key: user.access_token, Id: user.Sales_Rep__c, month, day, year, newsletter })).then((list) => {
 
-                    let contactList = JSON.parse(list || "[]")
-                    // let contactList = sortArrayHandler(JSON.parse(list || "[]") || [], g => g?.updatedAt, 'desc')
-                    console.log({contactList});
-                    
-                    setContactList({ isLoaded: true, data: contactList })
+                    reportReady(list);
+
 
                 }).catch((conErr) => {
                     console.log({ conErr });
@@ -190,7 +195,7 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
                     "Brands Name": element.Brands,
                     "Subscriber Name": element.ContactName,
                     "Subscriber Email": element.ContactEmail,
-                    "Publish On": DateConvert(element.Date,true),
+                    "Publish On": DateConvert(element.Date, true),
                     "Status": element.mailStatus == 1 ? "Send" : element.mailSend == 2 ? "Failed" : "Not Sent",
                 }
                 exportData.push(temp)
@@ -205,7 +210,7 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
         const data = new Blob([excelBuffer], { type: fileType });
         FileSaver.saveAs(data, `Subscribers List for ${months[month - 1]} ${day}, ${year}'s NewLetter ${new Date().toDateString()}` + fileExtension);
     }
-    console.log({ mailList,data });
+    console.log({ mailList, data });
 
     return (
         <div>

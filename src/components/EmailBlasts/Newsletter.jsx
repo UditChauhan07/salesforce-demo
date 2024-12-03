@@ -19,7 +19,7 @@ const Newsletter = () => {
     const [permissions, setPermissions] = useState(null);
 
     const newLetterReady = (report) => {
-        report.sort((a, b) => {
+        report?.sort((a, b) => {
             // First compare by Year
             if (a.Year !== b.Year) {
                 return b.Year - a.Year;

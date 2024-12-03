@@ -63,7 +63,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         }
       }
     }
-    if (response.OpportunityLineItems.length > 0) {
+    if (response?.OpportunityLineItems?.length > 0) {
       let productCode = "";
       response.OpportunityLineItems?.map((element, index) => {
         productCode += `'${element?.ProductCode}'`

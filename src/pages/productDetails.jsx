@@ -12,7 +12,7 @@ import { originAPi } from "../lib/store";
 import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
-const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true , selectedsalesRep }) => {
+const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true, selectedsalesRep }) => {
     const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
     const [product, setProduct] = useState({ isLoaded: false, data: [], discount: {} });
     const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -24,16 +24,19 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     const [accountDetails, setAccountDetails] = useState();
     const [manufacturerId, setManufacturerId] = useState();
     const [clickedProduct, setClickedProduct] = useState(null);
-    
+
     const fetchAccountDetails = async () => {
         const data = await GetAuthData();
         let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
-         salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
+        salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
         try {
-            const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {  salesRepId
-                
-                , accessToken }));
-            setAccountDetails(res.data.accountDetails);
+            const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+                salesRepId
+                , accessToken
+            }));
+            if(res){
+                setAccountDetails(res?.data?.accountDetails);
+            }
         } catch (error) {
             console.error("Error fetching account details:", error);
         }
@@ -51,45 +54,45 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
             .catch((err) => console.error("Error fetching auth data:", err));
     }
     const readyProductDetails = (data) => {
-        if(data){
-        const manufacturer = data.data?.ManufacturerId__c; // ManufacturerId from the product
-        setManufacturerId(manufacturer);
-        setClickedProduct(data.data);
-    
-        // Logic to handle both cases: with and without AccountId
-        let filteredAccountDetails = accountDetails[manufacturer] || {}; // Default to all accounts under the manufacturer
-        if (AccountId) {
-            if (filteredAccountDetails[AccountId]) {
-                // Filter for specific account if AccountId exists
-                filteredAccountDetails = { [AccountId]: filteredAccountDetails[AccountId] };
-            } else {
-                console.warn(`No account details found for AccountId: ${AccountId}`);
+        if (data) {
+            const manufacturer = data.data?.ManufacturerId__c; // ManufacturerId from the product
+            setManufacturerId(manufacturer);
+            setClickedProduct(data.data);
+
+            // Logic to handle both cases: with and without AccountId
+            let filteredAccountDetails = accountDetails[manufacturer] || {}; // Default to all accounts under the manufacturer
+            if (AccountId) {
+                if (filteredAccountDetails[AccountId]) {
+                    // Filter for specific account if AccountId exists
+                    filteredAccountDetails = { [AccountId]: filteredAccountDetails[AccountId] };
+                } else {
+                    console.warn(`No account details found for AccountId: ${AccountId}`);
+                }
             }
+
+            // Extract discount and calculate prices
+            const accountDiscount = filteredAccountDetails[AccountId]?.Discount || {};
+            const discount = accountDiscount.margin || 0;
+
+            const listPrice = Number(data.data?.usdRetail__c?.replace("$", "").replace(",", ""));
+            const salesPrice = (listPrice - (discount / 100) * listPrice).toFixed(2);
+
+            // Update product data with calculated prices and discount
+            data.data.salesPrice = salesPrice;
+            data.data.discount = discount;
+
+            // Set the product state with the relevant account details
+            setProduct({
+                isLoaded: true,
+                data: data.data,
+                discount: filteredAccountDetails, // Either filtered or the default full data
+            });
         }
-    
-        // Extract discount and calculate prices
-        const accountDiscount = filteredAccountDetails[AccountId]?.Discount || {};
-        const discount = accountDiscount.margin || 0;
-    
-        const listPrice = Number(data.data?.usdRetail__c?.replace("$", "").replace(",", ""));
-        const salesPrice = (listPrice - (discount / 100) * listPrice).toFixed(2);
-    
-        // Update product data with calculated prices and discount
-        data.data.salesPrice = salesPrice;
-        data.data.discount = discount;
-    
-        // Set the product state with the relevant account details
-        setProduct({
-            isLoaded: true,
-            data: data.data,
-            discount: filteredAccountDetails, // Either filtered or the default full data
-        });
-    }
     };
-    
+
     useEffect(() => {
         fetchAccountDetails();
-    }, [selectedsalesRep ]);
+    }, [selectedsalesRep]);
 
     useEffect(() => {
         if (productId) {
@@ -106,13 +109,13 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     useBackgroundUpdater(fetchProductDetailHandler, defaultLoadTime);
     if (!productId) return null;
 
-    
+
     const onQuantityChange = (element, quantity) => {
         const listPrice = Number(element?.usdRetail__c?.replace("$", "").replace(",", ""));
         const selectProductDealWith = product?.discount || {};
         const listOfAccounts = Object.keys(selectProductDealWith);
         let addProductToAccount = null;
-    
+
         if (AccountId) {
             // If AccountId is an array, extract the first element
             addProductToAccount = Array.isArray(AccountId) ? AccountId[0] : AccountId;
@@ -120,10 +123,10 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
         } else if (listOfAccounts.length) {
             if (listOfAccounts.length === 1) {
                 addProductToAccount = listOfAccounts[0];
-                console.log(addProductToAccount , "add product to account")
+                console.log(addProductToAccount, "add product to account")
             } else if (selectAccount?.value) {
                 addProductToAccount = selectAccount.value;
-                console.log(addProductToAccount , "add product to account")
+                console.log(addProductToAccount, "add product to account")
             } else {
                 const accounts = listOfAccounts.map((actId) => ({
                     value: actId,
@@ -134,23 +137,23 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                 return;
             }
         }
-   
+
         if (addProductToAccount) {
             const accountDetails = selectProductDealWith[addProductToAccount] || {};
             const account = {
-                shippingMethod : accountDetails?.ShippingMethod , 
+                shippingMethod: accountDetails?.ShippingMethod,
                 name: accountDetails?.Name,
                 id: addProductToAccount,
-                
-                address : accountDetails?.ShippingAddress 
-              
-                
+
+                address: accountDetails?.ShippingAddress
+
+
             };
             const manufacturer = {
                 name: element.ManufacturerName__c,
                 id: element.ManufacturerId__c,
             };
-    
+
             let orderType = "wholesale";
             if (
                 element?.Category__c?.toUpperCase() === "PREORDER" ||
@@ -159,22 +162,22 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                 orderType = "pre-order";
             }
             element.orderType = orderType;
-    
+
             const discount =
                 element?.Category__c === "TESTER"
                     ? accountDetails?.Discount?.testerMargin || 0
                     : element?.Category__c === "Samples"
                         ? accountDetails?.Discount?.sample || 0
                         : accountDetails?.Discount?.margin || 0;
-    
+
             const salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
             element.price = salesPrice;
             element.qty = element.Min_Order_QTY__c;
-    
+
             addOrder(element, account, manufacturer);
         }
     };
-    
+
 
     const accountSelectionHandler = () => {
         onQuantityChange(replaceCartProduct.product, replaceCartProduct.quantity);
@@ -189,62 +192,62 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
 
     const HtmlFieldSelect = ({ title, list = [], value, onChange }) => {
         const styles = {
-          holder: {
-            border: "1px dashed #ccc",
-            padding: "10px",
-            width: "100%",
-            marginBottom: "20px",
-          },
-          title: {
-            color: "#000",
-            textAlign: "left",
-            fontFamily: "Montserrat",
-            fontSize: "14px",
-            fontStyle: "normal",
-            fontWeight: 500,
-            lineHeight: "24px",
-            letterSpacing: "2.2px",
-            textTransform: "uppercase",
-          },
+            holder: {
+                border: "1px dashed #ccc",
+                padding: "10px",
+                width: "100%",
+                marginBottom: "20px",
+            },
+            title: {
+                color: "#000",
+                textAlign: "left",
+                fontFamily: "Montserrat",
+                fontSize: "14px",
+                fontStyle: "normal",
+                fontWeight: 500,
+                lineHeight: "24px",
+                letterSpacing: "2.2px",
+                textTransform: "uppercase",
+            },
         };
-      
+
         // Custom styles for react-select
         const customSelectStyles = {
-          option: (provided, state) => ({
-            ...provided,
-            backgroundColor: state.isSelected ? "black" : state.isFocused ? "lightgray" : "white",
-            color: state.isSelected ? "white" : "black",
-          }),
-          control: (provided) => ({
-            ...provided,
-            border: "1px solid #ccc",
-          }),
-          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-          menu: (provided) => ({
-            ...provided,
-            maxHeight: "200px", // Maximum height for the dropdown
-            overflowY: "auto", // Adds vertical scrolling
-          }),
-          menuList: (provided) => ({
-            ...provided,
-            maxHeight: "200px", // Matches the menu height
-            overflowY: "auto", // Adds vertical scrolling
-          }),
+            option: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.isSelected ? "black" : state.isFocused ? "lightgray" : "white",
+                color: state.isSelected ? "white" : "black",
+            }),
+            control: (provided) => ({
+                ...provided,
+                border: "1px solid #ccc",
+            }),
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            menu: (provided) => ({
+                ...provided,
+                maxHeight: "200px", // Maximum height for the dropdown
+                overflowY: "auto", // Adds vertical scrolling
+            }),
+            menuList: (provided) => ({
+                ...provided,
+                maxHeight: "200px", // Matches the menu height
+                overflowY: "auto", // Adds vertical scrolling
+            }),
         };
-      
+
         return (
-          <div style={styles.holder}>
-            <p style={styles.title}>{title}</p>
-            <Select
-              options={list}
-              menuPortalTarget={document.body}
-              styles={customSelectStyles}
-              onChange={onChange}
-              value={list.find((option) => option.value === value?.value) || ""}
-            />
-          </div>
+            <div style={styles.holder}>
+                <p style={styles.title}>{title}</p>
+                <Select
+                    options={list}
+                    menuPortalTarget={document.body}
+                    styles={customSelectStyles}
+                    onChange={onChange}
+                    value={list.find((option) => option.value === value?.value) || ""}
+                />
+            </div>
         );
-      };
+    };
     let styles = {
         btn: { color: '#fff', fontFamily: 'Montserrat-600', fontSize: '14px', fontStyle: 'normal', fontWeight: 600, lineHeight: 'normal', letterSpacing: '1.4px', backgroundColor: '#000', width: '100px', height: '30px', cursor: 'pointer' }
     }
@@ -258,8 +261,8 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                         <div className="d-flex flex-column gap-3">
                             <h2>Attention!</h2>
                             <p>
-              You have multi store with deal with this Brand.<br /> can you please select you create order for
-            </p>
+                                You have multi store with deal with this Brand.<br /> can you please select you create order for
+                            </p>
                             <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
                             <div className="d-flex justify-content-around ">
                                 <button style={styles.btn} onClick={accountSelectionHandler}>

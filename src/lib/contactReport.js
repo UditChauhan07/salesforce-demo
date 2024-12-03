@@ -35,9 +35,8 @@ export const fetchAccountDetails = async (
 
     // Make the API request
     const res = await dataStore.getPageData("/account-contact-detailed-Report"+saleRepId,()=> axios.post(apiUrl, requestBody));
-    console.log("API Response:", res.data);
 
-    if (res.data) {
+    if (res?.data) {
       const records = res.data.records;
 
       // Flatten records for easier access
@@ -53,7 +52,6 @@ export const fetchAccountDetails = async (
 
       // Filter out inactive accounts before setting records
       const activeRecords = expandedRecords.filter(record => record.accountDetails?.Active_Closed__c); 
-      console.log("Active records:", activeRecords);
 
       setAccountManufacturerRecords(activeRecords);
       setFilteredRecords(activeRecords);
