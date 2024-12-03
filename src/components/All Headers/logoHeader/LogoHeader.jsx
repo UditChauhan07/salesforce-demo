@@ -13,6 +13,7 @@ import { CustomerServiceIcon, OrderIcon } from "../../../lib/svg";
 import Loading from "../../Loading";
 import "./style.css";
 import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
+import { useLocation } from 'react-router-dom';
 const LogoHeader = () => {
   const navigate = useNavigate();
   const [permissions, setPermissions] = useState(null);
@@ -26,6 +27,9 @@ const LogoHeader = () => {
   useEffect(() => {
     setCartQty(getOrderQuantity() ?? 0)
   }, [getOrderQuantity])
+  useEffect(()=>{
+    fetchCart();
+  },[useLocation])
   const handleInputChange = (e) => setSearchTerm(e.target.value);
   useEffect(() => {
     async function fetchPermissions() {
