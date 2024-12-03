@@ -13,15 +13,15 @@ import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 const MyRetailersPage = () => {
   const { data: manufacturers } = useManufacturer();
-  const [manufacturerList,setManufacturerList] = useState([]);
-  useEffect(()=>{
-    dataStore.subscribe("/brands",(data)=>setManufacturerList(data));
-    if(manufacturers?.data?.length){
-      dataStore.updateData("/brands",manufacturers.data);
+  const [manufacturerList, setManufacturerList] = useState([]);
+  useEffect(() => {
+    dataStore.subscribe("/brands", (data) => setManufacturerList(data));
+    if (manufacturers?.data?.length) {
+      dataStore.updateData("/brands", manufacturers.data);
       setManufacturerList(manufacturers.data)
     }
-    return ()=>dataStore.unsubscribe("/brands",(data)=>setManufacturerList(data));
-  },[manufacturers?.data])
+    return () => dataStore.unsubscribe("/brands", (data) => setManufacturerList(data));
+  }, [manufacturers?.data])
   const [searchParams] = useSearchParams();
   const manufacturerId = searchParams.get("manufacturerId");
   const [retailerList, setRetailerList] = useState({ data: [], isLoading: true });
@@ -54,7 +54,7 @@ const MyRetailersPage = () => {
 
       // // Fetch sales reps if admin
       if (admins.includes(user.Sales_Rep__c)) {
-        getSalesRepList({ key: user.x_access_token })
+        dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: user.x_access_token }))
           .then((repRes) => setSalesRepList(repRes.data))
           .catch((repErr) => console.log({ repErr }));
       }
@@ -71,7 +71,7 @@ const MyRetailersPage = () => {
     }
   }, [selectedSalesRepId]);
 
-  useBackgroundUpdater(fetchData,defaultLoadTime);
+  useBackgroundUpdater(fetchData, defaultLoadTime);
 
 
 

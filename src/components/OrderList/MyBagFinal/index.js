@@ -15,6 +15,7 @@ import ModalPage from "../../Modal UI";
 import { CustomerServiceIcon, OrderStatusIcon } from "../../../lib/svg";
 import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
 import dataStore from "../../../lib/dataStore";
+import ImageHandler from "../../loader/ImageHandler";
 
 function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   let Img1 = "/assets/images/dummy.png";
@@ -322,16 +323,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
                                     <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
-                                      {
-                                        item?.ProductImage ? <img src={item.ProductImage} className={`${Styles.imgHolder} zoomInEffect`} alt="img" width={25} onClick={() => { setProductDetailId(item?.Product2Id) }} /> :
-                                          item?.ContentDownloadUrl ? <img src={item.ContentDownloadUrl} className={`${Styles.imgHolder} zoomInEffect`} alt="img" width={25} onClick={() => { setProductDetailId(item?.Product2Id) }} /> :
-                                            !productImage.isLoaded ? <LoaderV2 /> :
-                                              productImage.images?.[item.ProductCode] ?
-                                                productImage.images[item.ProductCode]?.ContentDownloadUrl ?
-                                                  <img src={productImage.images[item.ProductCode]?.ContentDownloadUrl} className={`${Styles.imgHolder} zoomInEffect`} alt="img" width={25} onClick={() => { setProductDetailId(item?.Product2Id) }} />
-                                                  : <img src={productImage.images[item.ProductCode]} className={`${Styles.imgHolder} zoomInEffect`} alt="img" width={25} onClick={() => { setProductDetailId(item?.Product2Id) }} />
-                                                : <img src={Img1} className={`${Styles.imgHolder} zoomInEffect`} alt="img" onClick={() => { setProductDetailId(item?.Product2Id) }} width={25} />
-                                      }
+                                      <ImageHandler image={{src:item.ProductImage??item?.ContentDownloadUrl??productImage.images[item.ProductCode]?.ContentDownloadUrl??productImage.images[item.ProductCode]??'dummy.png'}} onClick={() => { setProductDetailId(item?.Product2Id) }} width={50}/>
                                     </div>
                                     <div className={Styles.Mainbox3}>
                                       <h2 onClick={() => { setProductDetailId(item?.Product2Id) }} className="linkEffect" style={{ cursor: 'pointer' }}>{item.Name.split(OrderData.Name)}</h2>

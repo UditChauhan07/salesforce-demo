@@ -202,7 +202,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             <div className={Detail.LeftMainTopBox}>
                                 <p>
                                     <UserChecked />
-                                    <span>{data.Account?.Name}</span>&nbsp; raised this on {DateConvert(data.Date_Opened__c)}
+                                    <span><Link style={{color:'#000'}} to={'/store/'+data.AccountId}>{data.Account?.Name}</Link></span>&nbsp; raised this on {DateConvert(data.Date_Opened__c)}
                                 </p>
                             </div>
                             {/* <div
@@ -299,7 +299,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             </div> */}
                             {data.ManufacturerName__c && <div className={Detail.ManufactureID}>
                                 <h3>Manufacture ID</h3>
-                                <p>{data.ManufacturerName__c}</p>
+                                <p><Link style={{color:'#000'}} to={'/Brand/'+data.ManufacturerId__c}>{data.ManufacturerName__c}</Link></p>
                             </div>}
                             <div className={Detail.CaseNumber}>
                                 <h3>Case Number</h3>
@@ -315,7 +315,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             </div>}
                             <div className={Detail.RecordType}>
                                 <h3>Record Type</h3>
-                                <p>{data.RecordType.Name}</p>
+                                <p>{data.RecordType?.Name}</p>
                             </div>
                             {attachmentUrls && attachmentUrls?.length > 0 && (
                                 <div className={Detail.RecordType}>
@@ -344,10 +344,10 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                                                     }}
                                                     className={Detail.DownloadLink}
                                                     onClick={() =>
-                                                        downloadFile(attachment.id, attachment.name)
+                                                        downloadFile(attachment.id, attachment?.name)
                                                     }
                                                 >
-                                                    {attachment.name}
+                                                    {attachment?.name}
                                                 </a>
                                             </li>
                                         ))}

@@ -10,9 +10,9 @@ import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 import ModalPage from "../Modal UI";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
+import ImageHandler from "../loader/ImageHandler";
 
-const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) => {
-  console.log({accountDetails});
+const TopProductCard = ({ data, productImages, to = null, accountDetails = {} }) => {
 
   const navigate = useNavigate();
   const [productDetailId, setProductDetailId] = useState(null);
@@ -145,7 +145,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
         textTransform: "uppercase",
       },
     };
-  
+
     // Custom styles for react-select
     const customSelectStyles = {
       option: (provided, state) => ({
@@ -169,7 +169,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
         overflowY: "auto", // Adds vertical scrolling
       }),
     };
-  
+
     return (
       <div style={styles.holder}>
         <p style={styles.title}>{title}</p>
@@ -183,20 +183,20 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
       </div>
     );
   };
-  
 
-  useEffect(() => {}, [productDetailId, productImages]);
+
+  useEffect(() => { }, [productDetailId, productImages]);
   return (
     <section>
       <ModalPage
         open={dealAccountList?.length ? true : false}
         content={
-          <div className="d-flex flex-column" style={{width:'400px'}}>
+          <div className="d-flex flex-column" style={{ width: '400px' }}>
             <h2>Attention!</h2>
             <p>
-            You have multi store with deal with this Brand.<br /> can you please select you create order for
+              You have multi store with deal with this Brand.<br /> can you please select you create order for
             </p>
-              <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
+            <HtmlFieldSelect value={selectAccount} list={dealAccountList} onChange={(value) => setSelectAccount(value)} />
             <div className="d-flex justify-content-around ">
               <button className={Styles.btn} onClick={accountSelectionHandler}>
                 OK
@@ -277,7 +277,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
             }
             salesPrice = (+listPrice - ((discount || 0) / 100) * +listPrice).toFixed(2);
             let ProductInCart = isProductCarted(product.Id);
-            
+
             return (
               <div className={Styles.cardElement}>
                 <div className={Styles.salesHolder}>
@@ -304,23 +304,19 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
                     </text>{" "}
                   </svg>
                 </div>
-                {productImages?.isLoaded ? (
-                  <div className={` last:mb-0 mb-4 ${Styles.HoverArrow}`}>
-                    <div className={` border-[#D0CFCF] flex flex-col gap-4 h-full  ${Styles.ImgHover1}`}>
-                      <img
-                        className={Styles.imgHolder}
-                        onClick={() => {
-                          setProductDetailId(product.Id);
-                          setBrand(product.ManufacturerId__c);
-                          setsalesRepId(accountDetails?.[product.ManufacturerId__c]?.SalesRepId ?? null);
-                        }}
-                        src={product.ProductImage ? product.ProductImage : productImages?.images?.[product.ProductCode]?.ContentDownloadUrl ?? "\\assets\\images\\dummy.png"}
-                      />
-                    </div>
+                <div className={` last:mb-0 mb-4 ${Styles.HoverArrow}`}>
+                  <div className={` border-[#D0CFCF] flex flex-col gap-4 h-full  ${Styles.ImgHover1}`}>
+                    <ImageHandler
+                      onClick={() => {
+                        setProductDetailId(product.Id);
+                        setBrand(product.ManufacturerId__c);
+                        setsalesRepId(accountDetails?.[product.ManufacturerId__c]?.SalesRepId ?? null);
+                      }}
+                      image={{ src: product.ProductImage ? product.ProductImage : productImages?.images?.[product.ProductCode]?.ContentDownloadUrl ?? "\\assets\\images\\dummy.png" }}
+                      className={Styles.imgHolder}
+                    />
                   </div>
-                ) : (
-                  <LoaderV2 />
-                )}
+                </div>
                 <p className={Styles.brandHolder} onClick={() => navigate("/Brand/" + product.ManufacturerId__c)}>{product?.ManufacturerName__c}</p>
                 <p
                   className={Styles.titleHolder}
@@ -338,10 +334,10 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
                   {product?.Name.substring(0, 20)}...
                 </p>
                 {product?.Category__c === "PREORDER" && <small className={Styles.preOrderBadge}>Pre-Order</small>}
-                {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> :ProductInCart?<small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
+                {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> : ProductInCart ? <small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
                 <p className={Styles.priceHolder}>
                   <div>
-                    {salesPrice != listPrice ? <p className={Styles.priceCrossed}>${listPrice.toFixed(2)}</p>:ProductInCart?<p className={Styles.priceCrossed}>${listPrice.toFixed(2)}</p>:null}
+                    {salesPrice != listPrice ? <p className={Styles.priceCrossed}>${listPrice.toFixed(2)}</p> : ProductInCart ? <p className={Styles.priceCrossed}>${listPrice.toFixed(2)}</p> : null}
                   </div>&nbsp;
                   <div>
                     <p>${ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price).toFixed(2)}</Link> : salesPrice}</p>
@@ -349,7 +345,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails={} }) =
                 </p>
                 {ProductInCart ? (
                   <>
-                  
+
                     {/* <b className={Styles.priceHolder}>{inputPrice * orders[product?.Id]?.quantity}</b> */}
                     <div className="d-flex">
                       <QuantitySelector

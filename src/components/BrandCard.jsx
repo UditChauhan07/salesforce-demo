@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Page from "../pages/page.module.css";
 import { ArrowRightInBrands } from "../lib/svg";
+import ImageHandler from "./loader/ImageHandler";
 const BrandCard = ({ brand, image ,createOrder}) => {
   const navigate = useNavigate();
   return (
@@ -10,7 +11,7 @@ const BrandCard = ({ brand, image ,createOrder}) => {
         {image ? (
           <Link to={'/Brand/' + brand.Id}>
             <div className={`border-[0.5px]  relative  border-[#D0CFCF] ${Page.ImgHover}`}>
-              <img src={`/assets/images/${image}`} className="object-scale-down max-h-[200px] h-full w-full" alt="img" />
+              <ImageHandler image={{src:image?`/assets/images/${image}`:"dummy.png"}} className={"object-scale-down max-h-[200px] h-full w-full"}/>
             </div>
           </Link>
         ) : null}

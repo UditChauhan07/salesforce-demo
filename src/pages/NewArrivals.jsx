@@ -7,8 +7,6 @@ import { CloseButton } from "../lib/svg";
 import { defaultLoadTime, fetchAccountDetails, GetAuthData, getMarketingCalendar } from "../lib/store";
 import { useNavigate } from "react-router-dom";
 import { getPermissions } from "../lib/permission";
-import { originAPi } from "../lib/store";
-import axios from "axios";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
 import { useManufacturer } from "../api/useManufacturer";

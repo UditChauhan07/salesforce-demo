@@ -124,7 +124,9 @@ const OrderListPage = () => {
         if (!selectedSalesRepId) setSelectedSalesRepId(response.Sales_Rep__c)
         getOrderlIsthandler({ key: response.x_access_token, Sales_Rep__c: selectedSalesRepId ?? response.Sales_Rep__c })
         if (admins.includes(response.Sales_Rep__c)) {
-          dataStore.getPageData(getSalesRepList, () => getSalesRepList({ key: response.x_access_token })).then((repRes) => {
+          dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: response.x_access_token })).then((repRes) => {
+            console.log({repRes});
+            
             setSalesRepList(repRes.data)
           }).catch((repErr) => {
             console.log({ repErr });
@@ -163,9 +165,9 @@ const OrderListPage = () => {
   }
   useBackgroundUpdater(()=>getOrderlIsthandler(userData.x_access_token,userData.Sales_Rep__c),defaultLoadTime);
   const orderListBasedOnRepHandler = (value) => {
+    setOrders([])
     setSelectedSalesRepId(value)
     setLoaded(false)
-    setOrders([])
     getOrderlIsthandler({ key: userData.x_access_token, Sales_Rep__c: value })
   }
 

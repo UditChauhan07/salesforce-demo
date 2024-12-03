@@ -16,9 +16,7 @@ const CustomerSupportDetails = () => {
   const detailsId = queryParams.get("id");
   const [detailsData, setDetailsData] = useState({});
   const [attachmentUrls, setAttachmentUrls] = useState([]);
-  const [isLoadingAttachments, setLoadingAttachments] = useState(false);
   const [isLoaded, setLoaded] = useState(false);
-  const [isAttachmentsLoaded, setAttachmentsLoaded] = useState(false);
   const handleCustomerSupportReady = (data) => {
     setDetailsData(data);
     setLoaded(true);
@@ -32,7 +30,7 @@ const CustomerSupportDetails = () => {
 
       dataStore.getPageData(location.pathname + location.search, () => getSupportDetails({ rawData }))
         .then((details) => {
-          details.salesRepName = user.Name;
+          details.salesRepName = user?.Name;
           details.salesRepId = user.Sales_Rep__c;
 
           // Update state or call relevant functions
@@ -82,15 +80,15 @@ const CustomerSupportDetails = () => {
             () => getAttachment(user.x_access_token, detailsId)
           );
 
-          if (response && response.attachments) {
+          if (response && response?.attachments) {
             const formattedAttachments = response.attachments.map(
               (attachment) => ({
                 id: attachment.id,
-                formattedId: `${attachment.id}.${attachment.name
+                formattedId: `${attachment.id}.${attachment?.name
                   .split(".")
                   .pop()
                   .toLowerCase()}`,
-                name: attachment.name,
+                name: attachment?.name,
               })
             );
             setAttachmentUrls(formattedAttachments);
@@ -110,6 +108,7 @@ const CustomerSupportDetails = () => {
 
     fetchAttachmentsWithTimeout();
   }, [detailsId]);
+  
 
   if (!detailsId || detailsId === "") return navigate("/customer-support");
 

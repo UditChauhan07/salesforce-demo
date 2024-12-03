@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import ContentLoader from "react-content-loader";
 import ProductDetails from "../../pages/productDetails";
 import dataStore from "../../lib/dataStore";
+import ImageHandler from "../loader/ImageHandler";
 
 const BrandDetailCard = ({ brandId }) => {
     const brand = brandDetails[brandId];
@@ -106,7 +107,7 @@ const BrandDetailCard = ({ brandId }) => {
                     </div>
                     <div className="col-xl-8 col-lg-8 col-md-12 col-sm-12 m-auto ">
                         <div className="row">
-                        <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
+                            <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
                                 {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0].ManufacturerName__c : null}</p> :
                                     <img style={{width: '65%'}}  className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
                             </div>
@@ -137,17 +138,8 @@ const BrandDetailCard = ({ brandId }) => {
                                                 <Link to={'/my-retailers?manufacturerId=' + brandId}>
                                                     Shop The Collection
                                                 </Link>
-                                                <div className="fitContent" onClick={() => setProductId(item.Id)}>
-                                                    {(productImages?.isLoaded || item.ProductImage) ? (
-                                                        <img className="zoomInEffect"
-                                                            style={{ maxHeight: '320px', width: 'auto', margin: '10px auto' }}
-                                                            src={item.ProductImage ? item.ProductImage : productImages?.images?.[item.ProductCode]?.ContentDownloadUrl ?? "\\assets\\images\\dummy.png"}
-                                                        />
-                                                    ) : (
-                                                        <div className="d-grid place-content-center" style={{ height: '300px', margin: 'auto' }}>
-                                                            <LoaderV2 mods={{ height: '150px', width: '150px' }} />
-                                                        </div>
-                                                    )}
+                                                <div className="fitContent d-flex justify-content-center align-items-center" onClick={() => setProductId(item.Id)}>
+                                                    <ImageHandler image={{ src: item.ProductImage ?? productImages?.images?.[item.ProductCode]?.ContentDownloadUrl ?? productImages?.images?.[item.ProductCode] ?? "dummy.png" }} />
                                                 </div>
                                             </div>
                                         </div>
