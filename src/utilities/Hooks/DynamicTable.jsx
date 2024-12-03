@@ -63,9 +63,9 @@ const DynamicTable = ({ mainData=[], itemsPerPage = 100, children, head = null, 
             </tr>
           ))
           }
-          {hasMoreData && (
+          {(hasMoreData) && (
             <tr ref={loaderRef}>
-              <td colSpan={100} className="d-grid place-content-center"><Loading /></td>
+              <td colSpan={100}><Loading /></td>
             </tr>
           )}
           {!hasMoreData && items.length > 0 && (
