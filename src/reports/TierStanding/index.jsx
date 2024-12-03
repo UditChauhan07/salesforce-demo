@@ -32,9 +32,11 @@ const Tier = () => {
     const [tier, setTier] = useState({ isLoad: false, data: [], getSalesHolder: {}, currentYearRevenue: 0, previousYearRevenue: 0 });
 
     const TierReady = (data) => {
-        let currentYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
-        let previousYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year - 1], 0);
-        setTier({ isLoad: true, data: data?.salesArray ?? [], getSalesHolder: data?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
+        if (data) {
+            let currentYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
+            let previousYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year - 1], 0);
+            setTier({ isLoad: true, data: data?.salesArray ?? [], getSalesHolder: data?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
+        }
     }
     const GetDataHandler = () => {
         GetAuthData().then((user) => {

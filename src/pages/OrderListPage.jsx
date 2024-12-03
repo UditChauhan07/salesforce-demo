@@ -110,8 +110,10 @@ const OrderListPage = () => {
   }, [filterValue, orders, searchShipBy]);
 
   const readyOrderList = (order) => {
-    let sorting = sortingList(order);
-    setOrders(sorting);
+    if(order){
+      let sorting = sortingList(order||[]);
+      setOrders(sorting);
+    }
     setLoaded(true);
   }
 

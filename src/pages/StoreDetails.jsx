@@ -19,19 +19,21 @@ const StoreDetails = () => {
   const [memoizedPermissions, setMemoizedPermissions] = useState(null);
   const [selectedSalesRepId, setSelectedSalesRepId] = useState();
   const readyAccountHandle = (data) => {
-    GetAuthData().then((user) => {
-      let brands = []
-      data.Brands.map((element) => {
-        console.log({ element });
-        if (element.Sales_Rep__c == user.Sales_Rep__c) {
-          brands.push(element)
-        }
+    if(data){
+      GetAuthData().then((user) => {
+        let brands = []
+        data.Brands.map((element) => {
+          console.log({ element });
+          if (element.Sales_Rep__c == user.Sales_Rep__c) {
+            brands.push(element)
+          }
+        })
+        setBrandList(brands)
+        setAccount({ isLoaded: true, data: data })
+      }).catch((userErr) => {
+        console.log({ userErr });
       })
-      setBrandList(brands)
-      setAccount({ isLoaded: true, data: data })
-    }).catch((userErr) => {
-      console.log({ userErr });
-    })
+    }
   }
   const getStoreData  = (id)=>{
     GetAuthData().then((user) => {

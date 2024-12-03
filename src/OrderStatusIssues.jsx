@@ -41,7 +41,7 @@ const OrderStatusIssues = () => {
     };
 
     function sortingList(data) {
-        data.sort(function (a, b) {
+        data?.sort(function (a, b) {
             return new Date(b.CreatedDate) - new Date(a.CreatedDate);
         });
         return data;
@@ -123,8 +123,8 @@ const OrderStatusIssues = () => {
             }
         }))
             .then((order) => {
-                let sorting = sortingList(order);
-                setOrders(sorting);
+                    let sorting = sortingList(order||[]);
+                    setOrders(sorting);
                 setLoaded(true);
             })
             .catch((error) => {
@@ -137,7 +137,7 @@ const OrderStatusIssues = () => {
         GetAuthData()
             .then((response) => {
                 dataStore.subscribe("/orderList" + selectedSalesRepId ?? response.Sales_Rep__c, (data) => {
-                    let sorting = sortingList(data);
+                    let sorting = sortingList(data||[]);
                     setOrders(sorting);
                     setLoaded(true);
                 })
@@ -153,7 +153,7 @@ const OrderStatusIssues = () => {
                 }
                 return () => {
                     dataStore.unsubscribe("/orderList" + selectedSalesRepId ?? response.Sales_Rep__c, (data) => {
-                        let sorting = sortingList(data);
+                        let sorting = sortingList(data||[]);
                         setOrders(sorting);
                         setLoaded(true);
                     })
