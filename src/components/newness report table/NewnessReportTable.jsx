@@ -3,7 +3,7 @@ import styles from "./table.module.css";
 import { Link } from "react-router-dom";
 import Loading from "../Loading";
 const NewnessReportTable = ({ newnessData, dataDisplay }) => {
-  
+
   const handleTableDataDisplay = (value) => {
     if (dataDisplay === "price")
       return `$${Number(value)
@@ -42,7 +42,7 @@ const NewnessReportTable = ({ newnessData, dataDisplay }) => {
       {newnessData?.status === 200 ? (
         newnessData.AccountList.length ? (
           <div className={`d-flex p-3 ${styles.tableBoundary} mb-5`}>
-            <div className={`{styles.WidthTable} table-responsive overflow-scroll `} style={{ maxHeight: "67vh", minHeight: "40vh"  , width: "100%"}}>
+            <div className={`{styles.WidthTable} table-responsive overflow-scroll `} style={{ height: "75vh", width: "100%" }}>
               <table id="salesReportTable" className="table table-responsive">
                 <thead>
                   <tr>

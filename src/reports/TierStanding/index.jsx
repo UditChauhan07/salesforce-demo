@@ -293,7 +293,7 @@ const Tier = () => {
                             </svg></div></div>
                     </div>}
                 <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
-                    <div className="" style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
+                    <div className="" style={{ overflow: "auto", width: "100%" }}>
                         {isLoad ?
                             <DynamicTable mainData={data} head={<thead>
                                 <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading}`}>Account</th>

@@ -45,8 +45,6 @@ const TargetReport = () => {
     const [searchSaleBy, setSearchSaleBy] = useState("");
     const [salesRepList, setSalesRepList] = useState([]);
     const [exportToExcelState, setExportToExcelState] = useState(false);
-    const [selectedSalesRepId, setSelectedSalesRepId] = useState();
-    const [userData, setUserData] = useState({});
     const [hasPermission, setHasPermission] = useState(null);
     const [permissions, setPermissions] = useState(null);
     const navigate = useNavigate();
@@ -543,7 +541,7 @@ const TargetReport = () => {
                         </div>
                     )}
                     <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
-                        <div className="" style={{ maxHeight: "73vh", minHeight: "40vh", overflow: "auto", width: "100%" }}>
+                        <div className="" style={{ overflow: "auto", width: "100%" }}>
                             <DynamicTable mainData={sortArrayHandler(filteredTargetData,g=>g.ManufacturerName)} head={<thead>
                                 <tr>
                                     <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading} `} style={{ minWidth: "170px" }}>
