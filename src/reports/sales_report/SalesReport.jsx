@@ -227,6 +227,7 @@ const SalesReport = () => {
     let salesList = [];
     let manuIds = [];
     let manufacturerList = [];
+    if(data){
     data?.data?.data?.map((manu) => {
       if (!manuIds.includes(manu.ManufacturerId__c)) {
         manuIds.push(manu.ManufacturerId__c);
@@ -249,6 +250,7 @@ const SalesReport = () => {
         });
       }
     });
+  }
     setManufacturers(manufacturerList)
     setSalesRepList(salesList);
     setSalesReportData(data?.data?.data);

@@ -50,8 +50,10 @@ const CustomerSupport = () => {
   const supportHandler = ({ key, salesRepId }) => {
     dataStore.getPageData("/customer-support" + salesRepId, () => getSupportList({ key, salesRepId }))
       .then((supports) => {
-        let sorting = sortArrayHandler(supports, g => g.CreatedDate, 'desc')
-        setSupportList(sorting);
+        if(supports){
+          let sorting = sortArrayHandler(supports, g => g.CreatedDate, 'desc')
+          setSupportList(sorting);
+        }
         setLoaded(true);
       })
       .catch((error) => {
@@ -71,10 +73,10 @@ const CustomerSupport = () => {
           if (!selectedSalesRepId) setSelectedSalesRepId(user.Sales_Rep__c);
           setUserData(user)
           dataStore.subscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
-            console.log({ data });
-
-            let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
-            setSupportList(sorting);
+            if(data){
+              let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
+              setSupportList(sorting);
+            }
             setLoaded(true);
           })
           if (!selectedSalesRepId) setSelectedSalesRepId(user.Sales_Rep__c)
@@ -83,15 +85,19 @@ const CustomerSupport = () => {
           brandhandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
           if (admins.includes(user.Sales_Rep__c)) {
             dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: user.x_access_token })).then((repRes) => {
-              setSalesRepList(repRes.data)
+              if(repRes){
+                setSalesRepList(repRes.data)
+              }
             }).catch((repErr) => {
               console.log({ repErr });
             })
           }
           return () => {
             dataStore.unsubscribe("/customer-support" + selectedSalesRepId ?? user.Sales_Rep__c, (data) => {
-              let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
-              setSupportList(sorting);
+              if(data){
+                let sorting = sortArrayHandler(data, g => g.CreatedDate, 'desc')
+                setSupportList(sorting);
+              }
               setLoaded(true);
             })
           }

@@ -108,7 +108,6 @@ const CustomerSupportDetails = () => {
 
     fetchAttachmentsWithTimeout();
   }, [detailsId]);
-  console.log({detailsData});
   
 
   if (!detailsId || detailsId === "") return navigate("/customer-support");
