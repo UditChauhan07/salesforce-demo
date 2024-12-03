@@ -315,7 +315,7 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                             </div>}
                             <div className={Detail.RecordType}>
                                 <h3>Record Type</h3>
-                                <p>{data.RecordType.Name}</p>
+                                <p>{data.RecordType?.Name}</p>
                             </div>
                             {attachmentUrls && attachmentUrls?.length > 0 && (
                                 <div className={Detail.RecordType}>
@@ -344,10 +344,10 @@ function FullQuearyDetail({ data, setRest, attachmentUrls = [] }) {
                                                     }}
                                                     className={Detail.DownloadLink}
                                                     onClick={() =>
-                                                        downloadFile(attachment.id, attachment.name)
+                                                        downloadFile(attachment.id, attachment?.name)
                                                     }
                                                 >
-                                                    {attachment.name}
+                                                    {attachment?.name}
                                                 </a>
                                             </li>
                                         ))}

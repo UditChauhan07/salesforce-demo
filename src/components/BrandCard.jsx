@@ -11,7 +11,7 @@ const BrandCard = ({ brand, image ,createOrder}) => {
         {image ? (
           <Link to={'/Brand/' + brand.Id}>
             <div className={`border-[0.5px]  relative  border-[#D0CFCF] ${Page.ImgHover}`}>
-              <ImageHandler image={{src:image?`/assets/images/${image}`:"dummy.png"}}/>
+              <ImageHandler image={{src:image?`/assets/images/${image}`:"dummy.png"}} className={"object-scale-down max-h-[200px] h-full w-full"}/>
             </div>
           </Link>
         ) : null}

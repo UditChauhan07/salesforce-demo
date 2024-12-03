@@ -110,6 +110,9 @@ const SalesReportTable = ({ salesData, year, ownerPermission }) => {
         <td className={`${styles.lastRow} ${styles.stickyFirstColumn} ${styles.stickyLastRow}`} colSpan={3}>
           TOTAL
         </td>
+        <td className={`${styles.lastRow} ${styles.lastRowMonth} ${styles.stickyLastRow}`}></td>
+        <td className={`${styles.lastRow} ${styles.lastRowMonth} ${styles.stickyLastRow}`}></td>
+        <td className={`${styles.lastRow} ${styles.lastRowMonth} ${styles.stickyLastRow}`}></td>
         {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
           (monthName) => (
             <td key={monthName} className={`${styles.lastRow} ${styles.lastRowMonth} ${styles.stickyLastRow}`}>

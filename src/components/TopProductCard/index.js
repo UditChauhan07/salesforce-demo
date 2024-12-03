@@ -313,6 +313,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails = {} })
                         setsalesRepId(accountDetails?.[product.ManufacturerId__c]?.SalesRepId ?? null);
                       }}
                       image={{ src: product.ProductImage ? product.ProductImage : productImages?.images?.[product.ProductCode]?.ContentDownloadUrl ?? "\\assets\\images\\dummy.png" }}
+                      className={Styles.imgHolder}
                     />
                   </div>
                 </div>

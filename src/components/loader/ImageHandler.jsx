@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import LoaderV2 from './v2';
 
-const ImageHandler = ({ image, onClick = null,height='auto',width='auto' }) => {
+const ImageHandler = ({ image, onClick = null,height='auto',width='auto',className }) => {
   const [loading, setLoading] = useState(true); // State to track loading
   const [error, setError] = useState(false); // State to track image loading error
 
@@ -30,7 +30,7 @@ const ImageHandler = ({ image, onClick = null,height='auto',width='auto' }) => {
       )}
 
       <img
-        className={`zoomInEffect max-h-[350px] w-[100%] img-fluid ${loading ? 'hidden' : ''}`} // Hide image while loading
+        className={`zoomInEffect max-h-[350px] w-[100%] ${loading ? 'hidden' : ''} ${className}`} // Hide image while loading
         src={imageSrc}
         alt={image?.alt??"...."}
         onClick={onClick}
