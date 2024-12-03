@@ -49,6 +49,8 @@ const CartProvider = ({ children }) => {
             const user = await GetAuthData();
             const getOrder = { CreatedBy: user?.Sales_Rep__c };
             const cart = await cartSync({ cart: getOrder });
+            
+            
             // Validate if the fetched cart has essential content like Account and Manufacturer
             if (cart.id && cart.Account?.id && cart.Manufacturer?.id) {
                 setOrder(cart); // Set the fetched cart if valid
@@ -562,7 +564,6 @@ const CartProvider = ({ children }) => {
 
         return false;
     };
-    console.log({ order });
 
 
     const contentApiFunction = async (productList, account, manufacturer, ordertype = 'wholesale') => {

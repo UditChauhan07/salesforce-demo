@@ -22,7 +22,9 @@ const BMAIssues = () => {
         GetAuthData().then((user) => {
             setUserData(user)
             dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: user.x_access_token })).then((repRes) => {
-                setSalesRepList(repRes.data)
+                if(repRes){
+                    setSalesRepList(repRes.data)
+                }
             }).catch((repErr) => {
                 console.log({ repErr });
             })

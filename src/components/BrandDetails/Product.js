@@ -182,13 +182,13 @@ function Product() {
     if (!(localStorage.getItem("ManufacturerId__c") && localStorage.getItem("AccountId__c"))) {
       setRedirect(true);
     }
-    let productData = productRes.data.records || []
+    let productData = productRes?.data?.records || []
     productData.map((element) => {
       if (element.AttachedContentDocuments) {
   
       }
     })
-    let discount = productRes.discount;
+    let discount = productRes?.discount||{};
 
 
     setProductCartSchema({ testerInclude: productRes.discount?.testerInclude, sampleInclude: productRes.discount?.sampleInclude })
