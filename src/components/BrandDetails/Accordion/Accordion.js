@@ -10,7 +10,8 @@ import ImageHandler from "../../loader/ImageHandler";
 
 const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
-
+let selectedsalesRep = JSON.parse(localStorage.getItem('selectedSalesrepId'))
+console.log(selectedsalesRep , "----accordian salesrep")
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted, updateProductPrice } = useCart();
   const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -247,6 +248,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
         setProductDetailId={setProductDetailId}
         ManufacturerId={localStorage.getItem("ManufacturerId__c")}
         AccountId={[localStorage.getItem("AccountId__c")]}
+        selectedsalesRep = {selectedsalesRep}
       />
     </>
   );
