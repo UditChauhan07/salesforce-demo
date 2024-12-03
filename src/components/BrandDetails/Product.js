@@ -352,7 +352,6 @@ function Product() {
     return Number(getOrderTotal() || 0).toFixed(2);
   }
 
-
   return (
     <>
       {redirect ? (
