@@ -67,7 +67,7 @@ function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, 
             >
                 <path d="M7.71484 10.8534L14.8098 17.7119L21.9048 10.8534" stroke="#403A35" strokeWidth={"2"} />
               </svg></div>
-            <div className={` overflow-y-auto ${styles.bodyAccor}`} style={{ height: "44vh" }}>
+            <div className={` overflow-x-auto ${styles.bodyAccor}`} style={{ height: "44vh" }}>
               {showCat ? categoryFilters?.includes("Samples") || categoryFilters?.includes("TESTER") ? <>
                 <div className={`${styles.title} ${styles.borderRad} text-uppercase text-[11px]`}> No Category</div>
               </> : <>
