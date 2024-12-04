@@ -10,8 +10,6 @@ import { getPermissions } from "../lib/permission";
 import { GetAuthData } from "../lib/store";
 import { useNavigate } from "react-router-dom";
 import { fetchAccountDetails } from "../lib/store";
-import axios from "axios";
-import { originAPi } from "../lib/store";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
 import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";

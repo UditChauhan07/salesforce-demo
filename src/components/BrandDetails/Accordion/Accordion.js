@@ -3,7 +3,6 @@ import styles from "./Style.module.css";
 import CollapsibleRow from "../../CollapsibleRow";
 import QuantitySelector from "./QuantitySelector";
 import ModalPage from "../../Modal UI";
-import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
 import { useCart } from "../../../context/CartContext";
 import ImageHandler from "../../loader/ImageHandler";
