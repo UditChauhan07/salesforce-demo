@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TopNav from "./All Headers/topNav/TopNav";
 import LogoHeader from "./All Headers/logoHeader/LogoHeader";
 import Header from "./All Headers/header/Header";
@@ -6,6 +6,13 @@ import MobileHeader from "./All Headers/mobileHeader/MobileHeader";
 import Footer from "./Footer/Footer";
 import { motion, AnimatePresence } from 'framer-motion';
 const AppLayout = ({ children, filterNodes }) => {
+  useEffect(()=>{
+    let ppc= localStorage.getItem("ppc");
+    if(ppc && ppc != ""&&ppc != "undefined"&&ppc!="null"){
+      localStorage.removeItem("ppc");
+      window.location.href = window.location.origin+"/productPage/"+ppc
+    }
+  },[])
   return (
     <div className="col-12">
       <div className="container p-0">
