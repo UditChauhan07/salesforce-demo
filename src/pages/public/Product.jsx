@@ -70,7 +70,7 @@ const PublicProduct = () => {
                 product.isloaded ?
                     <div className="productDetailContainer" style={{ margin: '1rem auto 4rem' }}>
                         {product.data?.Id ?
-                            <ProductDetailCard product={product} orders={{}} isAddtoCart={false} /> : null}
+                            <ProductDetailCard product={product} orders={{}} publicView={true} /> : null}
                     </div> : <Loading height={'70vh'} />}
             <HelpSection />
             <Footer readOnly />

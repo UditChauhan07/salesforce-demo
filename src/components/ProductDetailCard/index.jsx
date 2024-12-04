@@ -8,8 +8,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import ModalPage from "../Modal UI";
 
-const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
-  console.log({product})
+const ProductDetailCard = ({ product, orders, onQuantityChange = null,publicView=false }) => {
   const { updateProductQty, removeProduct } = useCart();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState();
   const [modalShow,setModalShow]= useState(false);
@@ -37,7 +36,7 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
  
   let listPrice = Number(product?.data?.usdRetail__c?.replace("$", "")?.replace(",", ""));
   let salesPrice = 0;
-  let listOfAccounts = Object.keys(product?.discount);
+  let listOfAccounts = Object.keys(product?.discount||{});
   if (listOfAccounts.length) {
     if (listOfAccounts.length == 1) {
       selAccount = product?.discount?.[listOfAccounts[0]];
@@ -109,13 +108,13 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
             </p>
           )}
           <div className="text-start">
-            {selAccount?.Name ? <small>Price for <b>{selAccount?.Name}</b></small> : orders ? <small>Price for <b>{orders.Account.name}</b></small> : null}
+            {!publicView ? selAccount?.Name ? <small>Price for <b>{selAccount?.Name}</b></small> : (orders) ? <small>Price for <b>{orders?.Account?.name}</b></small> : null:null}
           </div>
           <p className={`${Styles.priceHolder} d-flex mt-2`}>
-            {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : orders ? <p className={Styles.crossed}>{!isNaN(listPrice) ? "$"+listPrice.toFixed(2):listPrice}&nbsp;</p> : null:null}
-            <b>{orders ? <Link to={"/my-bag"}>${Number(orders?.items?.price).toFixed(2)}</Link> : !isNaN(listPrice)?'$'+salesPrice:product.data.usdRetail__c??"NA"}</b>
+            {!publicView ?(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <p className={Styles.crossed}>${listPrice.toFixed(2)}&nbsp;</p> : orders ? <p className={Styles.crossed}>{!isNaN(listPrice) ? "$"+listPrice.toFixed(2):listPrice}&nbsp;</p> : null:null:null}
+            <b>{!publicView ?orders ? <Link to={"/my-bag"}>${Number(orders?.items?.price).toFixed(2)}</Link> : !isNaN(salesPrice)?'$'+salesPrice:product.data.usdRetail__c??"NA":product.data.usdRetail__c}</b>
           </p>
-          {!product.data.ProductUPC__c || !product.data.ProductCode || !product.data.IsActive || (!product.data?.PricebookEntries?.length || !product?.data?.PricebookEntries?.[0]?.IsActive && (!isNaN(salesPrice) && !isNaN(listPrice)) || !isDateEqualOrGreaterThanToday(product.data.Launch_Date__c)) ? <button
+          {!publicView?!product.data.ProductUPC__c || !product.data.ProductCode || !product.data.IsActive || (!product.data?.PricebookEntries?.length || !product?.data?.PricebookEntries?.[0]?.IsActive && (!isNaN(salesPrice) && !isNaN(listPrice)) || !isDateEqualOrGreaterThanToday(product.data.Launch_Date__c)) ? <button
             className={`${Styles.button}`}
             onClick={()=>setModalShow(true)}
           >
@@ -159,7 +158,7 @@ const ProductDetailCard = ({ product, orders, onQuantityChange = null }) => {
                   </button>
                 </div>
               )}
-            </>}
+            </>:null}
           {/* {product?.data?.Description && <p style={{ textAlign: 'start', color: "#898989" }}>{product?.data?.Description}</p>} */}
           <hr className="mt-5" style={{ borderTop: "3px dashed #000", fontSize: "20px", color: "black" }}></hr>
           {product?.data?.ProductCode && <p className={Styles.descHolder}>
