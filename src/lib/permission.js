@@ -5,37 +5,37 @@ export const permissionsArray = [
   {
     userType: "superadmin",
     //0053b00000DgEVEAA3
-    allows: ["00530000005AdvsAAC", "0051O00000CvAVTQA3","0053b00000DgEVEAA3" , "0053b00000C75e8AAB" , "0053b00000DgEvqAAF"],
+    allows: ["00530000005AdvsAAC", "0051O00000CvAVTQA3", "0053b00000DgEVEAA3", "0053b00000C75e8AAB", "0053b00000DgEvqAAF"],
     permissions: {
       modules: {
-        godLevel: true, //check
+        godLevel: true,
         store: {
-          view: true  //check
+          view: true
         },
         order: {
-          view: true, //check
-          create: true, //check
+          view: true,
+          create: true,
         },
         emailBlast: {
-          view: true, //check but work on
+          view: true,
           create: true,
         },
         newArrivals: {
-          view: true, // check
+          view: true,
         },
         brands: {
-          view: true // check
+          view: true
         },
         dashboard: {
           view: true,
           redirect: true
         },
         topProducts: {
-          view: true, // check
+          view: true,
           create: true,
         },
         marketingCalender: {
-          view: true, //check
+          view: true,
           create: true,
         },
         educationCenter: {
@@ -43,53 +43,53 @@ export const permissionsArray = [
           create: true,
         },
         customerSupport: {
-          view: true, //check
+          view: true,
           create: true,
           childModules: {
             order_Status: {
               view: true,
-              create: true //check
+              create: true
             },
             customer_service: {
               view: true,
-              create: true //check
+              create: true
             },
             brandManagementApproval: {
               view: true,
-              create: true //check
+              create: true
             },
             how_To_Guide: {
-              view: true, //check
+              view: true,
             }
           },
         },
         reports: {
           hasAccess: true,
           salesReport: {
-            view: true, //check
+            view: true,
           },
           newnessReport: {
-            view: true, //check
+            view: true,
           },
           comparisonReport: {
-            view: true, //check
+            view: true,
           },
           yearlyComparisonReport: {
-            view: true, //check
+            view: true,
           },
           targetReport: {
-            view: true, //check
+            view: true,
           },
           contactDetailedReport: {
             view: true, //off
           },
           accountTier: {
-            view: true, //check
+            view: true,
           },
           auditReport: {
-            view: true, //check
-            create: true ,  //check
-            specify : true
+            view: true,
+            create: true,
+            specify: true
           },
         },
       },
@@ -180,8 +180,8 @@ export const permissionsArray = [
           },
           auditReport: {
             view: false, //check
-            create: false , 
-            specify : true //check
+            create: false,
+            specify: true //check
           },
         },
       },
@@ -192,34 +192,34 @@ export const permissionsArray = [
     allows: ["0053b00000DgGqOAAV"],
     permissions: {
       modules: {
-        godLevel: true, //check
+        godLevel: true,
         store: {
-          view: false  //check
+          view: false 
         },
         order: {
-          view: false, //check
-          create: false, //check
+          view: false,
+          create: false,
         },
         emailBlast: {
-          view: false, //check but work on
+          view: false,
           create: false,
         },
         newArrivals: {
-          view: false, // check
+          view: false,
         },
         brands: {
-          view: false // check
+          view: false
         },
         dashboard: {
           view: true,
           redirect: true
         },
         topProducts: {
-          view: false, // check
+          view: false,
           create: false,
         },
         marketingCalender: {
-          view: true, //check
+          view: true,
           create: false,
         },
         educationCenter: {
@@ -227,52 +227,52 @@ export const permissionsArray = [
           create: false,
         },
         customerSupport: {
-          view: false, //check
+          view: false,
           create: false,
           childModules: {
             order_Status: {
               view: false,
-              create: false //check
+              create: false
             },
             customer_service: {
               view: false,
-              create: false //check
+              create: false
             },
             brandManagementApproval: {
               view: false,
-              create: false //check
+              create: false
             },
             how_To_Guide: {
-              view: false, //check
+              view: false,
             }
           },
         },
         reports: {
           hasAccess: true,
           salesReport: {
-            view: true, //check
+            view: true,
           },
           newnessReport: {
-            view: false, //check
+            view: true,
           },
           comparisonReport: {
-            view: false, //check
+            view: true,
           },
           yearlyComparisonReport: {
-            view: false, //check
+            view: true,
           },
           targetReport: {
-            view: false, //check
+            view: true,
           },
           contactDetailedReport: {
-            view: true , //off
+            view: true,
           },
           accountTier: {
-            view: false, //check
+            view: false,
           },
           auditReport: {
-            view: true, //check
-            create: true //check
+            view: true,
+            create: true
           },
         },
       },
@@ -356,15 +356,15 @@ export const permissionsArray = [
             view: false, //check
           },
           contactDetailedReport: {
-            view: false , //off
+            view: false, //off
           },
           accountTier: {
             view: false, //check
           },
           auditReport: {
             view: false, //check
-            create: false  , //check
-            specify : true
+            create: false, //check
+            specify: true
           },
         },
       },
@@ -382,23 +382,17 @@ export async function getPermissions() {
     DestoryAuth();
     return null;
   }
+  
 
-  const salesRepId = authData.Sales_Rep__c;
-
-
-  for (const permission of permissionsArray) {
-    if (permission.allows.includes(salesRepId)) {
-      userType = permission.userType;
-      break;
-    }
+  let userPermissions =  null;
+  if(authData?.permission){
+    userPermissions= JSON.parse(authData.permission)
   }
-
-  const userPermissions = permissionsArray.find((p) => p.userType === userType);
 
   if (!userPermissions) {
     console.log("Permissions not found for the user type.");
     return null;
   }
 
-  return userPermissions.permissions;
+  return userPermissions;
 }
