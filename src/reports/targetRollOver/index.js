@@ -64,8 +64,6 @@ const TargetReport = () => {
         });
         setSalesRepList(salesRep);
         setTarget(data);
-        setManufacturerFilter(data.ownerPermission ? state?.manufacturerId : null);
-        setSearchSaleBy(data.ownerPermission ? state?.salesRepId : null);
     }
     const filteredTargetData = useMemo(() => {
         setCurrentPage(1);
@@ -117,9 +115,13 @@ const TargetReport = () => {
                 console.error({ userErr });
             });
     }
+    console.log({manufacturerFilter,searchSaleBy});
+    
     useEffect(() => {
         dataStore.subscribe("/Target-Report", handleTargetReady)
         GetTargetData();
+        setManufacturerFilter(target?.ownerPermission ? state?.manufacturerId :null);
+        setSearchSaleBy(target?.ownerPermission ? state?.salesRepId : null);
         return () => {
             dataStore.unsubscribe("/Target-Report", handleTargetReady)
         }
