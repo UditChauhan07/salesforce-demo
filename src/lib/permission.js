@@ -5,7 +5,7 @@ export const permissionsArray = [
   {
     userType: "superadmin",
     //0053b00000DgEVEAA3
-    allows: ["00530000005AdvsAAC", "0051O00000CvAVTQA3","0053b00000DgEVEAA3" , "0053b00000C75e8AAB" , "0053b00000DgEvqAAF"],
+    allows: ["00530000005AdvsAAC", "0051O00000CvAVTQA3", "0053b00000DgEVEAA3", "0053b00000C75e8AAB", "0053b00000DgEvqAAF"],
     permissions: {
       modules: {
         godLevel: true, //check
@@ -88,8 +88,8 @@ export const permissionsArray = [
           },
           auditReport: {
             view: true, //check
-            create: true ,  //check
-            specify : true
+            create: true,  //check
+            specify: true
           },
         },
       },
@@ -180,8 +180,8 @@ export const permissionsArray = [
           },
           auditReport: {
             view: false, //check
-            create: false , 
-            specify : true //check
+            create: false,
+            specify: true //check
           },
         },
       },
@@ -253,19 +253,19 @@ export const permissionsArray = [
             view: true, //check
           },
           newnessReport: {
-            view: false, //check
+            view: true, //check
           },
           comparisonReport: {
-            view: false, //check
+            view: true, //check
           },
           yearlyComparisonReport: {
-            view: false, //check
+            view: true, //check
           },
           targetReport: {
-            view: false, //check
+            view: true, //check
           },
           contactDetailedReport: {
-            view: true , //off
+            view: true, //off
           },
           accountTier: {
             view: false, //check
@@ -356,15 +356,15 @@ export const permissionsArray = [
             view: false, //check
           },
           contactDetailedReport: {
-            view: false , //off
+            view: false, //off
           },
           accountTier: {
             view: false, //check
           },
           auditReport: {
             view: false, //check
-            create: false  , //check
-            specify : true
+            create: false, //check
+            specify: true
           },
         },
       },

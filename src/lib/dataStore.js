@@ -165,9 +165,10 @@ const dataStore = {
             console.error('Error clearing data:', error);
         }
     },
-
-    // Clear all stored data
     async clearAll() {
+    },
+    // Clear all stored data
+    async clearAllDiscart() {
         try {
             const db = await openDatabase();
             const transaction = db.transaction('dataStore', 'readwrite');
