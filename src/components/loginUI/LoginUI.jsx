@@ -26,7 +26,6 @@ const LoginUI = () => {
   const onSubmit = async (values, action) => {
     setLoading(true);
     const apiData = await api.mutateLogin(values.email, values.password);
-    console.log({apiData});
     setLoading(false);
     if (apiData?.status === 200) {
       if (values.remember) {
