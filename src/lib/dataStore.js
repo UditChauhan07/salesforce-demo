@@ -166,6 +166,9 @@ const dataStore = {
         }
     },
     async clearAll() {
+        return new Promise((resolve, reject) => {
+            resolve(true);
+        });
     },
     // Clear all stored data
     async clearAllDiscart() {
@@ -173,13 +176,13 @@ const dataStore = {
             const db = await openDatabase();
             const transaction = db.transaction('dataStore', 'readwrite');
             const store = transaction.objectStore('dataStore');
-    
+
             // Return a promise that resolves when the clear operation is complete
             return new Promise((resolve, reject) => {
                 const request = store.clear();
-    
+
                 request.onsuccess = (event) => {
-                    console.log("All data cleared successfully.",{event});
+                    console.log("All data cleared successfully.", { event });
                     Object.keys(this.listeners).forEach((pageKey) => this.notify(pageKey, null)); // Notify all listeners
                     resolve(true); // Resolve the promise on success
                 };
