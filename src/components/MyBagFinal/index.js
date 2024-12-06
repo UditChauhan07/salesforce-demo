@@ -52,7 +52,6 @@ function MyBagFinal({ showOrderFor }) {
     if (order?.Account?.id && order?.Manufacturer?.id) {
       try {
         const res = await POGenerator();
-        console.log({res});
         
         if (res?.poNumber) {
           if(res?.address || res.shippingMethod){
