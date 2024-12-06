@@ -15,7 +15,6 @@ function ProductPage() {
           let user = await GetAuthData();
           if (user.permission) {
               let permission = JSON.parse(user.permission);
-              console.log({permission});
               
               if (permission?.modules?.order?.view === false) {
                   PermissionDenied()
