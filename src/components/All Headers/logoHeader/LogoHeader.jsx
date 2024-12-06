@@ -22,14 +22,16 @@ const LogoHeader = () => {
   const [key, setKey] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef(null);
-  const { getOrderQuantity,fetchCart } = useCart();
+  const { getOrderQuantity, fetchCart } = useCart();
   const [cartQty, setCartQty] = useState(0);
   useEffect(() => {
-    setCartQty(getOrderQuantity() ?? 0)
+    if (permissions?.modules?.order?.create) {
+      setCartQty(getOrderQuantity() ?? 0)
+    }
   }, [getOrderQuantity])
-  useEffect(()=>{
+  useEffect(() => {
     fetchCart();
-  },[useLocation])
+  }, [useLocation])
   const handleInputChange = (e) => setSearchTerm(e.target.value);
   useEffect(() => {
     async function fetchPermissions() {
@@ -53,7 +55,7 @@ const LogoHeader = () => {
     PermissionDenied();
   };
 
-useBackgroundUpdater(fetchCart,defaultLoadTime);
+  useBackgroundUpdater(fetchCart, defaultLoadTime);
 
   const searchAccounts = async (term) => {
     if (term.length <= 2) return setSuggestions([]);
@@ -102,10 +104,10 @@ useBackgroundUpdater(fetchCart,defaultLoadTime);
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
   const handleSuggestionClick = (id, manufacturerId, type, opportunityId) => {
-    
+
     setSearchTerm("");
     setSuggestions([]);
-  
+
     if (type === "account") {
       navigate(`/store/${id}`);
     } else if (type === "Account_Manufacturer__c") {
@@ -119,7 +121,7 @@ useBackgroundUpdater(fetchCart,defaultLoadTime);
       window.location.href = "/orderDetails";
     }
   };
- 
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -293,7 +295,7 @@ useBackgroundUpdater(fetchCart,defaultLoadTime);
 
           {memoizedPermissions?.modules?.order?.create ? <>
             <p className={`m-0  ${styles.language}`}>
-            <Link to="/my-bag" className="linkStyle">
+              <Link to="/my-bag" className="linkStyle">
                 My Bag ({cartQty})
               </Link>
             </p>

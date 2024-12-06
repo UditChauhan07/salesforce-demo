@@ -8,19 +8,21 @@ const CartHover = () => {
     const { order } = useCart();
     const navigate = useNavigate();
     const path = window.location.pathname;
-    const [ isShow,setIsShow] = useState(false);
+    const [isShow, setIsShow] = useState(false);
 
-    useEffect(()=>{
-        GetAuthData().then((user)=>{
-
-            if(user){
-                setIsShow(true);
+    useEffect(() => {
+        GetAuthData().then((user) => {
+            if (user) {
+                let permission = JSON.parse(user?.permission);              
+                if (permission?.modules?.order?.create === true) {
+                    setIsShow(true);
+                }
             }
-       }).catch((e)=>console.error({e}))
-        
-    },[path])
-    
-    if (!order?.items?.length||!isShow) return null;
+        }).catch((e) => console.error({ e }))
+
+    }, [path])
+
+    if (!order?.items?.length || !isShow) return null;
     const addMoreHandler = () => {
         localStorage.setItem("manufacturer", order.Manufacturer.name);
         localStorage.setItem("ManufacturerId__c", order.Manufacturer.id);
@@ -31,7 +33,7 @@ const CartHover = () => {
         localStorage.setItem("address", JSON.stringify(order.Account.address));
         navigate("/product");
     }
-    if(path == '/'||path == '/login'||path == '/logout') return null;
+    if (path == '/' || path == '/login' || path == '/logout') return null;
     return (
         <div className={styles.holder}>
             {path != "/my-bag" ?
