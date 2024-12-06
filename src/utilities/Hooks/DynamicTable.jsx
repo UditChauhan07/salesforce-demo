@@ -54,7 +54,7 @@ const DynamicTable = ({ mainData=[], itemsPerPage = 100, children, head = null, 
 
   return (
     <div style={{ height: "75vh", overflowY: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }} {...props}>
+      <table style={{ width: "100%", borderCollapse: "collapse",position:'relative',height:'98%' }} {...props}>
         {head ? head : null}
         <tbody>
           {items.map((item, index) => (
@@ -70,7 +70,7 @@ const DynamicTable = ({ mainData=[], itemsPerPage = 100, children, head = null, 
           )}
           {!hasMoreData && items.length > 0 && (
             <tr>
-              <td colSpan={100} className="text-center">No more data to load.</td>
+              <td colSpan={100} className="text-center" style={{height:'20px'}}>No more data to load.</td>
             </tr>
           )}
         </tbody>

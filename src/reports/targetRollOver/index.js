@@ -115,12 +115,12 @@ const TargetReport = () => {
                 console.error({ userErr });
             });
     }
-    console.log({manufacturerFilter,searchSaleBy});
-    
+    console.log({ manufacturerFilter, searchSaleBy });
+
     useEffect(() => {
         dataStore.subscribe("/Target-Report", handleTargetReady)
         GetTargetData();
-        setManufacturerFilter(target?.ownerPermission ? state?.manufacturerId :null);
+        setManufacturerFilter(target?.ownerPermission ? state?.manufacturerId : null);
         setSearchSaleBy(target?.ownerPermission ? state?.salesRepId : null);
         return () => {
             dataStore.unsubscribe("/Target-Report", handleTargetReady)
@@ -528,7 +528,7 @@ const TargetReport = () => {
                 />
             )}
             {!isLoaded ? (
-                <Loading  height={"70vh"} />
+                <Loading height={"70vh"} />
             ) : (
                 <section>
                     {true && (
@@ -544,7 +544,7 @@ const TargetReport = () => {
                     )}
                     <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
                         <div className="" style={{ overflow: "auto", width: "100%" }}>
-                            <DynamicTable mainData={sortArrayHandler(filteredTargetData,g=>g.ManufacturerName)} head={<thead>
+                            <DynamicTable mainData={sortArrayHandler(filteredTargetData, g => g.ManufacturerName)} head={<thead>
                                 <tr>
                                     <th className={`${Styles.th} ${Styles.stickyFirstColumnHeading} `} style={{ minWidth: "170px" }}>
                                         Sales Rep
@@ -728,7 +728,7 @@ const TargetReport = () => {
                                         ${formentAcmount(Total.diff)}
                                     </td>
                                 </tr>
-                            </tfoot>} id="salesReportTable" className="table table-responsive" style={{ minHeight: "300px" }}>
+                            </tfoot>} id="salesReportTable" className="table table-responsive">
 
                                 {(items) => allOrdersEmpty ? (
                                     <div className={`${styles.NodataText} py-4 w-full lg:min-h-[300px] xl:min-h-[380px]`} key="no-data">
@@ -742,16 +742,16 @@ const TargetReport = () => {
                                         <td className={`${Styles.td}`}>{items.Status}</td>
                                         <td className={`${Styles.td}`}>{DateConvert(items?.DateOpen)}</td>
                                         {months.map((month) => (
-                                        <>
-                                        <td className={`${Styles.td}`}>${formentAcmount(items?.[month]?.staticTarget)}
-                                            {/* {items?.[month]?.totalRoll ? (items?.[month]?.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(items?.[month]?.totalRoll)}</small>+{formentAcmount(items?.[month]?.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(items?.[month]?.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-items?.[month]?.totalRoll)}</small></p></> : null) : null} */}
-                                        </td>
-                                        <td className={`${Styles.td}`}>${formentAcmount(items?.[month]?.sales)}
-                                        </td>
-                                        <td className={`${Styles.td}`}>${items?.[month]?.staticTarget - items?.[month]?.sales >= 0 ? formentAcmount(items?.[month]?.staticTarget - items?.[month]?.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(items?.[month]?.staticTarget - items?.[month]?.sales))}</b>}</td>
-                                        </>
-                                    ))}
-                                       
+                                            <>
+                                                <td className={`${Styles.td}`}>${formentAcmount(items?.[month]?.staticTarget)}
+                                                    {/* {items?.[month]?.totalRoll ? (items?.[month]?.totalRoll > 0 ? <><br /><p className={Styles.calHolder}><small style={{ color: 'red' }}>{formentAcmount(items?.[month]?.totalRoll)}</small>+{formentAcmount(items?.[month]?.staticTarget)}</p></> : false ? <><br /><p className={Styles.calHolder}>{formentAcmount(items?.[month]?.staticTarget)}-<small style={{ color: 'green' }}>{formentAcmount(-items?.[month]?.totalRoll)}</small></p></> : null) : null} */}
+                                                </td>
+                                                <td className={`${Styles.td}`}>${formentAcmount(items?.[month]?.sales)}
+                                                </td>
+                                                <td className={`${Styles.td}`}>${items?.[month]?.staticTarget - items?.[month]?.sales >= 0 ? formentAcmount(items?.[month]?.staticTarget - items?.[month]?.sales) : <b style={{ color: 'green' }}>{formentAcmount(Math.abs(items?.[month]?.staticTarget - items?.[month]?.sales))}</b>}</td>
+                                            </>
+                                        ))}
+
                                         <td className={`${Styles.td} ${Styles.stickyThirdLastColumn}`}>${formentAcmount(items.Total.staticTarget)}</td>
                                         <td className={`${Styles.td} ${Styles.stickySecondLastColumn}`}>${formentAcmount(items.Total.sales)}</td>
                                         <td className={`${Styles.td} ${Styles.stickyLastColumn}`}>${formentAcmount(items.Total.staticTarget - items.Total.sales)}</td>
