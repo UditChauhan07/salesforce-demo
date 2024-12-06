@@ -161,7 +161,7 @@ const SalesReportTable = ({ salesData, year, ownerPermission }) => {
                   Total Amount
                 </th>
               </tr>
-            </thead>} foot={<tfoot style={{position:'sticky',bottom:0}}>{renderFooter()}</tfoot>} id="salesReportTable" className="table table-responsive">
+            </thead>} foot={<tfoot>{renderFooter()}</tfoot>} id="salesReportTable" className="table table-responsive">
 
               {(item) => allOrdersEmpty ? (
                 <div className={`${styles.NodataText} flex justify-center items-center py-4 w-full lg:min-h-[300px] xl:min-h-[380px]}`} key="no-data">
