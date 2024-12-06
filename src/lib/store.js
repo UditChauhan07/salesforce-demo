@@ -179,7 +179,6 @@ export async function POGenerator() {
   try {
 
     let orderDetails = fetchBeg();
-    console.log({ orderDetails })
     let date = new Date();
 
     //  const response = await fetch( "http://localhost:2611/PoNumber/generatepo"
@@ -203,12 +202,14 @@ export async function POGenerator() {
 
 
     const poData = await response.json();
-    console.log(poData);
-
     if (poData.success) {
-      let generatedPONumber = poData.poNumber;
+      
+      let res = await poData;
+      let poNumber = res.poNumber;
+      let address = res.address;
+      let shippingMethod = res.shippingMethod;
 
-      return await generatedPONumber;
+      return  {poNumber,address,shippingMethod};
     } else {
       console.error('Failed to generate PO number:', poData.message);
       return null;
