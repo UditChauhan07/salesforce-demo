@@ -20,6 +20,7 @@ import { CSVLink } from "react-csv";
 import { useCart } from "../../context/CartContext";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import PermissionDenied from "../PermissionDeniedPopUp/PermissionDenied";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
 const fileExtension = ".xlsx";
 const groupBy = function (xs, key) {
@@ -48,6 +49,21 @@ function Product() {
     testerInclude: true,
     sampleInclude: true,
   })
+  useEffect(() => {
+    const fetchPermission = async () => {
+        let user = await GetAuthData();
+        if (user.permission) {
+            let permission = JSON.parse(user.permission);
+            
+            if (permission?.modules?.order?.create === false) {
+                PermissionDenied()
+                navigate("/dashboard");
+            }
+        }
+
+    }
+    fetchPermission();
+}, [])
 
   const groupProductDataByCategory = (productData) => {
     const groupedData = groupBy(productData || [], "Category__c");

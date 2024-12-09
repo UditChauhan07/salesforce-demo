@@ -10,11 +10,11 @@ export async function getPermissions() {
     DestoryAuth();
     return null;
   }
+  
 
-
-  let userPermissions = null;
-  if (authData?.permission) {
-    userPermissions = JSON.parse(authData.permission)
+  let userPermissions =  null;
+  if(authData?.permission){
+    userPermissions= JSON.parse(authData.permission)
   }
 
   if (!userPermissions) {

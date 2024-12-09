@@ -46,14 +46,26 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     setTotal(getOrderTotal() ?? 0)
   }, [order])
+  console.log({order});
+  
   const FetchPoNumber = async () => {
     if (order?.Account?.id && order?.Manufacturer?.id) {
       try {
         const res = await POGenerator();
-        if (res) {
-
+        
+        if (res?.poNumber) {
+          if(res?.address || res.shippingMethod){
+            let tempOrder = order.Account;
+            if(res?.address){
+              tempOrder.address = res.address;
+            }
+            if(res?.shippingMethod){
+              tempOrder.shippingMethod = res.shippingMethod
+            }
+            keyBasedUpdateCart({ Account: tempOrder })
+          }
           let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
-          let poInit = res;
+          let poInit = res.poNumber;
           if (isPreOrder) {
             poInit = `PRE-${poInit}`
           }
