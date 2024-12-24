@@ -1767,6 +1767,11 @@ export const brandDetails =
     img: { src: "/assets/images/29.jpg" },
     tagLine: "Every. Single. Day.™",
     desc: "<p>SPF is the #1 thing you can do for your skin, so we put it first in all we do. Founded in 2005 by mom and former elementary school teacher Holly Thaggard, Supergoop! is made with a mission: To change the way the world thinks about sunscreen and end the epidemic of skin cancer. As the Experts in SPF™, we’ve been raising the bar for effective, feel-good sunscreen for nearly 20 years. Discover our 40+ dermatologist-tested formulas for all skin types, tones and routines, and find the SPF you want to wear. Every. Single. Day.™</p>"
+  },
+  a0ORb000001XtrZMAS: {
+    img: { src: '/assets/images/featured-a0ORb000001XtrZMAS.jpg' },
+    tagLine: "Where mood is elevated and scent is celebrated",
+    desc: "<p>Scent your world with NEST New York’s fragranced home, personal care, wellness, and technology collections. Recognized by the fragrance industry as a gamechanger, founder Laura Slatkin has a unique approach to fragrance, artfully blending notes of the familiar, the exotic, and the unexpected for a fragrance experience like no other.</p>"
   }
 }
 // .....................
