@@ -321,10 +321,10 @@ const YearlyComparisonReport = () => {
           />
           <FilterItem
             minWidth="220px"
-            label="Year"
-            name="Year"
+            label={new Date().getFullYear()}
+            name={new Date().getFullYear()}
             value={filter.year}
-            options={[{ label: 2024, value: 2024 }, { label: 2023, value: 2023 }]}
+            options={[{ label: new Date().getFullYear(), value: new Date().getFullYear() }, { label: new Date().getFullYear() - 1 , value: new Date().getFullYear() -1 }]}
             onChange={(value) => setFilter((prev) => ({ ...prev, year: value }))}
           />
           <FilterItem

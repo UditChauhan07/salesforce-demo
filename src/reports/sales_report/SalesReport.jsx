@@ -22,9 +22,10 @@ const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sh
 const fileExtension = ".xlsx";
 
 const SalesReport = () => {
+  let currentYear = new Date().getFullYear()
   const [PageSize, setPageSize] = useState(3);
   const [manufacturers, setManufacturers] = useState([]);
-  const [yearFor, setYearFor] = useState(2024);
+  const [yearFor, setYearFor] = useState(currentYear);
   const salesReportApi = useSalesReport();
   const [isLoading, setIsLoading] = useState(false);
   const [manufacturerFilter, setManufacturerFilter] = useState();
@@ -35,7 +36,7 @@ const SalesReport = () => {
   const [searchBy, setSearchBy] = useState("");
   const [searchBySalesRep, setSearchBySalesRep] = useState("");
   const [salesRepList, setSalesRepList] = useState([]);
-  const [yearForTableSort, setYearForTableSort] = useState(2024);
+  const [yearForTableSort, setYearForTableSort] = useState(currentYear);
   const [exportToExcelState, setExportToExcelState] = useState(false);
   const [permissions, setPermissions] = useState(null);
   const [dateFilter, setDateFilter] = useState("Created-Date");
@@ -215,10 +216,10 @@ const SalesReport = () => {
     setManufacturerFilter(null);
     setHighestOrders(true);
     setActiveAccounts("Active Account");
-    setYearFor(2024);
+    setYearFor(currentYear);
     setSearchBy("");
     setSearchBySalesRep("");
-    setYearForTableSort(2024);
+    setYearForTableSort(currentYear);
   };
   const navigate = useNavigate();
 
@@ -289,16 +290,16 @@ const SalesReport = () => {
     getSalesData(yearFor, dateFilter);
   };
   let yearList = [
-    { value: 2024, label: 2024 },
-    { value: 2023, label: 2023 },
-    { value: 2022, label: 2022 },
-    { value: 2021, label: 2021 },
-    { value: 2020, label: 2020 },
-    { value: 2019, label: 2019 },
-    { value: 2018, label: 2018 },
-    { value: 2017, label: 2017 },
-    { value: 2016, label: 2016 },
-    { value: 2015, label: 2015 },
+    { value: currentYear, label: currentYear },
+    { value: currentYear -1, label: currentYear -1 },
+    { value: currentYear -2, label: currentYear -2 },
+    { value: currentYear -3, label: currentYear -3 },
+    { value: currentYear -4, label: currentYear -4 },
+    { value: currentYear -5, label: currentYear -5 },
+    { value: currentYear -6, label: currentYear -6 },
+    { value: currentYear -7, label: currentYear -7 },
+    { value: currentYear - 8, label: currentYear - 8 },
+    { value: currentYear - 9, label: currentYear - 9 },
   ]
 
   // Fetch user data and permissions

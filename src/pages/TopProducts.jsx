@@ -18,6 +18,8 @@ import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 const TopProducts = () => {
+  let currentYear = new Date().getFullYear()
+  let previousYear = currentYear -1
   const { data: manufacturers } = useManufacturer();
   const [manufacturerList, setManufacturerList] = useState([]);
   useEffect(() => {
@@ -123,9 +125,9 @@ const TopProducts = () => {
     let helperArray = [];
     months.map((month, i) => {
       if (i <= monthIndex) {
-        helperArray.push({ label: `${month.slice(0, 3)}, 2024`, value: i + 1 })
+        helperArray.push({ label: `${month.slice(0, 3)}, ${currentYear}`, value: i + 1 })
       } else {
-        indexMonth.push({ label: `${month.slice(0, 3)}, 2023`, value: i + 1 })
+        indexMonth.push({ label: `${month.slice(0, 3)}, ${previousYear}`, value: i + 1 })
       }
     })
     let finalArray = indexMonth.concat(helperArray)
