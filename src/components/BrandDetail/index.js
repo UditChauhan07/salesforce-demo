@@ -110,7 +110,7 @@ const BrandDetailCard = ({ brandId }) => {
                     <div className="col-xl-8 col-lg-8 col-md-12 col-sm-12 m-auto ">
                         <div className="row">
                             <div className={`col-xl-7 col-lg-6 col-md-12 col-sm-12 ${brand?.tagLine ? Styles.borderRight : null}`}>
-                                {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0].ManufacturerName__c : null}</p> :
+                                {errorImage ? <p className={Styles.brandTitleHolder}>{topProducts.isLoaded ? topProducts.data[0]?.ManufacturerName__c : null}</p> :
                                     <img style={{ width: '65%' }} className="img-fluid" src={`${originAPi}/brandImage/${brandId}.png`} onError={() => setErrorImg(true)} />}
                             </div>
                             {brand?.tagLine ?
