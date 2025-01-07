@@ -269,7 +269,7 @@ function Dashboard() {
         if (dashboard?.monthlyManufactureData) {
           let colorArray = [];
           Object.values(dashboard?.monthlyManufactureData).map((value) => {
-            colorArray.push(generateUniqueLightColor(value.id));
+            colorArray.push(hexabrand[value.id]||"#ED8A61");
           })
           setDataa({
             options: {
