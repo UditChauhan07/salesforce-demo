@@ -379,11 +379,12 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
                             {product?.Name?.substring(0, 15)}...
                           </p>
                           {selAccount?.Name ? <small>Price for <b>{selAccount.Name}</b></small> : ProductInCart ? <small>Price for <b>{ProductInCart.Account.name}</b></small> : null}
-                          <p className={Styles.priceHolder}>
+                          {listPrice === null ?  <p className={Styles.priceHolder}>$NA </p> : <p className={Styles.priceHolder}>
                             {(!isNaN(salesPrice) && !isNaN(listPrice)) ? salesPrice != listPrice ? <div className={Styles.priceCrossed}>${listPrice?.toFixed(2)}</div> : ProductInCart ? <div className={Styles.priceCrossed}>{listPrice ? '$' + listPrice?.toFixed(2) : null}</div> : null : null}
                             &nbsp;
                             <div>{ProductInCart ? <Link to={"/my-bag"}>{Number(ProductInCart?.items?.price)?.toFixed(2)}</Link> : !isNaN(salesPrice) ? "$"+salesPrice?.toFixed(2) : listPrice+"" ?? "-- . --"}</div>
-                          </p>
+                          </p> }
+                          
                           <div className={Styles.linkHolder}>
                             {ProductInCart ? (
                               <>

@@ -21,19 +21,6 @@ const Slider = ({ data }) => {
     top: "15%",
   });
 
-  const handleMouseMove = (image, event) => {
-    const { left, top, width, height } = event.target.getBoundingClientRect();
-    const x = ((event.pageX - left) / width) * 100;
-    const y = ((event.pageY - top) / height) * 100;
-    console.log({ backgroundPosition: `${x}% ${y}%` });
-    setStyle({
-      ...style,
-      backgroundPosition: `${x}% ${y}%`,
-      display: "block",
-      backgroundImage: `url(${image})`,
-    });
-  };
-
   const handleMouveOut = (e) => {
     setStyle({ ...style, display: "none" });
   };

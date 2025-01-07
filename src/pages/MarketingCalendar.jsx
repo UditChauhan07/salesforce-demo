@@ -300,8 +300,8 @@ const MarketingCalendar = () => {
       filterNodes={
         <>
           <FilterItem
-            label="year"
-            name="Year"
+            label= {new Date().getFullYear()}
+            name={new Date().getFullYear()}
             value={selectYear}
             options={yearList}
             onChange={handleYearChange}

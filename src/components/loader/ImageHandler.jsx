@@ -1,38 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import LoaderV2 from './v2';
+import { addImageToDB, getImageFromDB } from '../../lib/indexedDBUtils';
 
-const ImageHandler = ({ image, onClick = null,height='auto',width='auto',className }) => {
-  const [loading, setLoading] = useState(true); // State to track loading
-  const [error, setError] = useState(false); // State to track image loading error
+const ImageHandler = ({ image, onClick = null, height = 'auto', width = 'auto', className }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const handleImageLoad = () => {
-    setLoading(false); // Set loading to false when image loads
+  useEffect(() => {
+    const fetchImageFromDB = async () => {
+      if (image && image.src) {
+        try {
+          const cachedImage = await getImageFromDB(image.src);
+          if (cachedImage) {
+            setLoading(false); // If the image is cached, stop loading
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+
+    fetchImageFromDB();
+  }, [image]);
+
+  const handleImageLoad = async () => {
+    setLoading(false);
+    if (image && image.src) {
+      await addImageToDB(image.src); // Cache the image in IndexedDB when it loads successfully
+    }
   };
 
   const handleImageError = () => {
-    setError(true); // Set error to true if image fails to load
-    setLoading(false); // Also stop loading
+    setError(true);
+    setLoading(false);
   };
 
-  // Determine the image source: use dummy image if there's an error
   const imageSrc = error ? "\\assets\\images\\dummy.png" : image?.src;
 
-  if(!image || !image?.src) return null;
+  if (!image || !image?.src) return null;
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
-      {/* Show a loading spinner or placeholder while the image is loading */}
       {loading && !error && (
         <div className="loading-placeholder m-auto">
-          {/* You can customize this placeholder */}
           <LoaderV2 />
         </div>
       )}
 
       <img
-        className={`zoomInEffect max-h-[350px] w-[100%] ${loading ? 'hidden' : ''} ${className}`} // Hide image while loading
+        className={`zoomInEffect max-h-[350px] w-[100%] ${loading ? 'hidden' : ''} ${className}`}
         src={imageSrc}
-        alt={image?.alt??"...."}
+        alt={image?.alt ?? "...."}
         onClick={onClick}
         style={{ cursor: 'pointer', transition: 'opacity 0.5s' }}
         onLoad={handleImageLoad}
