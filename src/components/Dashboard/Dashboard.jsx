@@ -187,6 +187,33 @@ function Dashboard() {
   };
   const [manufacturerSalesYear, setManufacturerSalesYaer] = useState([]);
   const [salesRepAdmin, setSalesRepAdmin] = useState();
+  function generateUniqueLightColor(value) {
+    // Function to generate a random light color (RGB values between 128 and 255)
+    const generateRandomLightHexColor = () => {
+        const getRandomLightValue = () => Math.floor(Math.random() * 128) + 128; // Random value between 128 and 255
+
+        const r = getRandomLightValue();
+        const g = getRandomLightValue();
+        const b = getRandomLightValue();
+
+        // Convert RGB to hex and return it as a string
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    };
+
+    // Check if a color is already in use for the given value
+    const isColorUnique = (color) => {
+        return !hexabrand[value] || !hexabrand[value].includes(color);
+    };
+
+    let newColor = generateRandomLightHexColor();
+
+    // Ensure the color is unique by checking the existing colors in hexabrand[value]
+    while (!isColorUnique(newColor)) {
+        newColor = generateRandomLightHexColor();
+    }
+
+    return newColor;
+}
 
   // API INTEGRATION
   // search params work 
@@ -242,7 +269,7 @@ function Dashboard() {
         if (dashboard?.monthlyManufactureData) {
           let colorArray = [];
           Object.values(dashboard?.monthlyManufactureData).map((value) => {
-            colorArray.push(hexabrand[value.id]);
+            colorArray.push(generateUniqueLightColor(value.id));
           })
           setDataa({
             options: {
