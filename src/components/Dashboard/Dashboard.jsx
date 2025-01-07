@@ -20,8 +20,8 @@ import { salesRepIdKey } from "../../lib/store";
 import { useSearchParams } from "react-router-dom";
 import dataStore from "../../lib/dataStore";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
-const GraphHandler=React.lazy(() => import("./GraphHandler"));
-const Chart=React.lazy(() => import("react-apexcharts"));
+const GraphHandler = React.lazy(() => import("./GraphHandler"));
+const Chart = React.lazy(() => import("react-apexcharts"));
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function Dashboard() {
@@ -190,30 +190,30 @@ function Dashboard() {
   function generateUniqueLightColor(value) {
     // Function to generate a random light color (RGB values between 128 and 255)
     const generateRandomLightHexColor = () => {
-        const getRandomLightValue = () => Math.floor(Math.random() * 128) + 128; // Random value between 128 and 255
+      const getRandomLightValue = () => Math.floor(Math.random() * 128) + 128; // Random value between 128 and 255
 
-        const r = getRandomLightValue();
-        const g = getRandomLightValue();
-        const b = getRandomLightValue();
+      const r = getRandomLightValue();
+      const g = getRandomLightValue();
+      const b = getRandomLightValue();
 
-        // Convert RGB to hex and return it as a string
-        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+      // Convert RGB to hex and return it as a string
+      return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     };
 
     // Check if a color is already in use for the given value
     const isColorUnique = (color) => {
-        return !hexabrand[value] || !hexabrand[value].includes(color);
+      return !hexabrand[value] || !hexabrand[value].includes(color);
     };
 
     let newColor = generateRandomLightHexColor();
 
     // Ensure the color is unique by checking the existing colors in hexabrand[value]
     while (!isColorUnique(newColor)) {
-        newColor = generateRandomLightHexColor();
+      newColor = generateRandomLightHexColor();
     }
 
     return newColor;
-}
+  }
 
   // API INTEGRATION
   // search params work 
@@ -1125,7 +1125,7 @@ function Dashboard() {
           </div>
         </div>
         <Suspense fallback={<ContentLoader />}>
-            <GraphHandler options={dataa.options} manufacturerSalesYear={manufacturerSalesYear} Styles={Styles} />
+          <GraphHandler options={dataa.options} manufacturerSalesYear={manufacturerSalesYear} Styles={Styles} />
         </Suspense>
       </div>
     </AppLayout>
