@@ -2,9 +2,7 @@ import axios from "axios";
 import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
-// export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
-export const originAPi = "https://live.beautyfashionsales.com"
-// export const originAPi = "http://localhost:3001"
+export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
 
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
@@ -362,12 +360,12 @@ export async function OrderPlaced({ order }) {
     localStorage.removeItem(accountKey);
     let lastCount = localStorage.getItem(POCount) || 1;
     localStorage.setItem(POCount, parseInt(+lastCount + 1));
-    return data.order;
+    return { orderId: data.order, err: null };
   } else if (data.status == 300) {
     DestoryAuth();
   } else {
     if (data?.data) {
-      return data.data;
+      return { err: data.data, orderId: null }
     } else {
       return false;
     }

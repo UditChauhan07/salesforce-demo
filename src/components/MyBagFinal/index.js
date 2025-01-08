@@ -217,15 +217,20 @@ function MyBagFinal({ showOrderFor }) {
               .then((response) => {
                 if (response) {
                   // console.log("response" , response.length)
-                  if (response.error) {
+                  if (response.err) {
 
                     setIsOrderPlaced(0);
-                    setorderStatus({ status: true, message: response[0].message });
+                    setorderStatus({ status: true, message: response.err[0].message });
                   } else {
 
                     let status = deleteOrder();
-                    navigate("/order-list");
                     setIsOrderPlaced(2);
+                    if (response?.orderId && typeof response.orderId == "string") {
+                      localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
+                      window.location.href = window.location.origin + "/orderDetails";
+                    } else {
+                      navigate("/order-list");
+                    }
                   }
                 }
               })
