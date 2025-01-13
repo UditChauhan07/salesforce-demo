@@ -14,6 +14,7 @@ import Loading from "../Loading";
 import { DeleteIcon } from "../../lib/svg";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 import ImageHandler from "../loader/ImageHandler";
+import ShipmentHandler from "./ShipmentHandler";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -38,31 +39,54 @@ function MyBagFinal({ showOrderFor }) {
   const { getOrderQuantity, updateProductPrice } = useCart();
   const [alert, setAlert] = useState(0);
   const [limitCheck, setLimitCheck] = useState(false);
+  const [orderShipment, setOrderShipment] = useState([]);
+  const [isSelect, setIsSelect] = useState(false);
   const handleNameChange = (event) => {
     const limit = 11;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
     setPONumber(value);
   };
   useEffect(() => {
+
+    if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0) {
+      setButtonActive(true);
+    }
+  }, [order, buttonActive]);
+  useEffect(() => {
     setTotal(getOrderTotal() ?? 0)
   }, [order])
-  console.log({order});
   
   const FetchPoNumber = async () => {
     if (order?.Account?.id && order?.Manufacturer?.id) {
       try {
         const res = await POGenerator();
+        console.log({res});
         
         if (res?.poNumber) {
-          if(res?.address || res.shippingMethod){
+          if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
-            if(res?.address){
-              tempOrder.address = res.address;
+            if (res?.address) {
+              tempOrder = { ...tempOrder, address: res?.address };
             }
-            if(res?.shippingMethod){
-              tempOrder.shippingMethod = res.shippingMethod
+            if (res.checkBrandAllow) {
+              if (res?.shippingMethod) {
+                tempOrder = { ...tempOrder, shippingMethod: res?.shippingMethod };
+              } else {
+                if (!isSelect) {
+                  tempOrder = { ...tempOrder, shippingMethod: null };
+                }
+              }
+            } else {
+              if (!isSelect) {
+                tempOrder = { ...tempOrder, shippingMethod: null };
+              }
             }
-            keyBasedUpdateCart({ Account: tempOrder })
+            keyBasedUpdateCart({ Account: tempOrder });
+            if (res?.brandShipping) {
+              if (res?.brandShipping.length) {
+                setOrderShipment(res?.brandShipping);
+              }
+            }
           }
           let isPreOrder = order.items.some(product => (product.Category__c?.toUpperCase()?.includes("PREORDER") || product.Category__c?.toUpperCase()?.includes("EVENT")))
           let poInit = res.poNumber;
@@ -88,21 +112,10 @@ function MyBagFinal({ showOrderFor }) {
 
     FetchPoNumber();
 
-  }, [order?.Account?.id, order?.Manufacturer?.id]);
-
-
+  }, [buttonActive, isSelect]);
 
   useBackgroundUpdater(FetchPoNumber, defaultLoadTime)
 
-
-
-  // .............
-  useEffect(() => {
-
-    if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0) {
-      setButtonActive(true);
-    }
-  }, []);
 
   const [productImage, setProductImage] = useState({ isLoaded: false, images: {} });
   // let total = 0;
@@ -169,7 +182,7 @@ function MyBagFinal({ showOrderFor }) {
 
     if (order?.Account?.SalesRepId) {
       setIsOrderPlaced(1);
-
+      setConfirm(false);
       GetAuthData()
         .then((user) => {
           // let bagValue = fetchBeg()
@@ -348,6 +361,27 @@ function MyBagFinal({ showOrderFor }) {
                         className={Styles.btnHolder}
                         onClick={() => setAlert(0)}
                       >
+                        OK
+                      </button>
+                    </div>
+                  </div>
+                </>
+              }
+              onClose={() => {
+                setAlert(0);
+              }}
+            />
+          )}
+           {alert == 3 && (
+            <ModalPage
+              open
+              content={
+                <>
+                  <div style={{ maxWidth: "309px" }}>
+                    <h1 className={`fs-5 ${Styles.ModalHeader}`}>Alert!!</h1>
+                    <p className={` ${Styles.ModalContent}`}>Please Select Shipping Method for this order</p>
+                    <div className="d-flex justify-content-center">
+                      <button className={Styles.btnHolder} onClick={() => setAlert(0)}>
                         OK
                       </button>
                     </div>
@@ -602,12 +636,34 @@ function MyBagFinal({ showOrderFor }) {
                           )}
                         </div>
                         <div className={Styles.TotalPricer}>
-                          <div>
-                            <h2>Total</h2>
+                          <div className="d-flex justify-content-between">
+                            <div>
+                              <h2>{order?.Account?.shippingMethod?.cal ? "Sub-" : null}Total</h2>
+                            </div>
+                            <div>
+                              <h2>${Number(total).toFixed(2)}</h2>
+                            </div>
                           </div>
-                          <div>
-                            <h2>${Number(total).toFixed(2)}</h2>
-                          </div>
+                          {order.Account?.shippingMethod?.cal ? (
+                            <div className="d-flex justify-content-between">
+                              <div>
+                                <h2 className="text-capitalize">Shipping ({order.Account.shippingMethod?.name})</h2>
+                              </div>
+                              <div>
+                                <h2>${order.Account.shippingMethod?.cal ? Number(total * order.Account.shippingMethod?.cal).toFixed(2) : 0}</h2>
+                              </div>
+                            </div>
+                          ) : null}
+                          {order.Account?.shippingMethod?.cal ? (
+                            <div className="d-flex justify-content-between">
+                              <div>
+                                <h2>Total</h2>
+                              </div>
+                              <div>
+                                <h2>${Number(total + total * order.Account.shippingMethod?.cal).toFixed(2)}</h2>
+                              </div>
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     </div>
@@ -635,6 +691,12 @@ function MyBagFinal({ showOrderFor }) {
                           {userData?.Sales_Rep__c == salesRepData?.Id ? 'Me' : salesRepData?.Name}
                         </div>
                       </>}
+                      {orderShipment.length > 0 ? (
+                          <div className={Styles.PaymentType}>
+                            <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
+                            <ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />
+                          </div>
+                        ) : null}
                       <div className={Styles.ShipAdress2}>
                         {/* <label>NOTE</label> */}
                         <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
@@ -674,6 +736,10 @@ function MyBagFinal({ showOrderFor }) {
                                     ) {
                                       setAlert(1);
                                     } else {
+                                      if (!order?.Account?.shippingMethod?.method && orderShipment?.length > 0) {
+                                        setAlert(3);
+                                        return;
+                                      }
                                       // if (testerInBag && order.Account.discount.testerproductLimit > total) {
                                       //   setAlert(2);
                                       // } else {
@@ -688,7 +754,7 @@ function MyBagFinal({ showOrderFor }) {
                             }}
                             disabled={!buttonActive}
                           >
-                            ${Number(total).toFixed(2)} PLACE ORDER
+                            ${Number(total + total * (order?.Account?.shippingMethod?.cal || 0)).toFixed(2)} PLACE ORDER
                           </button>
                           <p className={`${Styles.ClearBag}`} style={{ textAlign: 'center', cursor: 'pointer' }}
                             onClick={() => {

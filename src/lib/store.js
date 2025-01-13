@@ -205,9 +205,11 @@ export async function POGenerator() {
       let res = await poData;
       let poNumber = res.poNumber;
       let address = res.address;
-      let shippingMethod = res.shippingMethod;
+      let brandShipping = res?.brandShipping;
+      let shippingMethod = res?.shippingMethod;
+      let checkBrandAllow = res?.checkBrandAllow;
 
-      return  {poNumber,address,shippingMethod};
+      return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow };
     } else {
       console.error('Failed to generate PO number:', poData.message);
       return null;
