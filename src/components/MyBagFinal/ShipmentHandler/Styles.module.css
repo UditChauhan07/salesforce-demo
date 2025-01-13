@@ -1,0 +1,50 @@
+.dFlex {
+  display: flex;
+  justify-content: start;
+  gap: 50px;
+}
+.gap10 {
+  flex-wrap: wrap;
+  gap: 25px !important;
+}
+.templateHolder {
+  width: 47%;
+  min-width: 100px;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 10px;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  background-color: #fff; /* Default background color */
+  display: grid;
+  place-content: center;
+  border: 1px solid #ccc;
+}
+
+.templateHolder:hover {
+  box-shadow: 0 0 10px rgba(13, 41, 71, 0.5);
+  /* transform: scale(1.05); */
+}
+.templateHolder .labelHolder {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-bottom: 0;
+  padding: 0;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.templateHolder .descHolder,.templateHolder .descHolder span {
+  font-size: 11px;
+  line-height: 15px;
+}
+.selected {
+  border-color: #000; /* Black border for selected templates */
+  /* transform: scale(1.05); */
+}
+.hiddenRadio {
+  display: none;
+}

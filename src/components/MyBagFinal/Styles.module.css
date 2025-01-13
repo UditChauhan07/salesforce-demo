@@ -206,11 +206,35 @@
   justify-content: center;
   align-items: center;
 }
-
+.PaymentType {
+  margin-top: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.089);
+  padding: 15px;
+}
+.PaymentType span {
+  font-weight: 470;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.shipLabelHolder {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; /* 228.571% */
+  letter-spacing: 1.12px;
+  text-transform: uppercase;
+  margin: 0;
+  margin-left: 5px;
+}
 .TotalPricer {
   display: flex;
   justify-content: space-between;
   padding: 10px 5px 0 5px;
+  position: sticky;
+  bottom: 5px;
+  background: #fff;
+  flex-direction: column;
 }
 
 .TotalPricer h2 {
@@ -221,6 +245,7 @@
   font-weight: 700;
   line-height: 32px; /* 177.778% */
   letter-spacing: 1.12px;
+  margin: 0;
 }
 .Mainbox5 {
   margin: 0 0 0 20px;

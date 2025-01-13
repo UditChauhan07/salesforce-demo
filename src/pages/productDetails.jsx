@@ -42,16 +42,18 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
         }
     };
     const fetchProductDetailHandler = () => {
-        GetAuthData()
+        if(productId){
+            GetAuthData()
             .then((user) => {
                 const rawData = { productId, key: user?.x_access_token };
                 dataStore.getPageData("/productPage/" + productId, () => getProductDetails({ rawData }))
-                    .then((productRes) => {
-                        readyProductDetails(productRes)
-                    })
-                    .catch((err) => console.error("Error fetching product details:", err));
+                .then((productRes) => {
+                    readyProductDetails(productRes)
+                })
+                .catch((err) => console.error("Error fetching product details:", err));
             })
             .catch((err) => console.error("Error fetching auth data:", err));
+        }
     }
     const readyProductDetails = (data) => {
         if (data) {
