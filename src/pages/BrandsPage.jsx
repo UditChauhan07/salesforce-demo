@@ -28,11 +28,12 @@ const brandsImageMap = {
   "EVE LOM": "Evelom.png",
   AERIN: "Aerin.png",
   ARAMIS: "Aramis.png",
-  "Victoria Beckham Beauty": "32.png",
+  "Victoria Beckham Beauty": "vbbfreatured.png",
   "Re-Nutriv": "Re-Nutriv-2.png",
-  "LOccitane": "LOccitane.png",
+  "LOccitane": "LOccitane-freatured.png",
   "111Skin": "a0ORb000001EbK5MAK.png",
-  "SuperGoop": "30.jpg"
+  "Supergoop!": "super-freatured.png",
+  "NEST New York":"nest-freatured.png"
 };
 
 const defaultImage = "dummy.png";
