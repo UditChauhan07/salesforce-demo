@@ -597,7 +597,7 @@ function MyBagFinal({ showOrderFor }) {
                                         <span className={Styles.Span2}>
                                           {/* ${Number(salesPrice).toFixed(2)} */}
                                           <input type="number" value={salesPrice} placeholder={Number(salesPrice).toFixed(2)} className={`ms-1 ${Styles.customPriceInput}`}
-                                            onChange={(e) => { onPriceChangeHander(ele?.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
+                                            onChange={(e) => { onPriceChangeHander(ele?.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 5) : e.target.value.slice(0, 5) || 0) }} id="limit_input" minLength={0} maxLength={5}
                                             name="limit_input" />
                                         </span>
                                       </p>
