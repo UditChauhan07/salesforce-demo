@@ -185,7 +185,7 @@ console.log(selectedsalesRep , "----accordian salesrep")
                               <td>
                                 <div className="d-flex">
                                   ${(inputPrice || inputPrice == 0) ? <input type="number" value={inputPrice} placeholder={Number(inputPrice).toFixed(2)} className={`${styles.customPriceInput} ms-1`}
-                                    onChange={(e) => { onPriceChangeHander(value.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 4) : e.target.value.slice(0, 4) || 0) }} id="limit_input" minLength={0} maxLength={4}
+                                    onChange={(e) => { onPriceChangeHander(value.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 5) : e.target.value.slice(0, 5) || 0) }} id="limit_input" minLength={0} maxLength={4}
                                     name="limit_input" /> : salesPrice}
                                 </div>
                               </td>

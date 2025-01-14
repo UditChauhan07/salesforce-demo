@@ -9,7 +9,7 @@ import { SearchIcon } from "../lib/svg";
 import { GetAuthData, getOrderDetailsPdf, originAPi } from "../lib/store";
 const fileExtension = ".xlsx";
 const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-function MyBagOrder(props) {
+function MyBagOrder() {
   const [orderDetail, setOrderDetail] = useState([]);
   const [isPDFLoaded, setPDFIsloaed] = useState(false);
   const [pdfLoadingText, setPdfLoadingText] = useState(".");

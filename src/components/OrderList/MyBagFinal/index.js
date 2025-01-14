@@ -119,7 +119,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     // })
     getOrderDetails();
   }, []);
-  
+
   useBackgroundUpdater(getOrderDetails, defaultLoadTime);
 
   function downloadFiles(invoices) {
@@ -215,6 +215,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     }
     setConfirm("Invoice")
   }
+  console.log({ OrderData });
 
   return (
     <div>
@@ -297,7 +298,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                 <h4>
                   {" "}
                   <span> {OrderData.ManufacturerName__c} | </span>
-                  {OrderData.Name}
+                  &nbsp;{OrderData.Name}
                 </h4>{" "}
               </div>
 
@@ -323,7 +324,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
                                     <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
-                                      <ImageHandler image={{src:item.ProductImage??item?.ContentDownloadUrl??productImage.images[item.ProductCode]?.ContentDownloadUrl??productImage.images[item.ProductCode]??'dummy.png'}} onClick={() => { setProductDetailId(item?.Product2Id) }} width={50}/>
+                                      <ImageHandler image={{ src: item.ProductImage ?? item?.ContentDownloadUrl ?? productImage.images[item.ProductCode]?.ContentDownloadUrl ?? productImage.images[item.ProductCode] ?? 'dummy.png' }} onClick={() => { setProductDetailId(item?.Product2Id) }} width={50} />
                                     </div>
                                     <div className={Styles.Mainbox3}>
                                       <h2 onClick={() => { setProductDetailId(item?.Product2Id) }} className="linkEffect" style={{ cursor: 'pointer' }}>{item.Name.split(OrderData.Name)}</h2>
@@ -358,12 +359,20 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                       </div>
 
                       <div className={Styles.TotalPricer}>
-                        <div>
-                          <h2>Total</h2>
-                        </div>
-                        <div>
+                        <div className="d-flex justify-content-between">
+                          <h2>{OrderData?.Shipment_cost__c ? 'Sub-' : null}Total</h2>
                           <h2>${Number(OrderData.Amount).toFixed(2)}</h2>
                         </div>
+                        {OrderData?.Shipment_cost__c ?
+                          <div className="d-flex justify-content-between">
+                            <h2 className="text-capitalize">Shipping by ({OrderData?.Shipping_method__c})</h2>
+                            <h2>${OrderData?.Shipment_cost__c ? Number(OrderData?.Shipment_cost__c).toFixed(2) : 0}</h2>
+                          </div> : null}
+                        {OrderData?.Shipment_cost__c ?
+                          <div className="d-flex justify-content-between">
+                            <h2>Total</h2>
+                            <h2>${Number(OrderData.Amount + Number(OrderData?.Shipment_cost__c)).toFixed(2)}</h2>
+                          </div> : null}
                       </div>
                     </div>
                   </div>
@@ -407,7 +416,19 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                             {OrderData.Tracking__c}
                           </p>}
                       </div></>}
-
+                    {OrderData?.Payment_Status__c || OrderData?.Transaction_ID__c || OrderData?.PBL_Status__c ?
+                      <>
+                        <h2 style={{ marginTop: '10px' }}>Payment Details</h2>
+                        <div className={Styles.paymentCheck}>
+                          {OrderData?.Payment_Status__c ? <p>Payment Status : {OrderData?.Payment_Status__c} </p> : null}
+                          {OrderData?.Transaction_ID__c ? <p>Transaction ID : {OrderData?.Transaction_ID__c} </p> : null}
+                          {OrderData?.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
+                            <div className={Styles.ShipBut}>
+                              <button role="link"
+                                onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button></div>
+                            : null}
+                        </div>
+                      </> : null}
                     <div className={Styles.ShipAdress2}>
                       {/* <label>NOTE</label> */}
                       <p
