@@ -179,14 +179,20 @@ function MyBagFinal({ showOrderFor }) {
             keyBasedUpdateCart({ PoNumber: poInit });
             setPONumber(poInit);
           }
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
         } catch (error) {
           console.error("Error fetching PO number:", error);
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
         } finally {
         }
       } else {
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
         setPONumber(null);
       }
     };
