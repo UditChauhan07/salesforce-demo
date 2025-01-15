@@ -49,8 +49,8 @@ const CartProvider = ({ children }) => {
             const user = await GetAuthData();
             const getOrder = { CreatedBy: user?.Sales_Rep__c };
             const cart = await cartSync({ cart: getOrder });
-            
-            
+
+
             // Validate if the fetched cart has essential content like Account and Manufacturer
             if (cart.id && cart.Account?.id && cart.Manufacturer?.id) {
                 setOrder(cart); // Set the fetched cart if valid
@@ -123,7 +123,7 @@ const CartProvider = ({ children }) => {
                 if (!order.CreatedBy) {
                     order.CreatedBy = user?.Sales_Rep__c;
                 }
-    
+
                 order.CreatedAt = order.CreatedAt || new Date();
                 if (order?.Account?.id && order?.Manufacturer?.id) {
                     if (!order.id) {
@@ -138,11 +138,11 @@ const CartProvider = ({ children }) => {
                 console.error(err);
             }
         };
-    
+
         // Set a timeout to debounce the syncCart call
         if (timer) clearTimeout(timer);
         timer = setTimeout(syncCart, 1000);  // 1.5 second debounce
-    
+
         // Clean up the timeout on component unmount or order change
         return () => {
             if (timer) clearTimeout(timer);
@@ -382,7 +382,7 @@ const CartProvider = ({ children }) => {
     const updateProductPrice = (productId, price = 0) => {
         // Convert price to a number and validate
         const numericPrice = parseFloat(price);
-    
+
         if (isNaN(numericPrice) || numericPrice < 0) {
             Swal.fire({
                 title: "Invalid Price!",
@@ -392,11 +392,11 @@ const CartProvider = ({ children }) => {
             });
             return; // Stop further execution for invalid input
         }
-    
+
         // Format the price to 2 decimal places
         const formattedPrice = parseFloat(numericPrice.toFixed(2));
-        
-    
+
+
         setOrder((prevOrder) => {
             const product = prevOrder.items.find((item) => item.Id === productId);
             if (!product) {
@@ -408,19 +408,19 @@ const CartProvider = ({ children }) => {
                 });
                 return prevOrder; // No product found
             }
-    
+
             // Calculate the updated total
             const updatedItems = prevOrder.items.map((item) =>
                 item.Id === productId
                     ? { ...item, price: formattedPrice } // Update price for matching product
                     : item
             );
-            
+
             const updatedTotal =
                 prevOrder.total -
                 product.price * product.qty +
                 formattedPrice * product.qty;
-    
+
             // Return the updated order state
             return {
                 ...prevOrder,
@@ -428,7 +428,7 @@ const CartProvider = ({ children }) => {
                 total: parseFloat(updatedTotal.toFixed(2)), // Ensure total is also formatted
             };
         });
-    
+
         // Optional success message (uncomment if needed)
         // Swal.fire({
         //     title: "Price Updated!",
@@ -437,8 +437,8 @@ const CartProvider = ({ children }) => {
         //     confirmButtonColor: "#000", // Black
         // });
     };
-    
-    
+
+
 
     // Update product quantity
     const updateProductQty = (productId, qty) => {
