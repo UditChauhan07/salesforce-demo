@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
 export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
-
+// export const originAPi =  "http://localhost:3001"
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;
@@ -219,6 +219,7 @@ export async function POGenerator() {
     return null;
   }
 }
+
 
 // account details 
 
@@ -1653,14 +1654,15 @@ export async function refreshTargetRollOver() {
     return false;
   }
 }
-export async function getBrandPaymentDetails({ key, Id }) {
+
+export async function getBrandPaymentDetails({ key, Id, AccountId }) {
   let headersList = {
     Accept: "*/*",
     "Content-Type": "application/json",
   };
   let response = await fetch(originAPi + "/stripe/e8IZytvGI1IJX74", {
     method: "POST",
-    body: JSON.stringify({ key, Id }),
+    body: JSON.stringify({ key, Id, AccountId }),
     headers: headersList,
   });
   let data = JSON.parse(await response.text());

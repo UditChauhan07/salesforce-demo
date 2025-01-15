@@ -16,6 +16,63 @@
 .ClearBag {
   background-color: #f1f0f0;
 }
+.templateHolder .labelHolder {
+  margin: 0;
+  text-align: start;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-bottom: 0;
+  padding: 0;
+  font-weight: bold;
+}
+.shipLabelHolder {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 32px; /* 228.571% */
+  letter-spacing: 1.12px;
+  text-transform: uppercase;
+  margin: 0;
+  margin-left: 5px;
+}
+.templateHolder {
+  width: 47%;
+  min-width: 100px;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid transparent;
+  padding: 10px;
+  border-radius: 8px;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  background-color: #fff; /* Default background color */
+  display: grid;
+  place-content: center;
+  border: 1px solid #ccc;
+}
+
+.templateHolder:hover {
+  box-shadow: 0 0 10px rgba(13, 41, 71, 0.5);
+  /* transform: scale(1.05); */
+}
+.templateHolder .labelHolder {
+  margin: 0;
+  text-align: start;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-bottom: 0;
+  padding: 0;
+  font-weight: bold;
+}
+.selected {
+  border-color: #000; /* Black border for selected templates */
+  /* transform: scale(1.05); */
+}
+.paymentButtons{
+  display: flex;
+  margin-top: 5px;
+  gap: 8px;
+}
 .MainInner {
   background: #fff;
   padding: 17px 27px;

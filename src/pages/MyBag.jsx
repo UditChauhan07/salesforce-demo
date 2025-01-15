@@ -5,8 +5,14 @@ import { GetAuthData } from "../lib/store";
 import { getPermissions } from "../lib/permission";
 import { useNavigate } from "react-router-dom";
 import PermissionDenied from "../components/PermissionDeniedPopUp/PermissionDenied";
+import { useCart } from "../context/CartContext";
 
 const MyBag = () => {
+  const {fetchCart} = useCart();
+
+  useEffect(()=>{
+    fetchCart()
+  },[])
   const [selectedSalesRepId, setSelectedSalesRepId] = useState();
   const [showOrderFor,setShowOrderFor] = useState(false)
   const navigate = useNavigate()
