@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, admins, defaultLoadTime, fetchBeg, getProductImageAll, salesRepIdKey } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, admins, defaultLoadTime, fetchBeg, getProductImageAll, salesRepIdKey , getBrandPaymentDetails , originAPi } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -15,6 +15,8 @@ import { DeleteIcon } from "../../lib/svg";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 import ImageHandler from "../loader/ImageHandler";
 import ShipmentHandler from "./ShipmentHandler";
+import CustomAccordion from "../CustomAccordian/CustomAccordain";
+import StripePay from "../StripePay";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -41,6 +43,19 @@ function MyBagFinal({ showOrderFor }) {
   const [limitCheck, setLimitCheck] = useState(false);
   const [orderShipment, setOrderShipment] = useState([]);
   const [isSelect, setIsSelect] = useState(false);
+  const [intentRes, setIntentRes] = useState(null);
+  const [paymentType, setPaymentType] = useState(null);
+  const [isPlayAble, setIsPlayAble] = useState(0);
+  const [greenStatus, setGreenStatus] = useState(null);
+  const [isAccordianOpen, setIsAccordianOpen] = useState(false);
+  const [detailsAccordian, setDetailsAccordian] = useState(true);
+  const [paymentAccordian, setPaymentAccordian] = useState(false);
+  const [qunatityChange, setQuantityChange] = useState();
+  const [paymentDetails, setPaymentDetails] = useState({
+    PK_KEY: null,
+    SK_KEY: null,
+  });
+  const [isPayNow , setIsPayNow] = useState(false)
   const handleNameChange = (event) => {
     const limit = 11;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -138,7 +153,7 @@ function MyBagFinal({ showOrderFor }) {
           }
         }
       }
-      if (order.items) {
+      if (order.items && false) {
         if (order.items.length > 0) {
           let productCode = "";
           order.items.map((element, index) => {
@@ -279,8 +294,146 @@ function MyBagFinal({ showOrderFor }) {
     if (price == '') price = 0;
     updateProductPrice(productId, price || 0)
   }
+  console.log({order})
 
+  const fetchBrandPaymentDetails = async () => {
+    try {
+      let id = order?.Manufacturer?.id;
+      let AccountID = order?.Account?.id;
+      const user = await GetAuthData();
+  
+      const brandRes = await getBrandPaymentDetails({
+        key: user.x_access_token,
+        Id: id,
+        AccountId: AccountID,
+      });
+  
+      setIntentRes(brandRes);
+  
+      brandRes.accountManufacturerData.map((item) =>
+        setPaymentType(item.Payment_Type__c)
+      );
+  
+      // Check for null keys
+      if (
+        !brandRes?.brandDetails.Stripe_Secret_key_test__c ||
+        !brandRes?.brandDetails.Stripe_Publishable_key_test__c
+      ) {
+        setIsPlayAble(0);
+        console.log(
+          "Brand payment details are missing, skipping payment processing."
+        );
+        return {
+          PK_KEY: null,
+          SK_KEY: null,
+        };
+      }
+  
+      let paymentIntent = await fetch(`${originAPi}/stripe/payment-intent`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: "100",
+          paymentId: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+        }),
+      });
+  
+      setGreenStatus(paymentIntent.status);
+      
+      // Check paymentIntent status and payment types
+      const paymentTypes = brandRes.accountManufacturerData.map(
+        (item) => item.Payment_Type__c
+      );
+      const hasNetPaymentType = paymentTypes.some(
+        (type) => type.startsWith("Net")
+      );
+  
+      if (
+        paymentIntent.status === 200 &&
+        paymentDetails.PK_KEY !== paymentDetails.SK_KEY &&
+        !hasNetPaymentType
+      ) {
+        setIsPlayAble(1);
+      } else if (
+        paymentIntent.status === 400 ||
+        paymentDetails.PK_KEY === paymentDetails.SK_KEY
+      ) {
+        setIsPlayAble(0);
+        console.log(isPlayAble, "is play able ");
+      }
+  
+      setPaymentDetails({
+        PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
+        SK_KEY: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+      });
+      console.log({ paymentDetails });
+  
+      return {
+        PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
+        SK_KEY: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+      };
+    } catch (error) {
+      console.log("Error fetching brand payment details:", error);
+      return null;
+    }
+  };
+  
+  const hasPaymentType = intentRes?.accountManufacturerData?.some(
+    (item) => item.Payment_Type__c
+  );
+  
+  useEffect(() => {
+    fetchBrandPaymentDetails();
+  }, [order]);
 
+  const handlePayNow = () => {
+    setIsPayNow(true);
+  }
+
+  const onToggle = () => {
+    setQuantityChange(false);
+    setIsAccordianOpen(!isAccordianOpen);
+    setDetailsAccordian(!detailsAccordian);
+    setPaymentAccordian(!paymentAccordian);
+  };
+
+  // const handleAccordian = () => {
+  //   if (order?.items?.length) {
+  //     if (PONumber.length) {
+  //       if (order?.items?.length > 100) {
+  //         setLimitCheck(true);
+  //       } else {
+  //         if (!order?.Account?.shippingMethod?.method && orderShipment?.length > 0) {
+  //           setAlert(3);
+  //           return;
+  //         } else {
+  //           if (order.Account.discount.MinOrderAmount > total) {
+  //             setAlert(1);
+  //           } else {
+  //             setQuantityChange(true);
+  //             setIsAccordianOpen(true);
+  //             setDetailsAccordian(false);
+  //             setPaymentAccordian(true);
+  //           }
+  //         }
+  //       }
+  //     } else {
+  //       setPONumberFilled(false);
+  //     }
+  //   }
+  // };
+  const handlePayLater = ()=>{
+    setIsPayNow(false);
+    setIsAccordianOpen(true);
+    setDetailsAccordian(true);
+    setPaymentAccordian(false);
+  }
+const handleAccordian = ()=>{
+  setPaymentAccordian(true)
+  setDetailsAccordian(false)
+}
   if (isOrderPlaced === 1) return <div style={{ height: "300px" }}><OrderLoader /> </div>;
   return (
     <div className="mt-4">
@@ -372,6 +525,7 @@ function MyBagFinal({ showOrderFor }) {
               }}
             />
           )}
+         
            {alert == 3 && (
             <ModalPage
               open
@@ -668,107 +822,262 @@ function MyBagFinal({ showOrderFor }) {
                       </div>
                     </div>
                   </div>
+                  <div className="col-lg-5 col-md-4 col-sm-12">    
+                   {isPayNow  ? 
+              
+ <CustomAccordion title="Shipping Address" isOpen={detailsAccordian} onToggle={onToggle} isModalOpen={isAccordianOpen}>
+   
+                   
+                   <div className={Styles.ShippControl}>
+                     {/* <h2>Shipping Address</h2> */}
 
-                  <div className="col-lg-5 col-md-4 col-sm-12">
-                    <div className={Styles.ShippControl}>
-                      <h2>Shipping Address</h2>
+                     <div className={Styles.ShipAdress}>
+                       {buttonActive ? (
+                         <p>
+                           {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
+                           {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
+                           <br />
+                           {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
+                         </p>
+                       ) : (
+                         <p>No Shipping Address</p>
+                       )}
+                     </div>
+                     {(showOrderFor && salesRepData?.Id && buttonActive) && <>
+                       <h2>Order For</h2>
+                       <div className={Styles.ShipAdress}>
+                         {userData?.Sales_Rep__c == salesRepData?.Id ? 'Me' : salesRepData?.Name}
+                       </div>
+                     </>}
+                     {isPlayAble ?<div className={Styles.paymentButtons}><div className={`${Styles.templateHolder}`}> <div className={Styles.labelHolder} onClick={handlePayNow}>Pay now</div>
+                    
+                     </div>
+                     <div className={`${Styles.templateHolder}`}>
+                     <div onClick={handlePayLater} className={Styles.labelHolder}>Pay later</div></div>
+                     </div>  : null}
+                     {orderShipment.length > 0 ? (
+                         <div className={Styles.PaymentType}>
+                           <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
+                           <ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />
+                         </div>
+                       ) : null}
+                     <div className={Styles.ShipAdress2}>
+                       {/* <label>NOTE</label> */}
+                       <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
+                     </div>
+                     {!PONumberFilled ? (
+                       <ModalPage
+                         open
+                         content={
+                           <div style={{ maxWidth: "309px" }}>
+                             <h1 className={`fs-5 ${StylesModal.ModalHeader}`}>Warning</h1>
+                             <p className={` ${StylesModal.ModalContent}`}>Enter PO Number</p>
+                             <div className="d-flex justify-content-center">
+                               <button
+                                 className={StylesModal.modalButton}
+                                 onClick={() => setPONumberFilled(true)}
+                               >
+                                 OK
+                               </button>
+                             </div>
+                           </div>
+                         }
+                         onClose={() => setPONumberFilled(true)}
+                       />
+                     ) : (
+                      
+                       <div className={Styles.ShipBut}>
+                          {isPayNow !== true ? <>
+                            <button
+                           onClick={() => {
 
-                      <div className={Styles.ShipAdress}>
-                        {buttonActive ? (
-                          <p>
-                            {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
-                            {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
-                            <br />
-                            {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
-                          </p>
-                        ) : (
-                          <p>No Shipping Address</p>
-                        )}
-                      </div>
-                      {(showOrderFor && salesRepData?.Id && buttonActive) && <>
-                        <h2>Order For</h2>
-                        <div className={Styles.ShipAdress}>
-                          {userData?.Sales_Rep__c == salesRepData?.Id ? 'Me' : salesRepData?.Name}
-                        </div>
-                      </>}
-                      {orderShipment.length > 0 ? (
-                          <div className={Styles.PaymentType}>
-                            <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
-                            <ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />
-                          </div>
-                        ) : null}
-                      <div className={Styles.ShipAdress2}>
-                        {/* <label>NOTE</label> */}
-                        <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
-                      </div>
-                      {!PONumberFilled ? (
-                        <ModalPage
-                          open
-                          content={
-                            <div style={{ maxWidth: "309px" }}>
-                              <h1 className={`fs-5 ${StylesModal.ModalHeader}`}>Warning</h1>
-                              <p className={` ${StylesModal.ModalContent}`}>Enter PO Number</p>
-                              <div className="d-flex justify-content-center">
-                                <button
-                                  className={StylesModal.modalButton}
-                                  onClick={() => setPONumberFilled(true)}
-                                >
-                                  OK
-                                </button>
-                              </div>
-                            </div>
+                             if (order?.items?.length) {
+                               if (PONumber.length) {
+                                 if (order?.items?.length > 100) {
+                                   setLimitCheck(true);
+                                 } else {
+                                   if (
+                                     order.Account.discount.MinOrderAmount >
+                                     total
+                                   ) {
+                                     setAlert(1);
+                                   } else {
+                                     if (!order?.Account?.shippingMethod?.method && orderShipment?.length > 0) {
+                                       setAlert(3);
+                                       return;
+                                     }
+                                     // if (testerInBag && order.Account.discount.testerproductLimit > total) {
+                                     //   setAlert(2);
+                                     // } else {
+                                     setConfirm(true);
+                                     // }
+                                   }
+                                 }
+                               } else {
+                                 setPONumberFilled(false);
+                               }
+                             }
+                           }}
+                           disabled={!buttonActive}
+                         >
+                       
+                           ${Number(total + total * (order?.Account?.shippingMethod?.cal || 0)).toFixed(2)} PLACE ORDER
+                         </button>
+                          </> :   <div className={Styles.ShipBut}>
+                          <button onClick={handleAccordian}>PROCEED TO PAY</button>
+                        </div> }
+                       
+                        {isPayNow === true && total > 0 ? (
+                   
+                   <CustomAccordion title="Payment Details" isOpen={paymentAccordian} onToggle={onToggle} isModalOpen={isAccordianOpen}>
+                   <StripePay
+                     description={order?.Note}
+                     PO_Number={PONumber}
+                     PK_KEY={paymentDetails.PK_KEY}
+                     SK_KEY={paymentDetails.SK_KEY}
+                     amount={total + total * (order?.Account?.shippingMethod?.cal || 0)}
+                     order={order}
+                     PONumber={PONumber}
+                     orderDesc={orderDesc}
+                   />
+                 </CustomAccordion>
+                    
+                    ) : null}
+
+                    {isPayNow == true && total > 0 ? (
+                      <p
+                        className={`${Styles.ClearBag}`}
+                        style={{ textAlign: "center", cursor: "pointer" }}
+                        onClick={() => {
+                          if (buttonActive) {
+                            setClearConfim(true);
                           }
-                          onClose={() => setPONumberFilled(true)}
-                        />
-                      ) : (
-                        <div className={Styles.ShipBut}>
-                          <button
-                            onClick={() => {
+                        }}
+                        disabled={!buttonActive}
+                      >
+                        {paymentAccordian ? null : "Clear Bag"}
+                      </p>
+                    ) : null}
+                    {paymentAccordian ? (
+                      <p className={`${Styles.ClearBag}`} style={{ textAlign: "center", cursor: "pointer" }} onClick={onToggle}>
+                        Edit Bag
+                      </p>
+                    ) : null}
+                       </div>
+                     )}
+                   </div>
+               
+               </CustomAccordion>
+             
+                   : 
+                  
+                   <div className={Styles.ShippControl}>
+                     <h2>Shipping Address</h2>
 
-                              if (order?.items?.length) {
-                                if (PONumber.length) {
-                                  if (order?.items?.length > 100) {
-                                    setLimitCheck(true);
-                                  } else {
-                                    if (
-                                      order.Account.discount.MinOrderAmount >
-                                      total
-                                    ) {
-                                      setAlert(1);
-                                    } else {
-                                      if (!order?.Account?.shippingMethod?.method && orderShipment?.length > 0) {
-                                        setAlert(3);
-                                        return;
-                                      }
-                                      // if (testerInBag && order.Account.discount.testerproductLimit > total) {
-                                      //   setAlert(2);
-                                      // } else {
-                                      setConfirm(true);
-                                      // }
-                                    }
-                                  }
-                                } else {
-                                  setPONumberFilled(false);
-                                }
-                              }
-                            }}
-                            disabled={!buttonActive}
-                          >
-                            ${Number(total + total * (order?.Account?.shippingMethod?.cal || 0)).toFixed(2)} PLACE ORDER
-                          </button>
-                          <p className={`${Styles.ClearBag}`} style={{ textAlign: 'center', cursor: 'pointer' }}
-                            onClick={() => {
-                              if (buttonActive) {
-                                setClearConfim(true)
-                              }
-                            }
-                            }
-                            disabled={!buttonActive}
-                          >Clear Bag</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                     <div className={Styles.ShipAdress}>
+                       {buttonActive ? (
+                         <p>
+                           {order?.Account?.address?.street}, {order?.Account?.address?.city} <br />
+                           {order?.Account?.address?.state}, {order?.Account?.address?.country} {order?.Account?.address?.postalCode}
+                           <br />
+                           {order?.Account?.address?.email} {order?.Account?.address?.contact && `{ |  ${order?.Account?.address?.contact}}`}
+                         </p>
+                       ) : (
+                         <p>No Shipping Address</p>
+                       )}
+                     </div>
+                     {(showOrderFor && salesRepData?.Id && buttonActive) && <>
+                       <h2>Order For</h2>
+                       <div className={Styles.ShipAdress}>
+                         {userData?.Sales_Rep__c == salesRepData?.Id ? 'Me' : salesRepData?.Name}
+                       </div>
+                     </>}
+                     {isPlayAble ?<div className={Styles.paymentButtons}><div className={`${Styles.templateHolder}`}> <div className={Styles.labelHolder} onClick={handlePayNow}>Pay now</div>
+                    
+                     </div>
+                     <div className={`${Styles.templateHolder}`}>
+                     <div className={Styles.labelHolder}>Pay later</div></div>
+                     </div>  : null}
+                     {orderShipment.length > 0 ? (
+                         <div className={Styles.PaymentType}>
+                           <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
+                           <ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />
+                         </div>
+                       ) : null}
+                     <div className={Styles.ShipAdress2}>
+                       {/* <label>NOTE</label> */}
+                       <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] " >{order?.Note}</textarea>
+                     </div>
+                     {!PONumberFilled ? (
+                       <ModalPage
+                         open
+                         content={
+                           <div style={{ maxWidth: "309px" }}>
+                             <h1 className={`fs-5 ${StylesModal.ModalHeader}`}>Warning</h1>
+                             <p className={` ${StylesModal.ModalContent}`}>Enter PO Number</p>
+                             <div className="d-flex justify-content-center">
+                               <button
+                                 className={StylesModal.modalButton}
+                                 onClick={() => setPONumberFilled(true)}
+                               >
+                                 OK
+                               </button>
+                             </div>
+                           </div>
+                         }
+                         onClose={() => setPONumberFilled(true)}
+                       />
+                     ) : (
+                       <div className={Styles.ShipBut}>
+                         <button
+                           onClick={() => {
+
+                             if (order?.items?.length) {
+                               if (PONumber.length) {
+                                 if (order?.items?.length > 100) {
+                                   setLimitCheck(true);
+                                 } else {
+                                   if (
+                                     order.Account.discount.MinOrderAmount >
+                                     total
+                                   ) {
+                                     setAlert(1);
+                                   } else {
+                                     if (!order?.Account?.shippingMethod?.method && orderShipment?.length > 0) {
+                                       setAlert(3);
+                                       return;
+                                     }
+                                     // if (testerInBag && order.Account.discount.testerproductLimit > total) {
+                                     //   setAlert(2);
+                                     // } else {
+                                     setConfirm(true);
+                                     // }
+                                   }
+                                 }
+                               } else {
+                                 setPONumberFilled(false);
+                               }
+                             }
+                           }}
+                           disabled={!buttonActive}
+                         >
+                           ${Number(total + total * (order?.Account?.shippingMethod?.cal || 0)).toFixed(2)} PLACE ORDER
+                         </button>
+                         <p className={`${Styles.ClearBag}`} style={{ textAlign: 'center', cursor: 'pointer' }}
+                           onClick={() => {
+                             if (buttonActive) {
+                               setClearConfim(true)
+                             }
+                           }
+                           }
+                           disabled={!buttonActive}
+                         >Clear Bag</p>
+                       </div>
+                     )}
+                   </div>
+             }
+             </div>
+                  
                 </div>
               </div>
             </div>

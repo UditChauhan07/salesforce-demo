@@ -114,16 +114,16 @@ const CartProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        let timer;
         const syncCart = async () => {
             try {
-
                 // Save the updated cart to local storage
                 localStorage.setItem(orderCartKey, JSON.stringify(order));
                 const user = await GetAuthData();
                 if (!order.CreatedBy) {
                     order.CreatedBy = user?.Sales_Rep__c;
                 }
-
+    
                 order.CreatedAt = order.CreatedAt || new Date();
                 if (order?.Account?.id && order?.Manufacturer?.id) {
                     if (!order.id) {
@@ -138,8 +138,15 @@ const CartProvider = ({ children }) => {
                 console.error(err);
             }
         };
-
-        syncCart();
+    
+        // Set a timeout to debounce the syncCart call
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(syncCart, 1500);  // 1.5 second debounce
+    
+        // Clean up the timeout on component unmount or order change
+        return () => {
+            if (timer) clearTimeout(timer);
+        };
     }, [order]);
 
 

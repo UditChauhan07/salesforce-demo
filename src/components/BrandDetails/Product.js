@@ -43,27 +43,26 @@ function Product() {
   const [testerInBag, setTesterInBag] = useState(false);
   const [orderFormModal, setOrderFromModal] = useState(false);
   const [productList, setProductlist] = useState({ isLoading: false, data: [], discount: {} });
-  const [salesRepId, setSalesrepid] = useState()
+  const [salesRepId, setSalesrepid] = useState();
   const brandName = productList?.data?.[0]?.ManufacturerName__c;
   const [productCartSchema, setProductCartSchema] = useState({
     testerInclude: true,
     sampleInclude: true,
-  })
+  });
   useEffect(() => {
     const fetchPermission = async () => {
-        let user = await GetAuthData();
-        if (user.permission) {
-            let permission = JSON.parse(user.permission);
-            
-            if (permission?.modules?.order?.create === false) {
-                PermissionDenied()
-                navigate("/dashboard");
-            }
-        }
+      let user = await GetAuthData();
+      if (user.permission) {
+        let permission = JSON.parse(user.permission);
 
-    }
+        if (permission?.modules?.order?.create === false) {
+          PermissionDenied();
+          navigate("/dashboard");
+        }
+      }
+    };
     fetchPermission();
-}, [])
+  }, []);
 
   const groupProductDataByCategory = (productData) => {
     const groupedData = groupBy(productData || [], "Category__c");
@@ -84,9 +83,9 @@ function Product() {
   };
   useEffect(() => {
     if (productTypeFilter === "Pre-order") {
-      setCategoryFilters([])
+      setCategoryFilters([]);
     }
-  }, [productTypeFilter])
+  }, [productTypeFilter]);
 
   const formattedData = useMemo(() => groupProductDataByCategory(productList.data), [productList.data]);
   const formattedFilterData = useMemo(() => {
@@ -117,8 +116,7 @@ function Product() {
           if (key.match("EVENT")) {
             newData[key] = finalFilteredProducts[key];
           }
-        }
-        else {
+        } else {
           if (key !== "PREORDER" && !key.toUpperCase().match("EVENT")) {
             newData[key] = finalFilteredProducts[key];
           }
@@ -142,9 +140,6 @@ function Product() {
       finalFilteredProducts = { ...newData };
     }
 
-
-
-
     if (sortBy) {
       if (sortBy === "Price: Low To High") {
         let newData = {};
@@ -164,19 +159,18 @@ function Product() {
       } else {
         Object.keys(finalFilteredProducts)?.forEach((key) => {
           const value = finalFilteredProducts[key];
-          sortArrayHandler(value, g => g.Name)
+          sortArrayHandler(value, (g) => g.Name);
         });
       }
     } else {
       Object.keys(finalFilteredProducts)?.forEach((key) => {
         const value = finalFilteredProducts[key];
-        sortArrayHandler(value, g => g.Name)
+        sortArrayHandler(value, (g) => g.Name);
       });
     }
 
     return finalFilteredProducts;
   }, [formattedData, categoryFilters, productTypeFilter, sortBy, searchBy]);
-
 
   const [productImage, setProductImage] = useState({ isLoaded: true, images: {} });
 
@@ -190,25 +184,23 @@ function Product() {
     }
     if (data[localStorage.getItem("ManufacturerId__c")]) {
       if (Object.values(data[localStorage.getItem("ManufacturerId__c")]).length > 0) {
-        setProductImage({ isLoaded: true, images: data[localStorage.getItem("ManufacturerId__c")] })
+        setProductImage({ isLoaded: true, images: data[localStorage.getItem("ManufacturerId__c")] });
       } else {
-        setProductImage({ isLoaded: false, images: {} })
+        setProductImage({ isLoaded: false, images: {} });
       }
     }
     if (!(localStorage.getItem("ManufacturerId__c") && localStorage.getItem("AccountId__c"))) {
       setRedirect(true);
     }
-    let productData = productRes?.data?.records || []
+    let productData = productRes?.data?.records || [];
     productData.map((element) => {
       if (element.AttachedContentDocuments) {
-  
       }
-    })
-    let discount = productRes?.discount||{};
+    });
+    let discount = productRes?.discount || {};
 
-
-    setProductCartSchema({ testerInclude: productRes?.discount?.testerInclude, sampleInclude: productRes?.discount?.sampleInclude })
-    setProductlist({ data: productData, isLoading: true, discount })
+    setProductCartSchema({ testerInclude: productRes?.discount?.testerInclude, sampleInclude: productRes?.discount?.sampleInclude });
+    setProductlist({ data: productData, isLoading: true, discount });
 
     //version 1
     // productData.map(product => {
@@ -224,75 +216,95 @@ function Product() {
     // })
 
     // version 2
-    let productCode = "";
-    productData.map((product, index) => {
-      productCode += `'${product?.ProductCode}'`
-      if (productData.length - 1 != index) productCode += ', ';
-    })
-    getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
-      if (res) {
-        if (data[localStorage.getItem("ManufacturerId__c")]) {
-          data[localStorage.getItem("ManufacturerId__c")] = { ...data[localStorage.getItem("ManufacturerId__c")], ...res }
-        } else {
-          data[localStorage.getItem("ManufacturerId__c")] = res
-        }
-        ShareDrive(data)
-        setProductImage({ isLoaded: true, images: res });
-      } else {
-        setProductImage({ isLoaded: true, images: {} });
-      }
-    }).catch((err) => {
-      console.log({ err });
-    })
-  }
+    if (false) {
+      let productCode = "";
+      productData.map((product, index) => {
+        productCode += `'${product?.ProductCode}'`;
+        if (productData.length - 1 != index) productCode += ", ";
+      });
+      getProductImageAll({ rawData: { codes: productCode } })
+        .then((res) => {
+          if (res) {
+            if (data[localStorage.getItem("ManufacturerId__c")]) {
+              data[localStorage.getItem("ManufacturerId__c")] = { ...data[localStorage.getItem("ManufacturerId__c")], ...res };
+            } else {
+              data[localStorage.getItem("ManufacturerId__c")] = res;
+            }
+            ShareDrive(data);
+            setProductImage({ isLoaded: true, images: res });
+          } else {
+            setProductImage({ isLoaded: true, images: {} });
+          }
+        })
+        .catch((err) => {
+          console.log({ err });
+        });
+    }
+  };
 
   const getProductListData = () => {
-    GetAuthData().then((user) => {
-      let rawData = {
-        key: user.access_token,
-        Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
-        Manufacturer: localStorage.getItem("ManufacturerId__c"),
-        AccountId__c: localStorage.getItem("AccountId__c"),
-      }
-      dataStore.getPageData("/product" + JSON.stringify({
-        Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
-        Manufacturer: localStorage.getItem("ManufacturerId__c"),
-        AccountId__c: localStorage.getItem("AccountId__c"),
-      }), () => getProductList({ rawData })).then((productRes) => {
-        readyProductListHandle(productRes);
-      }).catch((errPro) => {
-        console.log({ errPro });
-      })
-    }).catch((err) => {
-      console.log({ err });
-    })
-  }
-
-  useEffect(() => {
-
-    GetAuthData().then((user) => {
-      dataStore.subscribe("/product" + JSON.stringify({
-        Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
-        Manufacturer: localStorage.getItem("ManufacturerId__c"),
-        AccountId__c: localStorage.getItem("AccountId__c"),
-      }), readyProductListHandle)
-      setSalesrepid(localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c)
-      getProductListData();
-      return () => {
-        dataStore.unsubscribe("/product" + JSON.stringify({
+    GetAuthData()
+      .then((user) => {
+        let rawData = {
+          key: user.access_token,
           Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
           Manufacturer: localStorage.getItem("ManufacturerId__c"),
           AccountId__c: localStorage.getItem("AccountId__c"),
-        }), readyProductListHandle)
-      }
+        };
+        dataStore
+          .getPageData(
+            "/product" +
+              JSON.stringify({
+                Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
+                Manufacturer: localStorage.getItem("ManufacturerId__c"),
+                AccountId__c: localStorage.getItem("AccountId__c"),
+              }),
+            () => getProductList({ rawData })
+          )
+          .then((productRes) => {
+            readyProductListHandle(productRes);
+          })
+          .catch((errPro) => {
+            console.log({ errPro });
+          });
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
+  };
 
-    }).catch((err) => {
-      console.log({ err });
-    })
+  useEffect(() => {
+    GetAuthData()
+      .then((user) => {
+        dataStore.subscribe(
+          "/product" +
+            JSON.stringify({
+              Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
+              Manufacturer: localStorage.getItem("ManufacturerId__c"),
+              AccountId__c: localStorage.getItem("AccountId__c"),
+            }),
+          readyProductListHandle
+        );
+        setSalesrepid(localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c);
+        getProductListData();
+        return () => {
+          dataStore.unsubscribe(
+            "/product" +
+              JSON.stringify({
+                Sales_Rep__c: localStorage.getItem(salesRepIdKey) ?? user?.Sales_Rep__c,
+                Manufacturer: localStorage.getItem("ManufacturerId__c"),
+                AccountId__c: localStorage.getItem("AccountId__c"),
+              }),
+            readyProductListHandle
+          );
+        };
+      })
+      .catch((err) => {
+        console.log({ err });
+      });
   }, []);
 
-  useBackgroundUpdater(getProductListData,defaultLoadTime);
-
+  useBackgroundUpdater(getProductListData, defaultLoadTime);
 
   const redirecting = () => {
     setTimeout(() => {
@@ -362,11 +374,11 @@ function Product() {
     const { getOrderQuantity } = useCart();
 
     return getOrderQuantity() || 0;
-  }
+  };
   const OrderPrice = () => {
     const { getOrderTotal } = useCart();
     return Number(getOrderTotal() || 0).toFixed(2);
-  }
+  };
 
   return (
     <>
@@ -458,8 +470,9 @@ function Product() {
               open
               content={
                 <>
-                  <div style={{ maxWidth: "100%", minWidth: '700px' }}>
-                    <h1 className={`fs-5 ${Styles.ModalHeader} d-flex justify-content-between mb-3`}>Upload Order Form
+                  <div style={{ maxWidth: "100%", minWidth: "700px" }}>
+                    <h1 className={`fs-5 ${Styles.ModalHeader} d-flex justify-content-between mb-3`}>
+                      Upload Order Form
                       <CSVLink
                         data={csvData()}
                         filename={`Order Form ${new Date()}.csv`}
@@ -468,7 +481,8 @@ function Product() {
                       >
                         <MdOutlineDownload size={16} />
                         Order Form Template
-                      </CSVLink></h1>
+                      </CSVLink>
+                    </h1>
                     <div className={`${Styles.ModalContent} mt-2`}>
                       <SpreadsheetUploader
                         rawData={productList || {}}
@@ -478,9 +492,7 @@ function Product() {
                         salesRepId={salesRepId}
                       />
                     </div>
-                    <div className="d-flex justify-content-center">
-
-                    </div>
+                    <div className="d-flex justify-content-center"></div>
                   </div>
                 </>
               }
@@ -492,59 +504,63 @@ function Product() {
           <AppLayout
             filterNodes={
               <>
-                {!productList.isLoading ? null : <> <FilterItem
-                  label="Sort by"
-                  name="Sort-by"
-                  value={sortBy}
-                  options={[
-                    {
-                      label: "Price: High To Low",
-                      value: "Price: High To Low",
-                    },
-                    {
-                      label: "Price: Low To High",
-                      value: "Price: Low To High",
-                    },
-                  ]}
-                  onChange={(value) => {
-                    setSortBy(value);
-                  }}
-                />
-                  <FilterItem
-                    label="Product type"
-                    name="Product-type"
-                    value={productTypeFilter}
-                    options={[
-                      {
-                        label: "Wholesale",
-                        value: "Wholesale",
-                      },
-                      {
-                        label: "PREORDER",
-                        value: "Pre-order",
-                      }
-                    ]}
-                    onChange={(value) => {
-                      setProductTypeFilter(value);
-                    }}
-                  />
-                  <FilterSearch onChange={(e) => setSearchBy(e.target.value)} value={searchBy} placeholder={"Enter Product name,UPC & SKU"} minWidth="260px" />
-                  <button
-                    className="border px-2 py-1 leading-tight tracking-[1.2px] uppercase d-grid"
-                    onClick={() => {
-                      setSortBy("Price: High To Low");
-                      setSearchBy("");
-                      setProductTypeFilter("Wholesale");
-                    }}
-                  >
-                    <CloseButton crossFill={'#fff'} height={20} width={20} />
-                    <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>clear</small>
-                  </button>
-                  <button className="border px-2 py-1 leading-tight uppercase tracking-[1.2px] d-grid" onClick={() => setOrderFromModal(true)}>
-                    <MdOutlineUpload size={20} className="m-auto" />
-                    <small style={{ fontSize: '6px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Order Form</small>
-                  </button></>}
-
+                {!productList.isLoading ? null : (
+                  <>
+                    {" "}
+                    <FilterItem
+                      label="Sort by"
+                      name="Sort-by"
+                      value={sortBy}
+                      options={[
+                        {
+                          label: "Price: High To Low",
+                          value: "Price: High To Low",
+                        },
+                        {
+                          label: "Price: Low To High",
+                          value: "Price: Low To High",
+                        },
+                      ]}
+                      onChange={(value) => {
+                        setSortBy(value);
+                      }}
+                    />
+                    <FilterItem
+                      label="Product type"
+                      name="Product-type"
+                      value={productTypeFilter}
+                      options={[
+                        {
+                          label: "Wholesale",
+                          value: "Wholesale",
+                        },
+                        {
+                          label: "PREORDER",
+                          value: "Pre-order",
+                        },
+                      ]}
+                      onChange={(value) => {
+                        setProductTypeFilter(value);
+                      }}
+                    />
+                    <FilterSearch onChange={(e) => setSearchBy(e.target.value)} value={searchBy} placeholder={"Enter Product name,UPC & SKU"} minWidth="260px" />
+                    <button
+                      className="border px-2 py-1 leading-tight tracking-[1.2px] uppercase d-grid"
+                      onClick={() => {
+                        setSortBy("Price: High To Low");
+                        setSearchBy("");
+                        setProductTypeFilter("Wholesale");
+                      }}
+                    >
+                      <CloseButton crossFill={"#fff"} height={20} width={20} />
+                      <small style={{ fontSize: "6px", letterSpacing: "0.5px", textTransform: "uppercase" }}>clear</small>
+                    </button>
+                    <button className="border px-2 py-1 leading-tight uppercase tracking-[1.2px] d-grid" onClick={() => setOrderFromModal(true)}>
+                      <MdOutlineUpload size={20} className="m-auto" />
+                      <small style={{ fontSize: "6px", letterSpacing: "0.5px", textTransform: "uppercase" }}>Order Form</small>
+                    </button>
+                  </>
+                )}
               </>
             }
           >
@@ -567,7 +583,10 @@ function Product() {
                       </h4>
 
                       <p>
-                        <span>Account</span>: <Link style={{ color: '#000', textDecoration: 'underline' }} to={"/store/" + localStorage.getItem("AccountId__c")}>{localStorage.getItem("Account")}</Link>
+                        <span>Account</span>:{" "}
+                        <Link style={{ color: "#000", textDecoration: "underline" }} to={"/store/" + localStorage.getItem("AccountId__c")}>
+                          {localStorage.getItem("Account")}
+                        </Link>
                       </p>
                     </div>
 
@@ -593,15 +612,16 @@ function Product() {
                             border: "1px dashed black",
                           }}
                         >
-                          <Accordion data={productList} formattedData={formattedFilterData} productImage={productImage} productCartSchema={productCartSchema}
-                            salesRepId={salesRepId}
-                          ></Accordion>
-
+                          <Accordion data={productList} formattedData={formattedFilterData} productImage={productImage} productCartSchema={productCartSchema} salesRepId={salesRepId}></Accordion>
                         </div>
                         <div className={`${styles.TotalSide} `}>
                           <div className="d-flex align-items-start flex-column">
-                            <h4>Total Number of Products in Bag : <OrderQuantity /></h4>
-                            <h4>Total Price : $<OrderPrice /></h4>
+                            <h4>
+                              Total Number of Products in Bag : <OrderQuantity />
+                            </h4>
+                            <h4>
+                              Total Price : $<OrderPrice />
+                            </h4>
                           </div>
                           <button
                             onClick={() => {
