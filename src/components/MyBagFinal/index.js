@@ -885,7 +885,7 @@ function MyBagFinal({ showOrderFor }) {
                                 </div>
                                 <div className={`${Styles.templateHolder} ${!isPayNow ? Styles.selected : null}`} onClick={handlePayLater}>
                                   <div className={`${Styles.labelHolder}`}>
-                                    Pay later
+                                    Pay by Link
                                   </div>
                                 </div>
                               </div>
@@ -1032,7 +1032,7 @@ function MyBagFinal({ showOrderFor }) {
                                 </div>
                               </div>
                               <div className={`${Styles.templateHolder} ${!isPayNow ? Styles.selected : null}`} onClick={handlePayLater}>
-                                <div className={Styles.labelHolder}>Pay later</div>
+                                <div className={Styles.labelHolder}>Pay By Link</div>
                               </div>
                             </div>
                           </div>
