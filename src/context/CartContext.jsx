@@ -141,7 +141,7 @@ const CartProvider = ({ children }) => {
     
         // Set a timeout to debounce the syncCart call
         if (timer) clearTimeout(timer);
-        timer = setTimeout(syncCart, 1500);  // 1.5 second debounce
+        timer = setTimeout(syncCart, 1000);  // 1.5 second debounce
     
         // Clean up the timeout on component unmount or order change
         return () => {

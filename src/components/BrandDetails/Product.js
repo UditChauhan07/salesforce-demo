@@ -9,7 +9,7 @@ import Loading from "../Loading";
 import { FilterItem } from "../FilterItem";
 import FilterSearch from "../FilterSearch";
 import ModalPage from "../Modal UI";
-import { GetAuthData, ShareDrive, defaultLoadTime, fetchBeg, getProductImageAll, getProductList, salesRepIdKey, sortArrayHandler } from "../../lib/store";
+import { GetAuthData, ShareDrive, cartSync, defaultLoadTime, fetchBeg, getProductImageAll, getProductList, salesRepIdKey, sortArrayHandler } from "../../lib/store";
 import Styles from "../Modal UI/Styles.module.css";
 import { BackArrow, CloseButton } from "../../lib/svg";
 import AppLayout from "../AppLayout";
@@ -332,6 +332,9 @@ function Product() {
           if (testerInBag && productList.discount.testerproductLimit > bagPrice) {
             setAlert(2);
           } else {
+
+            
+            // cartSync({cart:begValue})
             navigate("/my-bag");
           }
         }
