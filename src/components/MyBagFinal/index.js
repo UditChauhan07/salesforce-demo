@@ -139,7 +139,6 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
-        await fetchBrandPaymentDetails();
         try {
           const res = await POGenerator();
 
@@ -192,6 +191,7 @@ function MyBagFinal({ showOrderFor }) {
       }
     };
     if (order?.Account?.id && order?.Manufacturer?.id) {
+      fetchBrandPaymentDetails();
       if (!PONumber) {
         FetchPoNumber();
       }
