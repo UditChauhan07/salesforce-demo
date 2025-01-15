@@ -139,7 +139,6 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
-        await fetchBrandPaymentDetails();
         try {
           const res = await POGenerator();
 
@@ -180,18 +179,25 @@ function MyBagFinal({ showOrderFor }) {
             keyBasedUpdateCart({ PoNumber: poInit });
             setPONumber(poInit);
           }
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
         } catch (error) {
           console.error("Error fetching PO number:", error);
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500);
         } finally {
         }
       } else {
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
         setPONumber(null);
       }
     };
     if (order?.Account?.id && order?.Manufacturer?.id) {
+      fetchBrandPaymentDetails();
       if (!PONumber) {
         FetchPoNumber();
       }
