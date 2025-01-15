@@ -64,7 +64,6 @@ function MyBagFinal({ showOrderFor }) {
   };
   useEffect(() => {
     if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0) {
-      fetchBrandPaymentDetails();
       setButtonActive(true);
     }
     setTotal(getOrderTotal() ?? 0);
@@ -76,61 +75,62 @@ function MyBagFinal({ showOrderFor }) {
       let id = order?.Manufacturer?.id;
       let AccountID = order?.Account?.id;
       const user = await GetAuthData();
+      if (id && AccountID) {
+        const brandRes = await getBrandPaymentDetails({
+          key: user.x_access_token,
+          Id: id,
+          AccountId: AccountID,
+        });
 
-      const brandRes = await getBrandPaymentDetails({
-        key: user.x_access_token,
-        Id: id,
-        AccountId: AccountID,
-      });
 
+        setIntentRes(brandRes);
 
-      setIntentRes(brandRes);
+        brandRes.accountManufacturerData.map((item) => setPaymentType(item.Payment_Type__c));
 
-      brandRes.accountManufacturerData.map((item) => setPaymentType(item.Payment_Type__c));
+        // Check for null keys
+        if (!brandRes?.brandDetails.Stripe_Secret_key_test__c || !brandRes?.brandDetails.Stripe_Publishable_key_test__c) {
+          setIsPlayAble(0);
+          console.log("Brand payment details are missing, skipping payment processing.");
+          return {
+            PK_KEY: null,
+            SK_KEY: null,
+          };
+        }
 
-      // Check for null keys
-      if (!brandRes?.brandDetails.Stripe_Secret_key_test__c || !brandRes?.brandDetails.Stripe_Publishable_key_test__c) {
-        setIsPlayAble(0);
-        console.log("Brand payment details are missing, skipping payment processing.");
+        let paymentIntent = await fetch(`${originAPi}/stripe/payment-intent`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: "100",
+            paymentId: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+          }),
+        });
+
+        setGreenStatus(paymentIntent.status);
+
+        // Check paymentIntent status and payment types
+        const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
+        const hasNetPaymentType = paymentTypes.some((type) => type.startsWith("Net"));
+
+        if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
+          setIsPlayAble(1);
+        } else if (paymentIntent.status === 400 || paymentDetails.PK_KEY === paymentDetails.SK_KEY) {
+          setIsPlayAble(0);
+          console.log(isPlayAble, "is play able ");
+        }
+
+        setPaymentDetails({
+          PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
+          SK_KEY: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+        });
+
         return {
-          PK_KEY: null,
-          SK_KEY: null,
+          PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
+          SK_KEY: brandRes?.brandDetails.Stripe_Secret_key_test__c,
         };
       }
-
-      let paymentIntent = await fetch(`${originAPi}/stripe/payment-intent`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: "100",
-          paymentId: brandRes?.brandDetails.Stripe_Secret_key_test__c,
-        }),
-      });
-
-      setGreenStatus(paymentIntent.status);
-
-      // Check paymentIntent status and payment types
-      const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
-      const hasNetPaymentType = paymentTypes.some((type) => type.startsWith("Net"));
-
-      if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
-        setIsPlayAble(1);
-      } else if (paymentIntent.status === 400 || paymentDetails.PK_KEY === paymentDetails.SK_KEY) {
-        setIsPlayAble(0);
-        console.log(isPlayAble, "is play able ");
-      }
-
-      setPaymentDetails({
-        PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
-        SK_KEY: brandRes?.brandDetails.Stripe_Secret_key_test__c,
-      });
-
-      return {
-        PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
-        SK_KEY: brandRes?.brandDetails.Stripe_Secret_key_test__c,
-      };
     } catch (error) {
       console.log("Error fetching brand payment details:", error);
       return null;
@@ -139,11 +139,12 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
+        await fetchBrandPaymentDetails();
         try {
           const res = await POGenerator();
 
-          console.log({res,order});
-          
+          console.log({ res, order });
+
 
           if (res?.poNumber) {
             if (res?.address || res?.brandShipping) {
@@ -192,8 +193,13 @@ function MyBagFinal({ showOrderFor }) {
     };
     if (order?.Account?.id && order?.Manufacturer?.id) {
       if (!PONumber) {
-        console.table({ order });
         FetchPoNumber();
+      }
+    } else {
+      if (isLoading) {
+        setTimeout(function () {
+          setIsLoading(false);
+        }, 1500);
       }
     }
 
@@ -313,19 +319,22 @@ function MyBagFinal({ showOrderFor }) {
               .then((response) => {
                 if (response) {
                   // console.log("response" , response.length)
-                  if (response.err) {
-                    setIsOrderPlaced(0);
-                    setorderStatus({ status: true, message: response.err[0].message });
-                  } else {
-                    let status = deleteOrder();
-                    setIsOrderPlaced(2);
-                    if (response?.orderId && typeof response.orderId == "string") {
-                      localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
-                      window.location.href = window.location.origin + "/orderDetails";
+                  setTimeout(async function () {
+                    if (response.err) {
+                      setIsOrderPlaced(0);
+                      setorderStatus({ status: true, message: response.err[0].message });
                     } else {
-                      navigate("/order-list");
+                      await deleteOrder();
+                      if (response?.orderId && typeof response.orderId == "string") {
+                        localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
+                        setIsOrderPlaced(2);
+                        window.location.href = window.location.origin + "/orderDetails";
+                      } else {
+                        setIsOrderPlaced(2);
+                        navigate("/order-list");
+                      }
                     }
-                  }
+                  }, 1000);
                 }
               })
               .catch((err) => {

@@ -138,16 +138,19 @@ const CartProvider = ({ children }) => {
                 console.error(err);
             }
         };
+        syncCart();
 
         // Set a timeout to debounce the syncCart call
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(syncCart, 1000);  // 1.5 second debounce
+        // if (timer) clearTimeout(timer);
+        // timer = setTimeout(syncCart, 1000);  // 1.5 second debounce
+  
 
-        // Clean up the timeout on component unmount or order change
-        return () => {
-            if (timer) clearTimeout(timer);
-        };
+        // // Clean up the timeout on component unmount or order change
+        // return () => {
+        //     if (timer) clearTimeout(timer);
+        // };
     }, [order]);
+    
 
 
 
