@@ -122,7 +122,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                         ShippingCountry: order?.Account?.address?.country,
                         ShippingZip: order?.Account?.address?.postalCode,
                         list: orderItems,
-                        key: user.data.x_access_token,
+                        key: user.x_access_token,
                         shippingMethod: order.Account.shippingMethod,
                         Payment_Status__c: paymentStatus,
                         Transaction_ID__c: paymentId
