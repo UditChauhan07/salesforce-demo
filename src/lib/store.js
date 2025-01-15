@@ -174,65 +174,48 @@ export async function getAllAccountOrders({ key, accountIds, month, date = null 
 }
 
 export async function POGenerator() {
-  const maxRetries = 10; // Maximum number of attempts
-  const delayMs = 3000; // Delay between attempts in milliseconds
-
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
   try {
+
     let orderDetails = fetchBeg();
     let date = new Date();
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(`Attempt ${attempt}: Fetching PO...`);
+    //  const response = await fetch( "http://localhost:2611/PoNumber/generatepo"
+    const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov2", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        accountName: orderDetails.Account?.name,
+        manufacturerName: orderDetails.Manufacturer?.name,
+        orderDate: date.toISOString(),
+        accountId: orderDetails.Account?.id,  // Make sure this is passed
+        manufacturerId: orderDetails.Manufacturer?.id // Ensure this is passed
+      }),
+    });
 
-        const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov2", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            accountName: orderDetails.Account?.name,
-            manufacturerName: orderDetails.Manufacturer?.name,
-            orderDate: date.toISOString(),
-            accountId: orderDetails.Account?.id, // Make sure this is passed
-            manufacturerId: orderDetails.Manufacturer?.id, // Ensure this is passed
-          }),
-        });
-
-        if (!response.ok) {
-          console.warn(`HTTP error! Status: ${response.status}`);
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const poData = await response.json();
-        if (poData.success) {
-          console.log("PO generated successfully:", poData);
-
-          let poNumber = poData.poNumber;
-          let address = poData.address;
-          let brandShipping = poData?.brandShipping;
-          let shippingMethod = poData?.shippingMethod;
-          let checkBrandAllow = poData?.checkBrandAllow;
-
-          return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow };
-        } else {
-          console.error('Failed to generate PO number:', poData.message);
-        }
-      } catch (innerError) {
-        console.error(`Attempt ${attempt} failed:`, innerError.message);
-      }
-
-      // Wait before the next attempt
-      console.log(`Waiting ${delayMs / 1000} seconds before retrying...`);
-      await delay(delayMs);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    console.error('Failed to generate PO number after maximum retries.');
-    return null;
+
+    const poData = await response.json();
+    if (poData.success) {
+      
+      let res = await poData;
+      let poNumber = res.poNumber;
+      let address = res.address;
+      let brandShipping = res?.brandShipping;
+      let shippingMethod = res?.shippingMethod;
+      let checkBrandAllow = res?.checkBrandAllow;
+
+      return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow };
+    } else {
+      console.error('Failed to generate PO number:', poData.message);
+      return null;
+    }
   } catch (error) {
-    console.error('Error in POGenerator:', error.message);
+    console.error('Error generating PO number:', error.message);
     return null;
   }
 }
