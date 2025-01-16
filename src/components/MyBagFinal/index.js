@@ -181,12 +181,12 @@ function MyBagFinal({ showOrderFor }) {
           }
           setTimeout(() => {
             setIsLoading(false);
-          }, 1500);
+          }, 2000);
         } catch (error) {
           console.error("Error fetching PO number:", error);
           setTimeout(() => {
             setIsLoading(false);
-          }, 1500);
+          }, 2000);
         } finally {
         }
       } else {

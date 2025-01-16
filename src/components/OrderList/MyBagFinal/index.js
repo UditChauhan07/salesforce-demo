@@ -29,6 +29,42 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [helpId, setHelpId] = useState();
   const [reason, setReason] = useState();
   const [restrict, setRestrict] = useState();
+  const [canRegenerate, setCanRegenerate] = useState(false);
+  const [linkRegenerated, setLinkRegenerated] = useState(false);
+  useEffect(() => {
+    // Log the createdDate to check its value
+    console.log('Created Date:', OrderData.CreatedDate);
+    
+    // Convert createdDate string to Date object
+    const createdDate = new Date(OrderData.CreatedDate); 
+  
+    // Check if the createdDate is valid
+    if (isNaN(createdDate)) {
+      console.error('Invalid createdDate:', OrderData.CreatedDate);
+      return; // Exit if date is invalid
+    }
+  
+    const currentDate = new Date();
+    
+    // Calculate the time difference in milliseconds
+    const timeDifference = currentDate - createdDate; 
+  
+    console.log('Time Difference in milliseconds:', timeDifference);
+  
+    // Convert the time difference to hours, minutes, and seconds
+    const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
+    const timeDifferenceInMinutes = timeDifference / (1000 * 60);
+    const timeDifferenceInSeconds = timeDifference / 1000;
+  
+    console.log('Time Difference in Hours:', timeDifferenceInHours);
+    console.log('Time Difference in Minutes:', timeDifferenceInMinutes);
+    console.log('Time Difference in Seconds:', timeDifferenceInSeconds);
+  
+    // Check if 24 hours have passed and if link hasn't been regenerated
+    if (timeDifference >= 24 * 60 * 60 * 1000 && !linkRegenerated) {
+      setCanRegenerate(true);
+    }
+  }, [OrderData.CreatedDate, linkRegenerated]);
   const handleRegenerateOrder = async () => {
     const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
     const Key = JSON.parse(localStorage.getItem('Api Data'));
@@ -495,14 +531,15 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                             <div className={Styles.ShipBut}>
                               <button role="link"
                                 onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button>
-                                  <button
-        role="link"
-        onClick={handleRegenerateOrder}
-        disabled={buttonLoading} // Disable button when loading
-      >
-        {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
-      </button>
-                                </div>
+                               {canRegenerate && !linkRegenerated && (
+        <button
+          role="link"
+          onClick={handleRegenerateOrder}
+          disabled={buttonLoading} // Disable button when loading
+        >
+          {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
+        </button>
+      )}                </div>
                             : null}
                         </div>
                       </> : null}

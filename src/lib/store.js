@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
 export const originAPi = process.env.REACT_APP_OA_URL || "https://staging.beautyfashionsales.com/"
-// export const originAPi =  "http://localhost:3004"
+// export const originAPi =  "http://localhost:3001"
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;
