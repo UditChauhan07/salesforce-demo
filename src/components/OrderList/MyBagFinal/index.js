@@ -4,7 +4,7 @@ import Styles from "./Styles.module.css";
 import axios from "axios";
 import Loading from "../../Loading";
 import { Link, useNavigate } from "react-router-dom";
-import { DestoryAuth, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
+import { DestoryAuth, GetAuthData  ,  ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
 import { MdOutlineDownload } from "react-icons/md";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
@@ -16,6 +16,7 @@ import { CustomerServiceIcon, OrderStatusIcon } from "../../../lib/svg";
 import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
 import dataStore from "../../../lib/dataStore";
 import ImageHandler from "../../loader/ImageHandler";
+import Swal from "sweetalert2";
 
 function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   let Img1 = "/assets/images/dummy.png";
@@ -27,7 +28,62 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [helpId, setHelpId] = useState();
   const [reason, setReason] = useState();
   const [restrict, setRestrict] = useState();
-
+  const handleRegenerateOrder = async () => {
+    const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
+    const Key = JSON.parse(localStorage.getItem('Api Data'));
+    const payload = {
+      orderId,
+      info: {
+        ManufacturerId__c: OrderData?.ManufacturerId__c,
+        key: Key?.data?.x_access_token,
+        currency: 'usd',
+        list: OrderData?.OpportunityLineItems.map(product => ({
+          ProductCode: product.ProductCode,
+          price: product?.UnitPrice, // Convert to cents
+          qty: product.Quantity,
+        })),
+        shippingMethod: {
+          method: 'UPS',
+          cal: Math.round(OrderData?.cal * 100), // Convert to cents
+        },
+      },
+    };
+  
+    try {
+      const response = await fetch(`${originAPi}/beauty/4eIAaY2H/regenerate-payment-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        Swal.fire({
+          title: "Success!",
+          text: "Payment link has been regenerated successfully.",
+          icon: "success",
+          confirmButtonText: "OK",
+          showCancelButton: true, // Add a cancel button
+          
+          allowOutsideClick: false, // Prevent clicking outside to close
+          preConfirm: () => {
+            // Page refresh logic when "OK" is clicked
+            window.location.reload();
+          },
+        });
+      } else {
+        console.error('Error:', data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+  
+  // useEffect(()=>{
+  //   handleRegenerateOrder()
+  // } , [])
   const OrderId = JSON.parse(localStorage.getItem("OpportunityId"));
 
   const Key = JSON.parse(localStorage.getItem("Api Data"));
@@ -120,6 +176,11 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     getOrderDetails();
   }, []);
 
+
+
+
+  
+
   useBackgroundUpdater(getOrderDetails, defaultLoadTime);
 
   function downloadFiles(invoices) {
@@ -176,7 +237,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       alert("do nothing")
     }
   }
-
   const SupportTransporter = ({ Type, Reason }) => {
     if (oldSupport?.[Type]?.[Reason]?.Id) {
       return (<Link to={"/CustomerSupportDetails?id=" + oldSupport[Type][Reason].Id} className={Styles.supportLinkHolder}>{oldSupport[Type][Reason]?.CaseNumber}</Link>)
@@ -198,6 +258,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       return null;
     }
   }
+  
   const caseChangeHandler = (type, reason) => {
     console.log({ type, reason, oldSupport });
 
@@ -216,6 +277,8 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     setConfirm("Invoice")
   }
   console.log({ OrderData });
+
+
 
   return (
     <div>
@@ -425,7 +488,11 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                           {OrderData?.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
                             <div className={Styles.ShipBut}>
                               <button role="link"
-                                onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button></div>
+                                onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button>
+                                 <button role="link" 
+                                 onClick={handleRegenerateOrder}
+                                >Regenerate Payment Link</button>
+                                </div>
                             : null}
                         </div>
                       </> : null}

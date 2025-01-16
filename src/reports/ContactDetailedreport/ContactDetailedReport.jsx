@@ -279,8 +279,9 @@ function ContactDetailedReport() {
             ) : (
                 <>
                     <div className={`d-flex p-3 ${Styles.tableBoundary} mb-5`}>
-                        <div style={{ overflow: "auto", width: "100%" }}>
-                            <DynamicTable mainData={sortArrayHandler(filteredData, g => g.accountDetails?.Name)} head={<thead>
+                        <div style={{ overflow: "auto", width: "100%", height:'400px' }}>
+                            {filteredRecords.length === 0 ? "NO DATA FOUND" :  
+                               <DynamicTable mainData={sortArrayHandler(filteredData, g => g.accountDetails?.Name)} head={<thead>
                                 <tr>
                                     <th className={`${styles.th} ${styles.stickyMonth} ${styles.stickyFirstColumnHeading}`} style={{ minWidth: "200px" }}>Account Name</th>
                                     <th className={`${styles.th} ${styles.stickyMonth}  ${styles.stickySecondColumnHeading} `} style={{ minWidth: "200px" }}> Sales Rep</th>
@@ -316,8 +317,11 @@ function ContactDetailedReport() {
 
                                 </tr>
                             </thead>} className="table table-responsive" style={{ minHeight: "300px" }}>
+                         
+                           
                                 {(items) => (
-                                    <>
+
+                                       <>
                                         <td className={`${styles.td} ${styles.stickyFirstColumn}`}>{items.accountDetails?.Name} </td>
                                         <td className={`${styles.td} ${styles.stickySecondColumn}`}>{items.manufacturers?.salesRep || 'N/A'}</td>
                                         <td className={styles.td}> {items.manufacturers?.manufacturerName || 'N/A'}</td>
@@ -348,6 +352,8 @@ function ContactDetailedReport() {
                                     </>
                                 )}
                             </DynamicTable>
+                            }
+                         
                         </div>
                     </div>
                 </>
