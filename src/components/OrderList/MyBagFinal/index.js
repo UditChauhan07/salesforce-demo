@@ -31,22 +31,23 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [restrict, setRestrict] = useState();
   const [canRegenerate, setCanRegenerate] = useState(false);
   const [linkRegenerated, setLinkRegenerated] = useState(false);
+ 
   useEffect(() => {
     // Check if OrderData and createdDate are available
-    if (!OrderData || !OrderData.CreatedDate) {
+    if (!OrderData || !OrderData.CloseDate) {
       console.error('OrderData or createdDate is missing');
       return; // Exit if OrderData or createdDate is not available
     }
 
-    const createdDate = new Date(OrderData.CreatedDate);
+    const createdDate = new Date(OrderData.CloseDate);
     const currentDate = new Date();
     const timeDifference = currentDate - createdDate; // in milliseconds
 
-    // Check if 24 hours have passed
+    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
     if (timeDifference >= 24 * 60 * 60 * 1000 && !linkRegenerated) {
       setCanRegenerate(true);
     }
-  }, [OrderData.CreatedDate, linkRegenerated]);
+  }, [OrderData.CloseDate, linkRegenerated]);
 
   const handleRegenerateOrder = async () => {
     const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
@@ -515,15 +516,15 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                             <div className={Styles.ShipBut}>
                               <button role="link"
                                 onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button>
-                               {canRegenerate && !linkRegenerated && (
-        <button
-          role="link"
-          onClick={handleRegenerateOrder}
-          disabled={buttonLoading} // Disable button when loading
-        >
-          {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
-        </button>
-      )}                </div>
+                               {canRegenerate && !linkRegenerated ? (
+         <button
+         role="link"
+         onClick={handleRegenerateOrder}
+         disabled={buttonLoading} // Disable button when loading
+       >
+         {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
+       </button>
+      ) : null}                </div>
                             : null}
                         </div>
                       </> : null}
