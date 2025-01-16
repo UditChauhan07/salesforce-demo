@@ -32,39 +32,22 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [canRegenerate, setCanRegenerate] = useState(false);
   const [linkRegenerated, setLinkRegenerated] = useState(false);
   useEffect(() => {
-    // Log the createdDate to check its value
-    console.log('Created Date:', OrderData.CreatedDate);
-    
-    // Convert createdDate string to Date object
-    const createdDate = new Date(OrderData.CreatedDate); 
-  
-    // Check if the createdDate is valid
-    if (isNaN(createdDate)) {
-      console.error('Invalid createdDate:', OrderData.CreatedDate);
-      return; // Exit if date is invalid
+    // Check if OrderData and createdDate are available
+    if (!OrderData || !OrderData.CreatedDate) {
+      console.error('OrderData or createdDate is missing');
+      return; // Exit if OrderData or createdDate is not available
     }
-  
+
+    const createdDate = new Date(OrderData.CreatedDate);
     const currentDate = new Date();
-    
-    // Calculate the time difference in milliseconds
-    const timeDifference = currentDate - createdDate; 
-  
-    console.log('Time Difference in milliseconds:', timeDifference);
-  
-    // Convert the time difference to hours, minutes, and seconds
-    const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
-    const timeDifferenceInMinutes = timeDifference / (1000 * 60);
-    const timeDifferenceInSeconds = timeDifference / 1000;
-  
-    console.log('Time Difference in Hours:', timeDifferenceInHours);
-    console.log('Time Difference in Minutes:', timeDifferenceInMinutes);
-    console.log('Time Difference in Seconds:', timeDifferenceInSeconds);
-  
-    // Check if 24 hours have passed and if link hasn't been regenerated
-    if (timeDifference >= 24 * 60 * 60 * 1000 && !linkRegenerated) {
+    const timeDifference = currentDate - createdDate; // in milliseconds
+
+    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
+    if (timeDifference >= 10 * 60 * 1000 && !linkRegenerated) {
       setCanRegenerate(true);
     }
   }, [OrderData.CreatedDate, linkRegenerated]);
+
   const handleRegenerateOrder = async () => {
     const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
     const Key = JSON.parse(localStorage.getItem('Api Data'));
@@ -93,6 +76,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      await new Promise((resolve) => setTimeout(resolve, 2000)); 
       setIsButtonLoading(true)
       const data = await response.json();
   
