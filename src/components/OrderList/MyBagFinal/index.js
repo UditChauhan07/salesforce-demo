@@ -42,8 +42,8 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     const currentDate = new Date();
     const timeDifference = currentDate - createdDate; // in milliseconds
 
-    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
-    if (timeDifference >= 10 * 60 * 1000 && !linkRegenerated) {
+    // Check if 24 hours have passed
+    if (timeDifference >= 24 * 60 * 60 * 1000 && !linkRegenerated) {
       setCanRegenerate(true);
     }
   }, [OrderData.CreatedDate, linkRegenerated]);
