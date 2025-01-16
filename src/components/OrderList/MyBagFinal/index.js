@@ -50,6 +50,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   }, [OrderData.CloseDate, linkRegenerated]);
 
   const handleRegenerateOrder = async () => {
+    setIsButtonLoading(true)
     const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
     const Key = JSON.parse(localStorage.getItem('Api Data'));
     const calValue = OrderData?.Shipment_cost__c /OrderData?.Amount
@@ -78,7 +79,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         body: JSON.stringify(payload),
       });
       await new Promise((resolve) => setTimeout(resolve, 2000)); 
-      setIsButtonLoading(true)
+    
       const data = await response.json();
   
       if (response.ok) {
@@ -92,11 +93,23 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
           },
           
           allowOutsideClick: false,
+         
           preConfirm: () => {
-            window.location.reload(); // Refresh the page on OK
+            setTimeout(()=>{
+              window.location.reload()
+            },[1500])
+           ; // Refresh the page on OK
           },
         });
       } else {
+        Swal.fire({
+          title: "Failed!",
+          text: "Unable to Generate Payment Link ",
+          icon: "Falied",
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: 'swal-center-button', // Add a custom class to the button
+          } })
         console.error('Error:', data);
       }
     } catch (error) {
@@ -514,8 +527,11 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                           {OrderData?.Transaction_ID__c ? <p>Transaction ID : {OrderData?.Transaction_ID__c} </p> : null}
                           {OrderData?.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
                             <div className={Styles.ShipBut}>
-                              <button role="link"
-                                onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button>
+                              {!buttonLoading ? <button role="link" 
+                                onClick={() => {if(!buttonLoading){
+                                  openInNewTab(OrderData.PBL_Status__c)
+                                }}}>Payment Link</button> : null}
+                              
                                {canRegenerate && !linkRegenerated ? (
          <button
          role="link"
