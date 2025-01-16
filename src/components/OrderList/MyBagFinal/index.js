@@ -93,8 +93,12 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
           },
           
           allowOutsideClick: false,
+         
           preConfirm: () => {
-            window.location.reload(); // Refresh the page on OK
+            setTimeout(()=>{
+              window.location.reload()
+            },[1500])
+           ; // Refresh the page on OK
           },
         });
       } else {
