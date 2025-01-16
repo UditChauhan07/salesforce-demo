@@ -31,6 +31,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const handleRegenerateOrder = async () => {
     const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
     const Key = JSON.parse(localStorage.getItem('Api Data'));
+    const calValue = OrderData?.Shipment_cost__c /OrderData?.Amount
     const payload = {
       orderId,
       info: {
@@ -44,7 +45,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         })),
         shippingMethod: {
           method: 'UPS',
-          cal: Math.round(OrderData?.cal * 100), // Convert to cents
+          cal: calValue, // Convert to cents
         },
       },
     };
