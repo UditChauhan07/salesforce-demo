@@ -69,8 +69,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
           customClass: {
             confirmButton: 'swal-center-button', // Add a custom class to the button
           },
-          showCancelButton: true, // If you have a cancel button, it won't affect this alignment
-          cancelButtonText: "Cancel",
+          
           allowOutsideClick: false,
           preConfirm: () => {
             window.location.reload(); // Refresh the page on OK
