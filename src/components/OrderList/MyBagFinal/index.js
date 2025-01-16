@@ -21,6 +21,7 @@ import Swal from "sweetalert2";
 function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   let Img1 = "/assets/images/dummy.png";
   const [OrderData, setOrderData] = useState([]);
+  const [buttonLoading , setIsButtonLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [showTracking, setShowTracking] = useState(false)
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-  
+      setIsButtonLoading(true)
       const data = await response.json();
   
       if (response.ok) {
@@ -65,12 +66,14 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
           text: "Payment link has been regenerated successfully.",
           icon: "success",
           confirmButtonText: "OK",
-          showCancelButton: true, // Add a cancel button
-          
-          allowOutsideClick: false, // Prevent clicking outside to close
+          customClass: {
+            confirmButton: 'swal-center-button', // Add a custom class to the button
+          },
+          showCancelButton: true, // If you have a cancel button, it won't affect this alignment
+          cancelButtonText: "Cancel",
+          allowOutsideClick: false,
           preConfirm: () => {
-            // Page refresh logic when "OK" is clicked
-            window.location.reload();
+            window.location.reload(); // Refresh the page on OK
           },
         });
       } else {
@@ -78,6 +81,9 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       }
     } catch (error) {
       console.error('Error:', error);
+    }
+    finally{
+      setIsButtonLoading(false)
     }
   };
   
@@ -490,9 +496,13 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                             <div className={Styles.ShipBut}>
                               <button role="link"
                                 onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button>
-                                 <button role="link" 
-                                 onClick={handleRegenerateOrder}
-                                >Regenerate Payment Link</button>
+                                  <button
+        role="link"
+        onClick={handleRegenerateOrder}
+        disabled={buttonLoading} // Disable button when loading
+      >
+        {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
+      </button>
                                 </div>
                             : null}
                         </div>
