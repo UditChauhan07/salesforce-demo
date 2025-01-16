@@ -547,6 +547,7 @@ function Dashboard() {
   let totalRecieved = 0;
   let totalConverted = 0;
   const sendDataTargetHandler = ({ salesRepId = null, manufacturerId = null }) => {
+    console.log({salesRepId})
     navigate('/Target-Report', { state: { salesRepId, manufacturerId } });
   }
   const targeetRollReferesh = () => {

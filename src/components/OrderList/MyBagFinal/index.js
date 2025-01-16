@@ -4,7 +4,7 @@ import Styles from "./Styles.module.css";
 import axios from "axios";
 import Loading from "../../Loading";
 import { Link, useNavigate } from "react-router-dom";
-import { DestoryAuth, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
+import { DestoryAuth, GetAuthData  ,  ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
 import { MdOutlineDownload } from "react-icons/md";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
@@ -16,10 +16,12 @@ import { CustomerServiceIcon, OrderStatusIcon } from "../../../lib/svg";
 import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
 import dataStore from "../../../lib/dataStore";
 import ImageHandler from "../../loader/ImageHandler";
+import Swal from "sweetalert2";
 
 function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   let Img1 = "/assets/images/dummy.png";
   const [OrderData, setOrderData] = useState([]);
+  const [buttonLoading , setIsButtonLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [showTracking, setShowTracking] = useState(false)
   const navigate = useNavigate();
@@ -27,7 +29,88 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [helpId, setHelpId] = useState();
   const [reason, setReason] = useState();
   const [restrict, setRestrict] = useState();
+  const [canRegenerate, setCanRegenerate] = useState(false);
+  const [linkRegenerated, setLinkRegenerated] = useState(false);
+ 
+  useEffect(() => {
+    // Check if OrderData and createdDate are available
+    if (!OrderData || !OrderData.CloseDate) {
+      console.error('OrderData or createdDate is missing');
+      return; // Exit if OrderData or createdDate is not available
+    }
 
+    const createdDate = new Date(OrderData.CloseDate);
+    const currentDate = new Date();
+    const timeDifference = currentDate - createdDate; // in milliseconds
+
+    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
+    if (timeDifference >= 24 * 60 * 60 * 1000 && !linkRegenerated) {
+      setCanRegenerate(true);
+    }
+  }, [OrderData.CloseDate, linkRegenerated]);
+
+  const handleRegenerateOrder = async () => {
+    const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
+    const Key = JSON.parse(localStorage.getItem('Api Data'));
+    const calValue = OrderData?.Shipment_cost__c /OrderData?.Amount
+    const payload = {
+      orderId,
+      info: {
+        ManufacturerId__c: OrderData?.ManufacturerId__c,
+        key: Key?.data?.x_access_token,
+        currency: 'usd',
+        list: OrderData?.OpportunityLineItems.map(product => ({
+          ProductCode: product.ProductCode,
+          price: product?.UnitPrice, // Convert to cents
+          qty: product.Quantity,
+        })),
+        shippingMethod: {
+          method: 'UPS',
+          cal: calValue, // Convert to cents
+        },
+      },
+    };
+  
+    try {
+      const response = await fetch(`${originAPi}/beauty/4eIAaY2H/regenerate-payment-link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      await new Promise((resolve) => setTimeout(resolve, 2000)); 
+      setIsButtonLoading(true)
+      const data = await response.json();
+  
+      if (response.ok) {
+        Swal.fire({
+          title: "Success!",
+          text: "Payment link has been regenerated successfully.",
+          icon: "success",
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: 'swal-center-button', // Add a custom class to the button
+          },
+          
+          allowOutsideClick: false,
+          preConfirm: () => {
+            window.location.reload(); // Refresh the page on OK
+          },
+        });
+      } else {
+        console.error('Error:', data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    finally{
+      setIsButtonLoading(false)
+    }
+  };
+  
+  
+  // useEffect(()=>{
+  //   handleRegenerateOrder()
+  // } , [])
   const OrderId = JSON.parse(localStorage.getItem("OpportunityId"));
 
   const Key = JSON.parse(localStorage.getItem("Api Data"));
@@ -120,6 +203,11 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     getOrderDetails();
   }, []);
 
+
+
+
+  
+
   useBackgroundUpdater(getOrderDetails, defaultLoadTime);
 
   function downloadFiles(invoices) {
@@ -176,7 +264,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       alert("do nothing")
     }
   }
-
   const SupportTransporter = ({ Type, Reason }) => {
     if (oldSupport?.[Type]?.[Reason]?.Id) {
       return (<Link to={"/CustomerSupportDetails?id=" + oldSupport[Type][Reason].Id} className={Styles.supportLinkHolder}>{oldSupport[Type][Reason]?.CaseNumber}</Link>)
@@ -198,6 +285,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       return null;
     }
   }
+  
   const caseChangeHandler = (type, reason) => {
     console.log({ type, reason, oldSupport });
 
@@ -216,6 +304,8 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     setConfirm("Invoice")
   }
   console.log({ OrderData });
+
+
 
   return (
     <div>
@@ -425,7 +515,16 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                           {OrderData?.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
                             <div className={Styles.ShipBut}>
                               <button role="link"
-                                onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button></div>
+                                onClick={() => openInNewTab(OrderData.PBL_Status__c)}>Payment Link</button>
+                               {canRegenerate && !linkRegenerated ? (
+         <button
+         role="link"
+         onClick={handleRegenerateOrder}
+         disabled={buttonLoading} // Disable button when loading
+       >
+         {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
+       </button>
+      ) : null}                </div>
                             : null}
                         </div>
                       </> : null}
