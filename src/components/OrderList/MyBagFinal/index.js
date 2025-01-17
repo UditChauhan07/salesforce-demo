@@ -38,12 +38,14 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     const timeDifference = currentDate - createdDate; // in milliseconds
 
     // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
-
-    if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
-      setCanRegenerate(true);
+    if (OrderData?.Id) {
+      if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) {
+        if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
+          setCanRegenerate(true);
+        }
+      }
     }
-  }, []);
-  console.log({ canRegenerate });
+  }, [OrderData]);
 
 
   const handleRegenerateOrder = async () => {
@@ -523,15 +525,18 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                         <div className={Styles.paymentCheck}>
                           {OrderData?.Payment_Status__c ? <p>Payment Status : {OrderData?.Payment_Status__c} </p> : null}
                           {OrderData?.Transaction_ID__c ? <p>Transaction ID : {OrderData?.Transaction_ID__c} </p> : null}
-                          {OrderData.PBL_Status__c ?
-                            !buttonLoading ? <div className={Styles.ShipBut}><button role="link"
-                              onClick={() => {
-                                if (!buttonLoading) {
-                                  openInNewTab(OrderData.PBL_Status__c)
-                                }
-                              }}>Payment Link</button></div> : null
+                          {OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
+                            <div className={Styles.ShipBut}>
+                              {!buttonLoading ? <button role="link"
+                                onClick={() => {
+                                  if (!buttonLoading) {
+                                    openInNewTab(OrderData.PBL_Status__c)
+                                  }
+                                }}>Payment Link</button> : null}
+
+                            </div>
                             : null}
-                          {(canRegenerate&&(!OrderData?.Transaction_ID__c && !OrderData?.PBL_Status__c)) ? (
+                          {canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
                             <div className={Styles.ShipBut}>
                               <button
                                 role="link"
@@ -539,8 +544,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 disabled={buttonLoading} // Disable button when loading
                               >
                                 {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
-                              </button>
-                            </div>
+                              </button> </div>
                           ) : null}
                         </div>
                       </> : null}
