@@ -34,12 +34,12 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
  
   useEffect(() => {
     // Check if OrderData and createdDate are available
-    if (!OrderData || !OrderData.CloseDate) {
+    if (!OrderData || !OrderData?.PBL_generation_Date__c) {
       console.error('OrderData or createdDate is missing');
       return; // Exit if OrderData or createdDate is not available
     }
 
-    const createdDate = new Date(OrderData.CloseDate);
+    const createdDate = new Date(OrderData?.PBL_generation_Date__c);
     const currentDate = new Date();
     const timeDifference = currentDate - createdDate; // in milliseconds
 
@@ -47,7 +47,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     if (timeDifference >= 24 * 60 * 60 * 1000 && !linkRegenerated) {
       setCanRegenerate(true);
     }
-  }, [OrderData.CloseDate, linkRegenerated]);
+  }, [OrderData?.PBL_generation_Date__c, linkRegenerated]);
 
   const handleRegenerateOrder = async () => {
     setIsButtonLoading(true)
@@ -104,7 +104,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       } else {
         Swal.fire({
           title: "Failed!",
-          text: "Unable to Generate Payment Link ",
+          text: "You can Generated Payment Link after 24 hours",
           icon: "Falied",
           confirmButtonText: "OK",
           customClass: {
