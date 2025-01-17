@@ -101,21 +101,10 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
            ; // Refresh the page on OK
           },
         });
-      } 
-      if(response?.status == 403){
+      } else {
         Swal.fire({
           title: "Failed!",
-          text: "You can Regenerate the Link the after 24 Hours",
-          icon: "Falied",
-          confirmButtonText: "OK",
-          customClass: {
-            confirmButton: 'swal-center-button', // Add a custom class to the button
-          } })
-      }
-        else {
-        Swal.fire({
-          title: "Failed!",
-          text: "Unable to Generate Payment Link ",
+          text: "You can Generated Payment Link after 24 hours",
           icon: "Falied",
           confirmButtonText: "OK",
           customClass: {
