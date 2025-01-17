@@ -531,7 +531,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 }
                               }}>Payment Link</button></div> : null
                             : null}
-                          {canRegenerate ? (
+                          {(canRegenerate&&(OrderData?.Transaction_ID__c && OrderData?.PBL_Status__c)) ? (
                             <div className={Styles.ShipBut}>
                               <button
                                 role="link"
