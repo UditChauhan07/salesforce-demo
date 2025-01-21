@@ -110,7 +110,7 @@ function MyBagFinal({ showOrderFor }) {
 
         // Check paymentIntent status and payment types
         const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
-        const hasNetPaymentType = paymentTypes.some((type) => type.startsWith("Net"));
+        const hasNetPaymentType = paymentTypes.some((type) => type?.startsWith("Net"));
 
         if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
           setIsPlayAble(1);
@@ -134,6 +134,7 @@ function MyBagFinal({ showOrderFor }) {
       return null;
     }
   };
+  console.log({isPlayAble})
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
@@ -871,7 +872,7 @@ function MyBagFinal({ showOrderFor }) {
                               <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                             </>
                           )}
-                          {isPlayAble ? (
+                          {isPlayAble && order?.ordertype !== "pre-order" ? (
                             <div className={Styles.PaymentType}>
                               <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                               <div className={Styles.paymentButtons}>
@@ -1019,7 +1020,7 @@ function MyBagFinal({ showOrderFor }) {
                             <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                           </>
                         )}
-                        {isPlayAble ? (
+                        {isPlayAble && order?.ordertype !== "pre-order" ? (
                           <div className={Styles.PaymentType}>
                             <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                             <div className={Styles.paymentButtons}>
