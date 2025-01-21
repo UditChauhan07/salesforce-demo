@@ -525,7 +525,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                         <div className={Styles.paymentCheck}>
                           {OrderData?.Payment_Status__c ? <p>Payment Status : {OrderData?.Payment_Status__c} </p> : null}
                           {OrderData?.Transaction_ID__c ? <p>Transaction ID : {OrderData?.Transaction_ID__c} </p> : null}
-                          {OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
+                          { OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
                             <div className={Styles.ShipBut}>
                               {!buttonLoading ? <button role="link"
                                 onClick={() => {
@@ -536,7 +536,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
 
                             </div>
                             : null}
-                          {canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
+                          { OrderData?.Type !== "Pre order"  &&canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
                             <div className={Styles.ShipBut}>
                               <button
                                 role="link"
