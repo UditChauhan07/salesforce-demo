@@ -872,7 +872,7 @@ function MyBagFinal({ showOrderFor }) {
                               <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                             </>
                           )}
-                          {isPlayAble && order?.ordertype !== "pre-order" ? (
+                          {total > 0 && isPlayAble && order?.ordertype !== "pre-order" ? (
                             <div className={Styles.PaymentType}>
                               <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                               <div className={Styles.paymentButtons}>
@@ -1020,7 +1020,7 @@ function MyBagFinal({ showOrderFor }) {
                             <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                           </>
                         )}
-                        {isPlayAble && order?.ordertype !== "pre-order" ? (
+                        {total > 0 && isPlayAble && order?.ordertype !== "pre-order" ? (
                           <div className={Styles.PaymentType}>
                             <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                             <div className={Styles.paymentButtons}>
