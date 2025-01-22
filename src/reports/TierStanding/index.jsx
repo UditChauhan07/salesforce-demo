@@ -55,10 +55,11 @@ const Tier = () => {
     
     useEffect(() => {
        
-        if (permissions?.modules?.reports?.accountTier?.view === false) {
+        if (memoizedPermissions?.modules?.reports?.accountTier?.view === false) {
             PermissionDenied(); 
             navigate('/dashboard'); 
         }
+
     }, [permissions]);
     const memoizedPermissions = useMemo(() => permissions, [permissions]);
     const GetDataHandler = () => {
@@ -79,7 +80,7 @@ const Tier = () => {
         dataStore.subscribe("/TierStanding", TierReady)
         GetDataHandler()
         return () => dataStore.unsubscribe("/TierStanding", TierReady)
-    }, [])
+    }, [permissions])
     //define marker
     const MarkLocations = useMemo(() => {
         let response = [];
