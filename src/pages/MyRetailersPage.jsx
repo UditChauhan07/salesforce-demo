@@ -53,7 +53,7 @@ const MyRetailersPage = () => {
       getRetailerListHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c });
 
       // // Fetch sales reps if admin
-      if (admins.includes(user.Sales_Rep__c)) {
+      if (memoizedPermissions?.modules?.godLevel) {
         dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: user.x_access_token }))
           .then((repRes) => setSalesRepList(repRes.data))
           .catch((repErr) => console.log({ repErr }));
@@ -69,7 +69,7 @@ const MyRetailersPage = () => {
     return () => {
       dataStore.unsubscribe("/my-retailers" + selectedSalesRepId ?? userData.Sales_Rep__c, (data) => setRetailerList({ data: data?.data.length ? data?.data : [], isLoading: false }))
     }
-  }, [selectedSalesRepId]);
+  }, [selectedSalesRepId , permissions]);
 
   useBackgroundUpdater(fetchData, defaultLoadTime);
 
@@ -93,7 +93,7 @@ const MyRetailersPage = () => {
       try {
         const user = await GetAuthData(); // Fetch user data
         const userPermissions = await getPermissions(); // Fetch permissions
-        console.log({ userPermissions });
+        
 
         setPermissions(userPermissions); // Set permissions in state
         if (userPermissions?.modules?.order?.create === false) {
@@ -110,6 +110,7 @@ const MyRetailersPage = () => {
 
   // Memoize permissions to avoid unnecessary re-calculations
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
+  console.log(memoizedPermissions?.modules?.godLevel , "retailer permission")
 localStorage.setItem('selectedSalesrepId' , JSON.stringify(selectedSalesRepId))
   return (
     <AppLayout

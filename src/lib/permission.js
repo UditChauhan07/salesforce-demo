@@ -15,6 +15,7 @@ export async function getPermissions() {
   let userPermissions =  null;
   if(authData?.permission){
     userPermissions= JSON.parse(authData.permission)
+    console.log({userPermissions})
   }
 
   if (!userPermissions) {

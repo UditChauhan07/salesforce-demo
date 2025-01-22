@@ -38,6 +38,7 @@ const TopNav = () => {
 
   // Memoize permissions to avoid unnecessary re-calculations
   const memoizedPermissions = useMemo(() => permissions, [permissions]);
+console.log(memoizedPermissions?.modules?.godLevel)
 
   // Handle restricted access
   const handleRestrictedAccess = () => {
@@ -50,8 +51,9 @@ const TopNav = () => {
           key: user?.x_access_token,
           salesRepId: user?.Sales_Rep__c,
         })
+
           .then((status) => {
-            if (admins.includes(status.data.Id)) {
+            if (memoizedPermissions?.modules?.godLevel) {
               setShowSetting(true);
             }
             setUserName(status?.data?.Name);
@@ -159,9 +161,9 @@ const TopNav = () => {
                   {userName ?? "User"}
                 </span>
               </p>
-              {showSetting && (
+             
 
-                <>
+              
                   {memoizedPermissions?.modules?.godLevel ? <>
                     <div className={styles.vr}></div>
                     <p className={`m-0 ${styles.nameText}`}>
@@ -221,8 +223,7 @@ const TopNav = () => {
                     </p>
                   </> : null}
 
-                </>
-              )}
+               
               <div className={styles.vr}></div>
 
               {/* My orders  */}

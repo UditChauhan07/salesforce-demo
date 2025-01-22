@@ -920,7 +920,7 @@ function MyBagFinal({ showOrderFor }) {
                             />
                           ) : (
                             <div className={Styles.ShipBut}>
-                              {isPayNow !== true ? (
+                              {isPlayAble !== true && total === 0 ? (
                                 <>
                                   <button
                                     onClick={() => {

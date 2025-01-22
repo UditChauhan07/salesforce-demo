@@ -28,6 +28,7 @@ const Tier = () => {
     let date = new Date();
     let dYear = date.getFullYear();
     const [ext, setExt] = useState(false);
+    const [permissions , setPermissions] = useState()
     const [year, setYear] = useState(dYear)
     const [tier, setTier] = useState({ isLoad: false, data: [], getSalesHolder: {}, currentYearRevenue: 0, previousYearRevenue: 0 });
 
@@ -38,9 +39,32 @@ const Tier = () => {
             setTier({ isLoad: true, data: data?.salesArray ?? [], getSalesHolder: data?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
         }
     }
+    useEffect(() => {
+        // Fetch permissions when the component mounts
+        const fetchData = async () => {
+            try {
+                const userPermissions = await getPermissions();
+                setPermissions(userPermissions); // Set permissions once they are fetched
+            } catch (error) {
+                console.log("Permission Error:", error);
+            }
+        };
+    
+        fetchData();
+    }, []); 
+    
+    useEffect(() => {
+       
+        if (memoizedPermissions?.modules?.reports?.accountTier?.view === false) {
+            PermissionDenied(); 
+            navigate('/dashboard'); 
+        }
+
+    }, [permissions]);
+    const memoizedPermissions = useMemo(() => permissions, [permissions]);
     const GetDataHandler = () => {
         GetAuthData().then((user) => {
-            if (admins.includes(user.Sales_Rep__c)) {
+            if (memoizedPermissions?.modules?.godLevel) {
                 dataStore.getPageData("/TierStanding", () => getTierReportHandler({ token: user.x_access_token, year: year })).then((res) => {
                     TierReady(res)
 
@@ -56,7 +80,7 @@ const Tier = () => {
         dataStore.subscribe("/TierStanding", TierReady)
         GetDataHandler()
         return () => dataStore.unsubscribe("/TierStanding", TierReady)
-    }, [])
+    }, [permissions])
     //define marker
     const MarkLocations = useMemo(() => {
         let response = [];
@@ -156,20 +180,8 @@ const Tier = () => {
         return `${Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}`
     }
 
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const userPermissions = await getPermissions()
-                if (userPermissions?.modules?.reports?.accountTier?.view === false) {
-                    navigate('/dashboard'); PermissionDenied();
-                }
-            } catch (error) {
-                console.log("Permission Error ", error)
-            }
-        }
-        fetchData()
-    }, [])
+ 
+    
 
     return (
         <AppLayout

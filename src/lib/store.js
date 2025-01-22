@@ -34,6 +34,7 @@ export const months = [
   "December",
 ];
 
+
 export function ShareDrive(data, remove = false, keyValue = shareKey) {
   if (remove) {
     localStorage.removeItem(keyValue);
@@ -507,10 +508,12 @@ export async function getTargetReportAll({ user, year, preOrder }) {
     let headersList = {
       Accept: "*/*",
     };
+    let authData = await GetAuthData()
+    let  userPermissions= JSON.parse(authData.permission)
     let tried = false;
     let bodyContent = new FormData();
     bodyContent.append("key", user.x_access_token);
-    if (!admins.includes(user.Sales_Rep__c)) {
+    if (!userPermissions?.modules?.godLevel) {
       bodyContent.append("SalesRepId", user.Sales_Rep__c);
     }
     if (year) {
@@ -529,7 +532,8 @@ export async function getTargetReportAll({ user, year, preOrder }) {
       DestoryAuth();
     } else {
       let rawRes = { ownerPermission: false, list: data.data };
-      if (admins.includes(user.Sales_Rep__c)) {
+    
+      if (userPermissions?.modules?.godLevel) {
         rawRes.ownerPermission = true;
       }
       return rawRes;

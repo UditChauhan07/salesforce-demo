@@ -3,6 +3,7 @@ import { DateConvert, GetAuthData, admins, deleteEmailBlast, getEmailBlast, getE
 import Styles from "./index.module.css"
 import { BiAddToQueue, BiEraser, BiExport, BiLeftArrow, BiMailSend, BiRefresh, BiTrash } from "react-icons/bi"
 import ModalPage from "../Modal UI"
+import { getPermissions } from "../../lib/permission"
 import Pagination from "../Pagination/Pagination"
 import { useNavigate } from "react-router-dom";
 import Loading from "../Loading"
@@ -29,6 +30,24 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
     const [searchValue, setSearchValue] = useState();
     const [checked, setChecked] = useState(false)
     const [checkAll, setCheckedAll] = useState(false);
+  const [permissions , setPermissions] = useState()
+  useEffect(() => {
+    async function fetchPermissions() {
+      try {
+        const user = await GetAuthData(); // Fetch user data
+        const userPermissions = await getPermissions(); // Fetch permissions
+        setPermissions(userPermissions); // Set permissions in state
+      } catch (err) {
+        console.error("Error fetching permissions", err);
+      }
+    }
+
+    fetchPermissions(); // Fetch permissions on mount
+  }, []);
+
+  // Memoize permissions to avoid unnecessary re-calculations
+  const memoizedPermissions = useMemo(() => permissions, [permissions]);
+console.log(memoizedPermissions?.modules?.godLevel)
 
 
     const reportReady = (data) => {
@@ -100,7 +119,7 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
         setSearchValue(null)
         setCheckId([])
         GetAuthData().then((user) => {
-            if (admins.includes(user.Sales_Rep__c)) {
+            if (memoizedPermissions?.modules?.godLevel) {
                 setUser(user)
                 dataStore.getPageData("/report" + month + day + year, () => getEmailBlast({ key: user.access_token, Id: user.Sales_Rep__c, month, day, year, newsletter })).then((list) => {
 
