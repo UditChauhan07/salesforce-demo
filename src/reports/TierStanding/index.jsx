@@ -30,7 +30,7 @@ const Tier = () => {
     const [ext, setExt] = useState(false);
     const [year, setYear] = useState(dYear)
     const [tier, setTier] = useState({ isLoad: false, data: [], getSalesHolder: {}, currentYearRevenue: 0, previousYearRevenue: 0 });
-
+    const [permissions , setPermissions] = useState()
     const TierReady = (data) => {
         if (data) {
             let currentYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
@@ -40,7 +40,7 @@ const Tier = () => {
     }
     const GetDataHandler = () => {
         GetAuthData().then((user) => {
-            if (admins.includes(user.Sales_Rep__c)) {
+            if (memoizedPermissions?.modules?.godLevel) {
                 dataStore.getPageData("/TierStanding", () => getTierReportHandler({ token: user.x_access_token, year: year })).then((res) => {
                     TierReady(res)
 
@@ -163,6 +163,7 @@ const Tier = () => {
                 const userPermissions = await getPermissions()
                 if (userPermissions?.modules?.reports?.accountTier?.view === false) {
                     navigate('/dashboard'); PermissionDenied();
+                    setPermissions(userPermissions)
                 }
             } catch (error) {
                 console.log("Permission Error ", error)
@@ -170,7 +171,7 @@ const Tier = () => {
         }
         fetchData()
     }, [])
-
+  const memoizedPermissions = useMemo(() => permissions, [permissions]);
     return (
         <AppLayout
             filterNodes={

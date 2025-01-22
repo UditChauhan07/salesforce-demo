@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { CustomerServiceIcon, OrderStatusIcon } from "../../../lib/svg";
@@ -6,18 +6,36 @@ import styles from "./index.module.css";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { BiMailSend } from "react-icons/bi";
 import { GetAuthData, admins, getSessionStatus } from "../../../lib/store";
-
+import { getPermissions } from "../../../lib/permission";
 const MobileHeader = () => {
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
   const [show, setShow] = useState(false);
   const [userName, setUserName] = useState(localStorage.getItem("Name"));
+const [permissions , setPermissions] = useState()
+  useEffect(() => {
+    async function fetchPermissions() {
+      try {
+        const user = await GetAuthData(); // Fetch user data
+        const userPermissions = await getPermissions(); // Fetch permissions
+        setPermissions(userPermissions); // Set permissions in state
+      } catch (err) {
+        console.error("Error fetching permissions", err);
+      }
+    }
+
+    fetchPermissions(); // Fetch permissions on mount
+  }, []);
+
+  // Memoize permissions to avoid unnecessary re-calculations
+  const memoizedPermissions = useMemo(() => permissions, [permissions]);
+console.log(memoizedPermissions?.modules?.godLevel)
 
 
   useEffect(() => {
     GetAuthData().then((user) => {
       getSessionStatus({ key: user?.x_access_token, salesRepId: user?.Sales_Rep__c }).then((status) => {
-        if (admins.includes(status.data.Id)) {
+        if (memoizedPermissions?.modules?.godLevel) {
 
         }
         setUserName(status?.data?.Name)

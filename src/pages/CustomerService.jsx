@@ -127,52 +127,62 @@ const CustomerService = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Get the authenticated user data
+        
         const user = await GetAuthData();
         setUserData(user);
-
-        // Fetch permissions for the user
-        const permissions = await getPermissions();
-        setPermissions(permissions);
-
-        // Check for customer_service permission
-        const customerServicePermission = permissions?.modules?.customerSupport?.childModules
-          ?.customer_service?.create;
-
-        // Redirect based on permission
+  
+     
+        const userPermissions = await getPermissions();
+        setPermissions(userPermissions);
+  
+      
+        const customerServicePermission = userPermissions?.modules?.customerSupport?.childModules?.customer_service?.create;
+  
+       
         if (!customerServicePermission) {
           console.log('Redirecting to Dashboard...');
-          PermissionDenied()
+          PermissionDenied();
           navigate("/dashboard");
-          return; // Ensure no further code execution
+          return; 
         }
+  
+       
         dataStore.subscribe("/orderList" + SalesRepId, (data) => {
           if (Reason) {
-            setReason(null)
+            setReason(null);
           }
           setOrders(data);
-          resetHandler()
-          setLoaded(true)
-        })
+          resetHandler();
+          setLoaded(true);
+        });
+  
         
-        // Continue with data fetching if permission is granted
         orderListBasedOnRepHandler(user.x_access_token, Reason ? SalesRepId : user.Sales_Rep__c, Reason ? false : true, OrderId);
-
-        if (admins.includes(user.Sales_Rep__c)) {
-          try {
-            const repRes = await dataStore.getPageData("getSalesRepList", () =>getSalesRepList({ key: user.x_access_token }));
-            setSalesRepList(repRes.data);
-          } catch (repErr) {
-            console.log('SalesRepList Error:', repErr);
-          }
-        }
       } catch (err) {
         console.log('Fetch Data Error:', err);
       }
     };
-
+  
     fetchData();
-  }, [Reason, SalesRepId, OrderId]);
+  }, [Reason, SalesRepId, OrderId]); 
+  
+  
+  useEffect(() => {
+    if (permissions?.modules?.godLevel) {
+      const fetchSalesRepList = async () => {
+        try {
+          const repRes = await dataStore.getPageData("getSalesRepList", () =>
+            getSalesRepList({ key: userData.x_access_token })
+          );
+          setSalesRepList(repRes.data);
+        } catch (repErr) {
+          console.log('SalesRepList Error:', repErr);
+        }
+      };
+  
+      fetchSalesRepList();
+    }
+  }, [permissions, userData]);
  
 
   const SubmitHandler = () => {

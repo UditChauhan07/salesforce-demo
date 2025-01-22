@@ -404,7 +404,7 @@ function Dashboard() {
         if (headers) {
           user.headers = headers;
         }
-        if (admins.includes(user.Sales_Rep__c)) {
+        if (memoizedPermissions?.modules?.godLevel) {
           setSalesRepAdmin(true)
         }
         dataStore.getPageData("/dashboard" + headers.month ?? currentMonth + headers.year ?? currentYear, () => getDashboardata({ user, saleRepId }))
@@ -591,13 +591,12 @@ function Dashboard() {
         <div className="row mt-4 justify-between">
           <div className="col-lg-6 my-2">
             <div className={Styles.DashboardWidth}>
-              {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Sales By Rep
-                {permissions?.modules?.godLevel ?
+              {memoizedPermissions?.modules?.godLevel ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Sales By Rep
+              
                   <span>{Monthlydataa.isLoaded ?
                     <BiRefresh className="cursor-pointer" size={25} onClick={targeetRollReferesh} title="Click here for Refresh" />
                     : null}</span>
-                  : null
-                }
+            
               </p> : <p className={Styles.Tabletext}>Month to date(MTD): Sales By Rep</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className="">
@@ -675,10 +674,10 @@ function Dashboard() {
           {/* Yearly SALESBYREP */}
           <div className="col-lg-6 my-2">
             <div className={Styles.DashboardWidth}>
-              {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Year to date(YTD): Sales By Rep
-                {permissions?.modules?.godLevel ?
+              {memoizedPermissions?.modules?.godLevel ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Year to date(YTD): Sales By Rep
+              
                   <span>{Yearlydataa.isLoaded ? <BiRefresh size={25} className="cursor-pointer" onClick={targeetRollReferesh} title="Click here for Refresh" /> : null}</span>
-                  : null}
+                
               </p> : <p className={Styles.Tabletext}>Year to date(YTD): Sales By Rep</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className="">
@@ -761,10 +760,10 @@ function Dashboard() {
           {/* monthly data goal by brand*/}
           <div className="col-lg-6 col-sm-12 my-2">
             <div className={Styles.DashboardWidth}>
-              {salesRepAdmin ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Goal by Brand
-                {permissions?.modules?.godLevel ?
+              {memoizedPermissions?.modules?.godLevel ? <p className={`${Styles.Tabletext} d-flex justify-content-between align-items-center`}>Month to date(MTD): Goal by Brand
+             
                   <span>{brandData.isLoaded ? <BiRefresh size={25} className="cursor-pointer" onClick={targeetRollReferesh} title="Click here for Refresh" /> : null}</span>
-                  : null}
+                 
               </p> : <p className={Styles.Tabletext}>Month to date(MTD): Goal by Brand</p>}
               <div className={`${Styles.goaltable} cardShadowHover`}>
                 <div className={Styles.table_scroll}>

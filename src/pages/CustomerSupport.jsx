@@ -83,7 +83,7 @@ const CustomerSupport = () => {
           supportHandler({ key: user.x_access_token, salesRepId: selectedSalesRepId ?? user.Sales_Rep__c })
           reatilerHandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
           brandhandler({ key: user.x_access_token, userId: selectedSalesRepId ?? user.Sales_Rep__c })
-          if (admins.includes(user.Sales_Rep__c)) {
+          if (memoizedPermissions?.modules?.godLevel) {
             dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: user.x_access_token })).then((repRes) => {
               if(repRes){
                 setSalesRepList(repRes.data)
@@ -108,7 +108,7 @@ const CustomerSupport = () => {
       .catch((err) => {
         console.error(err);
       });
-  }, []);
+  }, [permissions]);
 
 
   // useBackgroundUpdater(() => reatilerHandler({ key: userData.x_access_token, userId: selectedSalesRepId ?? userData.Sales_Rep__c }), defaultLoadTime);

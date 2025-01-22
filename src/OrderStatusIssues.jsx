@@ -144,7 +144,7 @@ const OrderStatusIssues = () => {
                 setUserData(response)
                 if (!selectedSalesRepId) setSelectedSalesRepId(response.Sales_Rep__c)
                 getOrderlIsthandler({ key: response.x_access_token, Sales_Rep__c: selectedSalesRepId ?? response.Sales_Rep__c })
-                if (admins.includes(response.Sales_Rep__c)) {
+                if (memoizedPermissions?.modules?.godLevel) {
                     dataStore.getPageData("getSalesRepList", () => getSalesRepList({ key: response.x_access_token })).then((repRes) => {
                         setSalesRepList(repRes.data)
                     }).catch((repErr) => {
@@ -162,7 +162,7 @@ const OrderStatusIssues = () => {
             .catch((err) => {
                 console.log({ err });
             });
-    }, [filterValue.month]);
+    }, [filterValue.month   , permissions]);
 
     useEffect(() => {
         setShipByText(searchShipBy);
