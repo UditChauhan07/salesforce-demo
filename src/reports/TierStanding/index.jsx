@@ -28,9 +28,10 @@ const Tier = () => {
     let date = new Date();
     let dYear = date.getFullYear();
     const [ext, setExt] = useState(false);
+    const [permissions , setPermissions] = useState()
     const [year, setYear] = useState(dYear)
     const [tier, setTier] = useState({ isLoad: false, data: [], getSalesHolder: {}, currentYearRevenue: 0, previousYearRevenue: 0 });
-    const [permissions , setPermissions] = useState()
+
     const TierReady = (data) => {
         if (data) {
             let currentYearRevenue = data?.salesArray.reduce((acc, curr) => acc + curr[year], 0);
@@ -38,6 +39,28 @@ const Tier = () => {
             setTier({ isLoad: true, data: data?.salesArray ?? [], getSalesHolder: data?.getSalesHolder ?? {}, currentYearRevenue, previousYearRevenue });
         }
     }
+    useEffect(() => {
+        // Fetch permissions when the component mounts
+        const fetchData = async () => {
+            try {
+                const userPermissions = await getPermissions();
+                setPermissions(userPermissions); // Set permissions once they are fetched
+            } catch (error) {
+                console.log("Permission Error:", error);
+            }
+        };
+    
+        fetchData();
+    }, []); 
+    
+    useEffect(() => {
+       
+        if (permissions?.modules?.reports?.accountTier?.view === false) {
+            PermissionDenied(); 
+            navigate('/dashboard'); 
+        }
+    }, [permissions]);
+    const memoizedPermissions = useMemo(() => permissions, [permissions]);
     const GetDataHandler = () => {
         GetAuthData().then((user) => {
             if (memoizedPermissions?.modules?.godLevel) {
@@ -156,22 +179,9 @@ const Tier = () => {
         return `${Number(amount).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}`
     }
 
+ 
+    
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const userPermissions = await getPermissions()
-                if (userPermissions?.modules?.reports?.accountTier?.view === false) {
-                    navigate('/dashboard'); PermissionDenied();
-                    setPermissions(userPermissions)
-                }
-            } catch (error) {
-                console.log("Permission Error ", error)
-            }
-        }
-        fetchData()
-    }, [])
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
     return (
         <AppLayout
             filterNodes={

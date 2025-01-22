@@ -513,7 +513,7 @@ export async function getTargetReportAll({ user, year, preOrder }) {
     let tried = false;
     let bodyContent = new FormData();
     bodyContent.append("key", user.x_access_token);
-    if (userPermissions?.modules?.godLevel) {
+    if (!userPermissions?.modules?.godLevel) {
       bodyContent.append("SalesRepId", user.Sales_Rep__c);
     }
     if (year) {
@@ -532,8 +532,7 @@ export async function getTargetReportAll({ user, year, preOrder }) {
       DestoryAuth();
     } else {
       let rawRes = { ownerPermission: false, list: data.data };
-      let authData = await GetAuthData()
-    let  userPermissions= JSON.parse(authData.permission)
+    
       if (userPermissions?.modules?.godLevel) {
         rawRes.ownerPermission = true;
       }
