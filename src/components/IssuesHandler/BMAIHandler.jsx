@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Styles from "./Style.module.css"
 import ModalPage from "../Modal UI";
+import Loading from "../Loading";
 const BMAIHandler = ({ reasons, reason, setReason,resetHandler }) => {
-    console.log({reason});
+    console.log({reasons});
     
     const [confirm,SetConfirm] = useState(false)
     const [temReason,SetTemReason] = useState()
@@ -52,7 +53,8 @@ const BMAIHandler = ({ reasons, reason, setReason,resetHandler }) => {
             <div>
                 <p className={Styles.reasonTitle}>How can we help you?</p>
                 <div className={Styles.reasonHolder}>
-                    {reasons.map((item) => {
+                    {!reasons  ? <Loading/>:<>
+                        {reasons.map((item) => {
                         return (<div className={`${Styles.reasonCard} ${reason == item.name ? Styles.activeReason : ''}`} title={reason != item.name ? `Click here to Select '${item.name}'` : null} id={reason == item.name ? "reason" : ""} onClick={reason == item.name ? shakeHandler : () => OnChangeHandler(item.name)}>
                             <div style={{ display: 'flex' }}>
                                 <img src={item.icon} alt={item.name} className={Styles.iconHolder} />
@@ -61,6 +63,8 @@ const BMAIHandler = ({ reasons, reason, setReason,resetHandler }) => {
                             <p className={Styles.descHolder}>{item.desc}</p>
                         </div>)
                     })}
+                    </> }
+                   
                 </div>
             </div>
         </div>
