@@ -45,6 +45,7 @@ const MarketingCalendar = () => {
   const currentYear = new Date().getFullYear();
   const yearList = useMemo(() => {
     return [
+      {value: currentYear - 1, label: currentYear - 1} , 
       { value: currentYear, label: currentYear },
       { value: currentYear + 1, label: currentYear + 1 },
     ];
