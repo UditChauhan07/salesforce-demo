@@ -57,8 +57,11 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
       orderId,
       info: {
         ManufacturerId__c: OrderData?.ManufacturerId__c,
+        Account_Name : OrderData?.Name , 
         key: Key?.data?.x_access_token,
         currency: 'usd',
+        Po_Num : OrderData?.PO_Number__c,
+        Account_Num : OrderData?.Account_Number__c , 
         list: OrderData?.OpportunityLineItems.map(product => ({
           ProductCode: product.ProductCode,
           price: product?.UnitPrice, // Convert to cents

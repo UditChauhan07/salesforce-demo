@@ -14,7 +14,7 @@ import { DeleteIcon } from "../../lib/svg";
 import ImageHandler from "../loader/ImageHandler";
 import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
-import StripePay from "../StripePay";
+import StripePay from "../StripePay";  
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -47,7 +47,7 @@ function MyBagFinal({ showOrderFor }) {
   const [greenStatus, setGreenStatus] = useState(null);
   const [isAccordianOpen, setIsAccordianOpen] = useState(false);
   const [detailsAccordian, setDetailsAccordian] = useState(true);
-
+const [orderId , setOrderId] = useState()
   const [paymentAccordian, setPaymentAccordian] = useState(false);
   const [qunatityChange, setQuantityChange] = useState();
   const [paymentDetails, setPaymentDetails] = useState({
@@ -103,6 +103,7 @@ function MyBagFinal({ showOrderFor }) {
           body: JSON.stringify({
             amount: "100",
             paymentId: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+            
           }),
         });
 
@@ -135,6 +136,7 @@ function MyBagFinal({ showOrderFor }) {
     }
   };
   console.log({isPlayAble})
+ 
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
@@ -331,6 +333,7 @@ function MyBagFinal({ showOrderFor }) {
                     } else {
                       await deleteOrder();
                       if (response?.orderId && typeof response.orderId == "string") {
+                        setOrderId(response.orderId)
                         localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
                         setIsOrderPlaced(2);
                         window.location.href = window.location.origin + "/orderDetails";
@@ -354,7 +357,7 @@ function MyBagFinal({ showOrderFor }) {
       alert("no sales rep.");
     }
   };
-
+  // console.log(order.Account.name)
   const deleteBag = () => {
     // localStorage.removeItem("AA0KfX2OoNJvz7x")
     deleteOrder()
@@ -973,6 +976,8 @@ function MyBagFinal({ showOrderFor }) {
                             order={order}
                             PONumber={PONumber}
                             orderDesc={orderDesc}
+                            AccountName = {order.Account.name}
+                            AccountNumber = {intentRes?.accountNumber?.Account_Number__c}
                           />
                         </CustomAccordion>
                       ) : null}
