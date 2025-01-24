@@ -14,7 +14,7 @@ import { DeleteIcon } from "../../lib/svg";
 import ImageHandler from "../loader/ImageHandler";
 import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
-import StripePay from "../StripePay";  
+import StripePay from "../StripePay";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -47,7 +47,7 @@ function MyBagFinal({ showOrderFor }) {
   const [greenStatus, setGreenStatus] = useState(null);
   const [isAccordianOpen, setIsAccordianOpen] = useState(false);
   const [detailsAccordian, setDetailsAccordian] = useState(true);
-const [orderId , setOrderId] = useState()
+  const [orderId, setOrderId] = useState();
   const [paymentAccordian, setPaymentAccordian] = useState(false);
   const [qunatityChange, setQuantityChange] = useState();
   const [paymentDetails, setPaymentDetails] = useState({
@@ -67,7 +67,6 @@ const [orderId , setOrderId] = useState()
     setTotal(getOrderTotal() ?? 0);
   }, [order, buttonActive]);
 
-
   const fetchBrandPaymentDetails = async () => {
     try {
       let id = order?.Manufacturer?.id;
@@ -79,7 +78,6 @@ const [orderId , setOrderId] = useState()
           Id: id,
           AccountId: AccountID,
         });
-
 
         setIntentRes(brandRes);
 
@@ -103,7 +101,6 @@ const [orderId , setOrderId] = useState()
           body: JSON.stringify({
             amount: "100",
             paymentId: brandRes?.brandDetails.Stripe_Secret_key_test__c,
-            
           }),
         });
 
@@ -111,48 +108,44 @@ const [orderId , setOrderId] = useState()
         const terms = [
           "Net",
           "terms:2%",
-          "TERMS:215" , 
-          "TERMS:210" , 
-          "TERMS:245" , 
-"TERMS:410" , 
-"TERMS:50%" , 
-"TERMS:505" , 
-"TERMS:AFT" , 
-"TERMS:AMA" , 
-"TERMS:BR"     ,
-"TERMS:BRA",
-"TERMS:CAT" , 
-"TERMS:COD" ,
-"TERMS:DIS" ,
-"TERMS:F30" ,
-"TERMS:FA3" ,
-"TERMS:GIF" ,
-"TERMS:KLA" ,
-"TERMS:LOG " ,
-"TERMS:N12" ,
-"TERMS:N15",
-"TERMS:N20",
-"TERMS:N30",
-"TERMS:N45",
-"TERMS:N60",
-"TERMS:N75",
-"TERMS:N90",
-"TERMS:NO",
-"TERMS:NT",
-"TERMS:OFF",
-"TERMS:PAY" , 
-"TERMS:SHO" ,
-"TERMS:UNK"
-
-
-
-          
+          "TERMS:215",
+          "TERMS:210",
+          "TERMS:245",
+          "TERMS:410",
+          "TERMS:50%",
+          "TERMS:505",
+          "TERMS:AFT",
+          "TERMS:AMA",
+          "TERMS:BR",
+          "TERMS:BRA",
+          "TERMS:CAT",
+          "TERMS:COD",
+          "TERMS:DIS",
+          "TERMS:F30",
+          "TERMS:FA3",
+          "TERMS:GIF",
+          "TERMS:KLA",
+          "TERMS:LOG",
+          "TERMS:N12",
+          "TERMS:N15",
+          "TERMS:N20",
+          "TERMS:N30",
+          "TERMS:N45",
+          "TERMS:N60",
+          "TERMS:N75",
+          "TERMS:N90",
+          "TERMS:NO",
+          "TERMS:NT",
+          "TERMS:OFF",
+          "TERMS:PAY",
+          "TERMS:SHO",
+          "TERMS:UNK",
+          "Check" , 
+          "Wire"
         ];
         // Check paymentIntent status and payment types
         const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
-        const hasNetPaymentType = paymentTypes.some((type) =>
-          terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase()))
-        );
+        const hasNetPaymentType = paymentTypes.some((type) => terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase())));
 
         if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
           setIsPlayAble(1);
@@ -176,8 +169,8 @@ const [orderId , setOrderId] = useState()
       return null;
     }
   };
-  console.log({isPlayAble})
- 
+  console.log({ isPlayAble });
+
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
@@ -185,7 +178,6 @@ const [orderId , setOrderId] = useState()
           const res = await POGenerator();
 
           console.log({ res, order });
-
 
           if (res?.poNumber) {
             if (res?.address || res?.brandShipping) {
@@ -250,9 +242,7 @@ const [orderId , setOrderId] = useState()
         }, 1500);
       }
     }
-
   }, [order]);
-
 
   const [productImage, setProductImage] = useState({ isLoaded: false, images: {} });
   // let total = 0;
@@ -374,7 +364,7 @@ const [orderId , setOrderId] = useState()
                     } else {
                       await deleteOrder();
                       if (response?.orderId && typeof response.orderId == "string") {
-                        setOrderId(response.orderId)
+                        setOrderId(response.orderId);
                         localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
                         setIsOrderPlaced(2);
                         window.location.href = window.location.origin + "/orderDetails";
@@ -419,7 +409,6 @@ const [orderId , setOrderId] = useState()
   };
 
   const hasPaymentType = intentRes?.accountManufacturerData?.some((item) => item.Payment_Type__c);
-
 
   const handlePayNow = () => {
     setIsPayNow(true);
@@ -707,7 +696,7 @@ const [orderId , setOrderId] = useState()
                       <b>
                         {buttonActive
                           ? // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
-                          PONumber
+                            PONumber
                           : "---"}
                       </b>
                     ) : (
@@ -803,7 +792,7 @@ const [orderId , setOrderId] = useState()
                                             value={salesPrice}
                                             placeholder={Number(salesPrice).toFixed(2)}
                                             className={`ms-1 ${Styles.customPriceInput}`}
-                                            style={qunatityChange ? { opacity: '0.3' } : null}
+                                            style={qunatityChange ? { opacity: "0.3" } : null}
                                             onChange={(e) => {
                                               if (!qunatityChange) {
                                                 onPriceChangeHander(ele?.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 5) : e.target.value.slice(0, 5) || 0);
@@ -822,7 +811,7 @@ const [orderId , setOrderId] = useState()
                                   <div className={Styles.Mainbox2M}>
                                     <div
                                       className={Styles.Mainbox4}
-                                      style={qunatityChange ? { opacity: '0.3' } : null}
+                                      style={qunatityChange ? { opacity: "0.3" } : null}
                                       onClick={() => {
                                         if (!qunatityChange) {
                                           if (order.items.length == 1) {
@@ -835,7 +824,7 @@ const [orderId , setOrderId] = useState()
                                     >
                                       <DeleteIcon fill="red" />
                                     </div>
-                                    <div className={Styles.Mainbox5} style={qunatityChange ? { opacity: '0.3' } : null}>
+                                    <div className={Styles.Mainbox5} style={qunatityChange ? { opacity: "0.3" } : null}>
                                       <QuantitySelector
                                         min={ele?.Min_Order_QTY__c || 0}
                                         onChange={(quantity) => {
@@ -922,14 +911,10 @@ const [orderId , setOrderId] = useState()
                               <div className={Styles.paymentButtons}>
                                 <div className={`${Styles.templateHolder} ${isPayNow ? Styles.selected : null}`} onClick={handlePayNow}>
                                   {" "}
-                                  <div className={`${Styles.labelHolder}`}>
-                                    Pay now
-                                  </div>
+                                  <div className={`${Styles.labelHolder}`}>Pay now</div>
                                 </div>
                                 <div className={`${Styles.templateHolder} ${!isPayNow ? Styles.selected : null}`} onClick={handlePayLater}>
-                                  <div className={`${Styles.labelHolder}`}>
-                                    Pay by Link
-                                  </div>
+                                  <div className={`${Styles.labelHolder}`}>Pay by Link</div>
                                 </div>
                               </div>
                             </div>
@@ -1017,8 +1002,8 @@ const [orderId , setOrderId] = useState()
                             order={order}
                             PONumber={PONumber}
                             orderDesc={orderDesc}
-                            AccountName = {order.Account.name}
-                            AccountNumber = {intentRes?.accountNumber?.Account_Number__c}
+                            AccountName={order.Account.name}
+                            AccountNumber={intentRes?.accountNumber?.Account_Number__c}
                           />
                         </CustomAccordion>
                       ) : null}
@@ -1072,9 +1057,7 @@ const [orderId , setOrderId] = useState()
                             <div className={Styles.paymentButtons}>
                               <div className={`${Styles.templateHolder} ${isPayNow ? Styles.selected : null}`} onClick={handlePayNow}>
                                 {" "}
-                                <div className={`${Styles.labelHolder}`}>
-                                  Pay now
-                                </div>
+                                <div className={`${Styles.labelHolder}`}>Pay now</div>
                               </div>
                               <div className={`${Styles.templateHolder} ${!isPayNow ? Styles.selected : null}`} onClick={handlePayLater}>
                                 <div className={Styles.labelHolder}>Pay By Link</div>
