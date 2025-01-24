@@ -14,7 +14,7 @@ import { DeleteIcon } from "../../lib/svg";
 import ImageHandler from "../loader/ImageHandler";
 import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
-import StripePay from "../StripePay";
+import StripePay from "../StripePay";  
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -47,7 +47,7 @@ function MyBagFinal({ showOrderFor }) {
   const [greenStatus, setGreenStatus] = useState(null);
   const [isAccordianOpen, setIsAccordianOpen] = useState(false);
   const [detailsAccordian, setDetailsAccordian] = useState(true);
-  const [orderId, setOrderId] = useState();
+const [orderId , setOrderId] = useState()
   const [paymentAccordian, setPaymentAccordian] = useState(false);
   const [qunatityChange, setQuantityChange] = useState();
   const [paymentDetails, setPaymentDetails] = useState({
@@ -67,6 +67,7 @@ function MyBagFinal({ showOrderFor }) {
     setTotal(getOrderTotal() ?? 0);
   }, [order, buttonActive]);
 
+
   const fetchBrandPaymentDetails = async () => {
     try {
       let id = order?.Manufacturer?.id;
@@ -78,6 +79,7 @@ function MyBagFinal({ showOrderFor }) {
           Id: id,
           AccountId: AccountID,
         });
+
 
         setIntentRes(brandRes);
 
@@ -101,6 +103,7 @@ function MyBagFinal({ showOrderFor }) {
           body: JSON.stringify({
             amount: "100",
             paymentId: brandRes?.brandDetails.Stripe_Secret_key_test__c,
+            
           }),
         });
 
@@ -108,44 +111,48 @@ function MyBagFinal({ showOrderFor }) {
         const terms = [
           "Net",
           "terms:2%",
-          "TERMS:215",
-          "TERMS:210",
-          "TERMS:245",
-          "TERMS:410",
-          "TERMS:50%",
-          "TERMS:505",
-          "TERMS:AFT",
-          "TERMS:AMA",
-          "TERMS:BR",
-          "TERMS:BRA",
-          "TERMS:CAT",
-          "TERMS:COD",
-          "TERMS:DIS",
-          "TERMS:F30",
-          "TERMS:FA3",
-          "TERMS:GIF",
-          "TERMS:KLA",
-          "TERMS:LOG",
-          "TERMS:N12",
-          "TERMS:N15",
-          "TERMS:N20",
-          "TERMS:N30",
-          "TERMS:N45",
-          "TERMS:N60",
-          "TERMS:N75",
-          "TERMS:N90",
-          "TERMS:NO",
-          "TERMS:NT",
-          "TERMS:OFF",
-          "TERMS:PAY",
-          "TERMS:SHO",
-          "TERMS:UNK",
-          "Check" , 
-          "Wire"
+          "TERMS:215" , 
+          "TERMS:210" , 
+          "TERMS:245" , 
+"TERMS:410" , 
+"TERMS:50%" , 
+"TERMS:505" , 
+"TERMS:AFT" , 
+"TERMS:AMA" , 
+"TERMS:BR"     ,
+"TERMS:BRA",
+"TERMS:CAT" , 
+"TERMS:COD" ,
+"TERMS:DIS" ,
+"TERMS:F30" ,
+"TERMS:FA3" ,
+"TERMS:GIF" ,
+"TERMS:KLA" ,
+"TERMS:LOG " ,
+"TERMS:N12" ,
+"TERMS:N15",
+"TERMS:N20",
+"TERMS:N30",
+"TERMS:N45",
+"TERMS:N60",
+"TERMS:N75",
+"TERMS:N90",
+"TERMS:NO",
+"TERMS:NT",
+"TERMS:OFF",
+"TERMS:PAY" , 
+"TERMS:SHO" ,
+"TERMS:UNK"
+
+
+
+          
         ];
         // Check paymentIntent status and payment types
         const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
-        const hasNetPaymentType = paymentTypes.some((type) => terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase())));
+        const hasNetPaymentType = paymentTypes.some((type) =>
+          terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase()))
+        );
 
         if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
           setIsPlayAble(1);
@@ -169,8 +176,8 @@ function MyBagFinal({ showOrderFor }) {
       return null;
     }
   };
-  console.log({ isPlayAble });
-
+  console.log({isPlayAble})
+ 
   useEffect(() => {
     const FetchPoNumber = async () => {
       if (order?.Account?.id && order?.Manufacturer?.id) {
@@ -178,6 +185,7 @@ function MyBagFinal({ showOrderFor }) {
           const res = await POGenerator();
 
           console.log({ res, order });
+
 
           if (res?.poNumber) {
             if (res?.address || res?.brandShipping) {
@@ -242,7 +250,9 @@ function MyBagFinal({ showOrderFor }) {
         }, 1500);
       }
     }
+
   }, [order]);
+
 
   const [productImage, setProductImage] = useState({ isLoaded: false, images: {} });
   // let total = 0;
@@ -364,7 +374,7 @@ function MyBagFinal({ showOrderFor }) {
                     } else {
                       await deleteOrder();
                       if (response?.orderId && typeof response.orderId == "string") {
-                        setOrderId(response.orderId);
+                        setOrderId(response.orderId)
                         localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
                         setIsOrderPlaced(2);
                         window.location.href = window.location.origin + "/orderDetails";
@@ -409,6 +419,7 @@ function MyBagFinal({ showOrderFor }) {
   };
 
   const hasPaymentType = intentRes?.accountManufacturerData?.some((item) => item.Payment_Type__c);
+
 
   const handlePayNow = () => {
     setIsPayNow(true);
@@ -696,7 +707,7 @@ function MyBagFinal({ showOrderFor }) {
                       <b>
                         {buttonActive
                           ? // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
-                            PONumber
+                          PONumber
                           : "---"}
                       </b>
                     ) : (
@@ -792,7 +803,7 @@ function MyBagFinal({ showOrderFor }) {
                                             value={salesPrice}
                                             placeholder={Number(salesPrice).toFixed(2)}
                                             className={`ms-1 ${Styles.customPriceInput}`}
-                                            style={qunatityChange ? { opacity: "0.3" } : null}
+                                            style={qunatityChange ? { opacity: '0.3' } : null}
                                             onChange={(e) => {
                                               if (!qunatityChange) {
                                                 onPriceChangeHander(ele?.Id, e.target.value < 10 ? e.target.value.replace("0", "").slice(0, 5) : e.target.value.slice(0, 5) || 0);
@@ -811,7 +822,7 @@ function MyBagFinal({ showOrderFor }) {
                                   <div className={Styles.Mainbox2M}>
                                     <div
                                       className={Styles.Mainbox4}
-                                      style={qunatityChange ? { opacity: "0.3" } : null}
+                                      style={qunatityChange ? { opacity: '0.3' } : null}
                                       onClick={() => {
                                         if (!qunatityChange) {
                                           if (order.items.length == 1) {
@@ -824,7 +835,7 @@ function MyBagFinal({ showOrderFor }) {
                                     >
                                       <DeleteIcon fill="red" />
                                     </div>
-                                    <div className={Styles.Mainbox5} style={qunatityChange ? { opacity: "0.3" } : null}>
+                                    <div className={Styles.Mainbox5} style={qunatityChange ? { opacity: '0.3' } : null}>
                                       <QuantitySelector
                                         min={ele?.Min_Order_QTY__c || 0}
                                         onChange={(quantity) => {
@@ -905,16 +916,20 @@ function MyBagFinal({ showOrderFor }) {
                               <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                             </>
                           )}
-                          {total > 0 && isPlayAble && order?.ordertype === "wholesale" ? (
+                          {total > 0 && isPlayAble && order?.ordertype !== "pre-order" ? (
                             <div className={Styles.PaymentType}>
                               <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                               <div className={Styles.paymentButtons}>
                                 <div className={`${Styles.templateHolder} ${isPayNow ? Styles.selected : null}`} onClick={handlePayNow}>
                                   {" "}
-                                  <div className={`${Styles.labelHolder}`}>Pay now</div>
+                                  <div className={`${Styles.labelHolder}`}>
+                                    Pay now
+                                  </div>
                                 </div>
                                 <div className={`${Styles.templateHolder} ${!isPayNow ? Styles.selected : null}`} onClick={handlePayLater}>
-                                  <div className={`${Styles.labelHolder}`}>Pay by Link</div>
+                                  <div className={`${Styles.labelHolder}`}>
+                                    Pay by Link
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -1002,8 +1017,8 @@ function MyBagFinal({ showOrderFor }) {
                             order={order}
                             PONumber={PONumber}
                             orderDesc={orderDesc}
-                            AccountName={order.Account.name}
-                            AccountNumber={intentRes?.accountNumber?.Account_Number__c}
+                            AccountName = {order.Account.name}
+                            AccountNumber = {intentRes?.accountNumber?.Account_Number__c}
                           />
                         </CustomAccordion>
                       ) : null}
@@ -1051,13 +1066,15 @@ function MyBagFinal({ showOrderFor }) {
                             <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                           </>
                         )}
-                        {total > 0 && isPlayAble && order?.ordertype === "wholesale" ? (
+                        {total > 0 && isPlayAble && order?.ordertype !== "pre-order" ? (
                           <div className={Styles.PaymentType}>
                             <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                             <div className={Styles.paymentButtons}>
                               <div className={`${Styles.templateHolder} ${isPayNow ? Styles.selected : null}`} onClick={handlePayNow}>
                                 {" "}
-                                <div className={`${Styles.labelHolder}`}>Pay now</div>
+                                <div className={`${Styles.labelHolder}`}>
+                                  Pay now
+                                </div>
                               </div>
                               <div className={`${Styles.templateHolder} ${!isPayNow ? Styles.selected : null}`} onClick={handlePayLater}>
                                 <div className={Styles.labelHolder}>Pay By Link</div>
