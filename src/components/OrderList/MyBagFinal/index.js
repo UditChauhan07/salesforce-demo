@@ -539,7 +539,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
 
                             </div>
                             : null}
-                          { OrderData?.Type !== "Pre order"  &&canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
+                          {OrderData.PBL_Status__c && OrderData?.Type !== "Pre order"  &&canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
                             <div className={Styles.ShipBut}>
                               <button
                                 role="link"
