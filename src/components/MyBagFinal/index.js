@@ -120,7 +120,7 @@ function MyBagFinal({ showOrderFor }) {
           "TERMS:BRA",
           "TERMS:CAT",
           "TERMS:COD",
-          "TERMS:DIS",
+         
           "TERMS:F30",
           "TERMS:FA3",
           "TERMS:GIF",
