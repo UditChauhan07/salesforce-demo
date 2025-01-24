@@ -179,16 +179,22 @@ export async function POGenerator() {
 
     let orderDetails = fetchBeg();
     let date = new Date();
-
-    //  const response = await fetch( "http://localhost:2611/PoNumber/generatepo"
+    const sanitizeString = (str) =>
+      str
+        .replace(/[^a-zA-Z0-9 ]/g, "") 
+        .replace(/\s+/g, " ")          
+        .trim(); 
+    const sanitizedAccountName = sanitizeString(orderDetails.Account?.name || "");
+    const sanitizedManufacturerName = sanitizeString(orderDetails.Manufacturer?.name || "");
+   
     const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov2", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        accountName: orderDetails.Account?.name,
-        manufacturerName: orderDetails.Manufacturer?.name,
+        accountName: sanitizedAccountName,
+        manufacturerName: sanitizedManufacturerName,
         orderDate: date.toISOString(),
         accountId: orderDetails.Account?.id,  // Make sure this is passed
         manufacturerId: orderDetails.Manufacturer?.id // Ensure this is passed

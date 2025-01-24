@@ -140,6 +140,8 @@ function MyBagFinal({ showOrderFor }) {
           "TERMS:PAY",
           "TERMS:SHO",
           "TERMS:UNK",
+          "Check" , 
+          "Wire"
         ];
         // Check paymentIntent status and payment types
         const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
@@ -903,7 +905,7 @@ function MyBagFinal({ showOrderFor }) {
                               <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                             </>
                           )}
-                          {total > 0 && isPlayAble && order?.ordertype !== "pre-order" ? (
+                          {total > 0 && isPlayAble && order?.ordertype === "wholesale" ? (
                             <div className={Styles.PaymentType}>
                               <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                               <div className={Styles.paymentButtons}>
@@ -1049,7 +1051,7 @@ function MyBagFinal({ showOrderFor }) {
                             <div className={Styles.ShipAdress}>{userData?.Sales_Rep__c == salesRepData?.Id ? "Me" : salesRepData?.Name}</div>
                           </>
                         )}
-                        {total > 0 && isPlayAble && order?.ordertype !== "pre-order" ? (
+                        {total > 0 && isPlayAble && order?.ordertype === "wholesale" ? (
                           <div className={Styles.PaymentType}>
                             <label className={Styles.shipLabelHolder}>Select Payment Type:</label>
                             <div className={Styles.paymentButtons}>
