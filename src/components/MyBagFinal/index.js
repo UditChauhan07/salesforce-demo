@@ -755,8 +755,8 @@ function MyBagFinal({ showOrderFor }) {
                               return (
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
-                                    <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
-                                      {/* <ImageHandler
+                                    {/* <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
+                                      <ImageHandler
                                         image={{
                                           src:
                                             ele?.ContentDownloadUrl ??
@@ -771,8 +771,8 @@ function MyBagFinal({ showOrderFor }) {
                                             setProductDetailId(ele?.Id);
                                           }
                                         }}
-                                      /> */}
-                                    </div>
+                                      />
+                                    </div> */}
                                     <div className={Styles.Mainbox3}>
                                       <h2
                                         onClick={() => {
