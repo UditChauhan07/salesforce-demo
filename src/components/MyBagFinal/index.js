@@ -56,7 +56,7 @@ function MyBagFinal({ showOrderFor }) {
   });
   const [isPayNow, setIsPayNow] = useState(false);
   const handleNameChange = (event) => {
-    const limit = 11;
+    const limit = 10;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
     setPONumber(value);
   };
@@ -703,6 +703,7 @@ function MyBagFinal({ showOrderFor }) {
                       <input
                         type="text"
                         value={PONumber}
+                        
                         onChange={handleNameChange} // Correctly handles input changes
                         placeholder="Enter PO Number"
                         style={{ borderBottom: "1px solid black" }}
@@ -754,7 +755,7 @@ function MyBagFinal({ showOrderFor }) {
                               return (
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
-                                    <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
+                                    {/* <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
                                       <ImageHandler
                                         image={{
                                           src:
@@ -771,7 +772,7 @@ function MyBagFinal({ showOrderFor }) {
                                           }
                                         }}
                                       />
-                                    </div>
+                                    </div> */}
                                     <div className={Styles.Mainbox3}>
                                       <h2
                                         onClick={() => {
