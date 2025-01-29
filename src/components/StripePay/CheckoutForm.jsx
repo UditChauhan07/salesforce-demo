@@ -49,7 +49,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
             card: cardElement,
             billing_details: { name: cardHolderName },
         });
-
+        localStorage.setItem('isEditaAble' , 1)
         if (error) {
             setErrorMessage(error.message);
             setLoading(false);
@@ -145,6 +145,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                                 }
                             }).then(() => {
                                 deleteOrder();
+                                localStorage.removeItem("isEditaAble")
                                 window.location.href = window.location.origin + '/orderDetails';
                             });
 

@@ -630,7 +630,6 @@ const CartProvider = ({ children }) => {
         }
     }
 
-
     // Get order total
     const getOrderTotal = () => {
         return order?.total || 0;
