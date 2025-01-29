@@ -78,22 +78,18 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
         setLoading(false);
 
     };
-useEffect(() => {
-    const handleBeforeUnload = (event) => {
-        if (!paymentSuccess) {
-            const message = "If you reload, the data you entered will be lost, and your payment has not been processed successfully.";
+      useEffect(() => {
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
             event.preventDefault();
-            event.returnValue = message;  // Standard way to display message
-            return message;  // For some browsers like Chrome
-        }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-        window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-}, [paymentSuccess]);
+            alert("Page refresh is disabled during payment.The page that you're looking for used information that you entered. Returning to that page might cause any action you took to be repeated.");
+          }
+        });
+        // window.addEventListener("beforeunload", function (event) {
+        //   event.preventDefault();
+        //   event.returnValue = "Are you sure you want to leave this page? Your payment may not be processed.";
+        // });
+      }, [])
 
     const orderPlaceHandler = async (paymentStatus, paymentId) => {
         if (order?.Account?.SalesRepId) {
