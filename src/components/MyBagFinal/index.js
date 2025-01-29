@@ -362,11 +362,10 @@ const editValue = localStorage.getItem("isEditaAble")
                       setIsOrderPlaced(0);
                       setorderStatus({ status: true, message: response.err[0].message });
                     } else {
-                     
+                      await deleteOrder();
+                   
                       if (response?.orderId && typeof response.orderId == "string") {
                         setOrderId(response.orderId);
-                        await deleteOrder();
-                        localStorage.removeItem("AA0KfX2OoNJvz7x")
                         localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
                         setIsOrderPlaced(2);
                         window.location.href = window.location.origin + "/orderDetails";
