@@ -154,6 +154,7 @@ useEffect(() => {
                                 "OpportunityId",
                                 JSON.stringify(response.orderId)
                             );
+                            localStorage.removeItem("AA0KfX2OoNJvz7x")
                             Swal.fire({
                                 title: 'Payment Successful!',
                                 text: 'Your payment is successful and order has been placed.',
@@ -165,6 +166,7 @@ useEffect(() => {
                             }).then(() => {
                                 deleteOrder();
                                 localStorage.removeItem("isEditaAble")
+                               
                                 window.location.href = window.location.origin + '/orderDetails';
                             });
 
