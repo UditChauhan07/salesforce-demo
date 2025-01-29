@@ -68,7 +68,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-            setPaymentSuccess(true);
+           
             await orderPlaceHandler(paymentIntent.status, paymentIntent.id);
 
         } else {
@@ -154,6 +154,7 @@ useEffect(() => {
                                 "OpportunityId",
                                 JSON.stringify(response.orderId)
                             );
+                            setPaymentSuccess(true);
                             localStorage.removeItem("AA0KfX2OoNJvz7x")
                             Swal.fire({
                                 title: 'Payment Successful!',
@@ -164,10 +165,11 @@ useEffect(() => {
                                     confirmButton: 'swal2-confirm'
                                 }
                             }).then(() => {
+                                
                                  localStorage.removeItem("AA0KfX2OoNJvz7x")
                                 deleteOrder();
                                 localStorage.removeItem("isEditaAble")
-                               
+                              
                                 window.location.href = window.location.origin + '/orderDetails';
                             });
 
