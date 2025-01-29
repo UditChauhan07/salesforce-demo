@@ -164,6 +164,7 @@ useEffect(() => {
                                     confirmButton: 'swal2-confirm'
                                 }
                             }).then(() => {
+                                 localStorage.removeItem("AA0KfX2OoNJvz7x")
                                 deleteOrder();
                                 localStorage.removeItem("isEditaAble")
                                
