@@ -117,7 +117,7 @@ console.log(selectedsalesRep , "----accordian salesrep")
           <table className="table table-hover ">
             <thead>
               <tr>
-                <th>Image</th>
+                {/* <th>Image</th> */}
                 <th style={{ width: "200px" }}>Title</th>
                 <th>Product Code</th>
                 <th>UPC</th>
@@ -163,13 +163,13 @@ console.log(selectedsalesRep , "----accordian salesrep")
                           salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
                           return (
                             <tr className={`${styles.ControlTR} w-full `} key={indexed}>
-                              <td className={styles.ControlStyle} style={{ cursor: "pointer" }}>
+                              {/* <td className={styles.ControlStyle} style={{ cursor: "pointer" }}> */}
                                 {/* <ImageHandler
                                   image={{ src: value?.ContentDownloadUrl || productImage.images[value?.ProductCode]?.ContentDownloadUrl || productImage.images[value?.ProductCode] || "dummy.png" }}
                                   width={50}
                                   onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
                                 /> */}
-                              </td>
+                              {/* </td> */}
                               <td
                                 className="text-capitalize linkEffect"
                                 style={{ fontSize: "13px", cursor: "pointer" }}
