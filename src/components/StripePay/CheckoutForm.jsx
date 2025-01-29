@@ -15,7 +15,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
     const [cardHolderName, setCardHolderName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [cardErrors, setCardErrors] = useState({});
-    const { order, deleteOrder } = useCart();
+    const { order, deleteOrder , deleteCartForever } = useCart();
     const [orderDesc, setOrderDesc] = useState(null);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const handleCardInput = (event) => {
@@ -149,13 +149,15 @@ useEffect(() => {
                         })
                     } else {
                         if (response?.orderId) {
-
+                            localStorage.removeItem("AA0KfX2OoNJvz7x")
+                              
                             localStorage.setItem(
                                 "OpportunityId",
                                 JSON.stringify(response.orderId)
                             );
                             setPaymentSuccess(true);
-                            localStorage.removeItem("AA0KfX2OoNJvz7x")
+                           
+
                             Swal.fire({
                                 title: 'Payment Successful!',
                                 text: 'Your payment is successful and order has been placed.',
@@ -165,12 +167,15 @@ useEffect(() => {
                                     confirmButton: 'swal2-confirm'
                                 }
                             }).then(() => {
-                                
-                                 localStorage.removeItem("AA0KfX2OoNJvz7x")
-                                deleteOrder();
-                                localStorage.removeItem("isEditaAble")
-                              
+                               
+                                 deleteOrder();
+                               deleteCartForever()
+                                  localStorage.removeItem("isEditaAble")
+                              setTimeout(()=>{
                                 window.location.href = window.location.origin + '/orderDetails';
+                              },[1300])
+                              
+                               
                             });
 
                         }

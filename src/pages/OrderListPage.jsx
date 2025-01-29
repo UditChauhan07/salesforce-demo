@@ -184,7 +184,7 @@ const OrderListPage = () => {
               label="salesRep"
               name="salesRep"
               value={selectedSalesRepId}
-              options={salesRepList.map((salesRep) => ({
+              options={salesRepList.sort((a, b) => a.Name.localeCompare(b.Name)).map((salesRep) => ({
                 label: salesRep.Id == userData.Sales_Rep__c ? 'My Orders (' + salesRep.Name + ')' : salesRep.Name,
                 value: salesRep.Id,
               }))}
