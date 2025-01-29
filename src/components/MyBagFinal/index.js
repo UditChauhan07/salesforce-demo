@@ -66,11 +66,13 @@ function MyBagFinal({ showOrderFor }) {
     }
     setTotal(getOrderTotal() ?? 0);
   }, [order, buttonActive]);
-const editValue = localStorage.getItem("isEditaAble")
+  const editValue = localStorage.getItem("isEditaAble")
   const fetchBrandPaymentDetails = async () => {
     try {
       let id = order?.Manufacturer?.id;
       let AccountID = order?.Account?.id;
+      console.log({ id, AccountID });
+
       const user = await GetAuthData();
       if (id && AccountID) {
         const brandRes = await getBrandPaymentDetails({
@@ -78,6 +80,7 @@ const editValue = localStorage.getItem("isEditaAble")
           Id: id,
           AccountId: AccountID,
         });
+        console.log({ brandRes });
 
         setIntentRes(brandRes);
 
@@ -91,6 +94,50 @@ const editValue = localStorage.getItem("isEditaAble")
             PK_KEY: null,
             SK_KEY: null,
           };
+        } else {
+          const terms = [
+            "Net",
+            "terms:2%",
+            "TERMS:215",
+            "TERMS:210",
+            "TERMS:245",
+            "TERMS:410",
+            "TERMS:50%",
+            "TERMS:505",
+            "TERMS:AFT",
+            "TERMS:AMA",
+            "TERMS:BR",
+            "TERMS:BRA",
+            "TERMS:CAT",
+            "TERMS:COD",
+            "TERMS:F30",
+            "TERMS:FA3",
+            "TERMS:GIF",
+            "TERMS:KLA",
+            "TERMS:LOG",
+            "TERMS:N12",
+            "TERMS:N15",
+            "TERMS:N20",
+            "TERMS:N30",
+            "TERMS:N45",
+            "TERMS:N60",
+            "TERMS:N75",
+            "TERMS:N90",
+            "TERMS:NO",
+            "TERMS:NT",
+            "TERMS:OFF",
+            "TERMS:PAY",
+            "TERMS:SHO",
+            "TERMS:UNK",
+            "Check",
+            "Wire"
+          ];
+          // Check paymentIntent status and payment types
+          const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
+          const hasNetPaymentType = paymentTypes.some((type) => terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase())));
+          if (!hasNetPaymentType) {
+            setIsPlayAble(1);
+          }
         }
 
         let paymentIntent = await fetch(`${originAPi}/stripe/payment-intent`, {
@@ -105,54 +152,14 @@ const editValue = localStorage.getItem("isEditaAble")
         });
 
         setGreenStatus(paymentIntent.status);
-        const terms = [
-          "Net",
-          "terms:2%",
-          "TERMS:215",
-          "TERMS:210",
-          "TERMS:245",
-          "TERMS:410",
-          "TERMS:50%",
-          "TERMS:505",
-          "TERMS:AFT",
-          "TERMS:AMA",
-          "TERMS:BR",
-          "TERMS:BRA",
-          "TERMS:CAT",
-          "TERMS:COD",
-         
-          "TERMS:F30",
-          "TERMS:FA3",
-          "TERMS:GIF",
-          "TERMS:KLA",
-          "TERMS:LOG",
-          "TERMS:N12",
-          "TERMS:N15",
-          "TERMS:N20",
-          "TERMS:N30",
-          "TERMS:N45",
-          "TERMS:N60",
-          "TERMS:N75",
-          "TERMS:N90",
-          "TERMS:NO",
-          "TERMS:NT",
-          "TERMS:OFF",
-          "TERMS:PAY",
-          "TERMS:SHO",
-          "TERMS:UNK",
-          "Check" , 
-          "Wire"
-        ];
-        // Check paymentIntent status and payment types
-        const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
-        const hasNetPaymentType = paymentTypes.some((type) => terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase())));
 
-        if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
-          setIsPlayAble(1);
-        } else if (paymentIntent.status === 400 || paymentDetails.PK_KEY === paymentDetails.SK_KEY) {
-          setIsPlayAble(0);
-          console.log(isPlayAble, "is play able ");
-        }
+        // if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
+        //   setIsPlayAble(1);
+        // } else if (paymentIntent.status === 400 || paymentDetails.PK_KEY === paymentDetails.SK_KEY) {
+        //   setIsPlayAble(0);
+        //   console.log(isPlayAble, "is play able ");
+        // }
+        setIsLoading(false);
 
         setPaymentDetails({
           PK_KEY: brandRes?.brandDetails.Stripe_Publishable_key_test__c,
@@ -166,10 +173,11 @@ const editValue = localStorage.getItem("isEditaAble")
       }
     } catch (error) {
       console.log("Error fetching brand payment details:", error);
+      setIsLoading(false);
       return null;
     }
   };
-  console.log({ isPlayAble });
+  ;
 
   useEffect(() => {
     const FetchPoNumber = async () => {
@@ -213,21 +221,10 @@ const editValue = localStorage.getItem("isEditaAble")
             keyBasedUpdateCart({ PoNumber: poInit });
             setPONumber(poInit);
           }
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 2000);
         } catch (error) {
           console.error("Error fetching PO number:", error);
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 2000);
-        } finally {
-        }
-      } else {
-        setTimeout(() => {
           setIsLoading(false);
-        }, 1500);
-        setPONumber(null);
+        }
       }
     };
     if (order?.Account?.id && order?.Manufacturer?.id) {
@@ -236,11 +233,7 @@ const editValue = localStorage.getItem("isEditaAble")
         FetchPoNumber();
       }
     } else {
-      if (isLoading) {
-        setTimeout(function () {
-          setIsLoading(false);
-        }, 1500);
-      }
+      setIsLoading(false);
     }
   }, [order]);
 
@@ -363,7 +356,7 @@ const editValue = localStorage.getItem("isEditaAble")
                       setorderStatus({ status: true, message: response.err[0].message });
                     } else {
                       await deleteOrder();
-                   
+
                       if (response?.orderId && typeof response.orderId == "string") {
                         setOrderId(response.orderId);
                         localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
@@ -697,14 +690,14 @@ const editValue = localStorage.getItem("isEditaAble")
                       <b>
                         {buttonActive
                           ? // If it's a Pre Order and PONumber doesn't already start with "PRE", prepend "PRE"
-                            PONumber
+                          PONumber
                           : "---"}
                       </b>
                     ) : (
                       <input
                         type="text"
                         value={PONumber}
-                        
+
                         onChange={handleNameChange} // Correctly handles input changes
                         placeholder="Enter PO Number"
                         style={{ borderBottom: "1px solid black" }}
@@ -1024,7 +1017,7 @@ const editValue = localStorage.getItem("isEditaAble")
                           {paymentAccordian ? null : "Clear Bag"}
                         </p>
                       ) : null}
-                      {paymentAccordian && !editValue? (
+                      {paymentAccordian && !editValue ? (
                         <p className={`${Styles.ClearBag}`} style={{ textAlign: "center", cursor: "pointer" }} onClick={onToggle}>
                           Edit Bag
                         </p>
