@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { GetAuthData, OrderPlaced } from '../../lib/store';
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
 import { useCart } from '../../context/CartContext';
@@ -15,9 +15,9 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
     const [cardHolderName, setCardHolderName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [cardErrors, setCardErrors] = useState({});
-    const { order, deleteOrder } = useCart();
+    const { order, deleteOrder , deleteCartForever } = useCart();
     const [orderDesc, setOrderDesc] = useState(null);
-
+    const [paymentSuccess, setPaymentSuccess] = useState(false);
     const handleCardInput = (event) => {
         const { error, elementType } = event;
 
@@ -49,7 +49,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
             card: cardElement,
             billing_details: { name: cardHolderName },
         });
-
+        localStorage.setItem('isEditaAble' , 1)
         if (error) {
             setErrorMessage(error.message);
             setLoading(false);
@@ -68,6 +68,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
+           
             await orderPlaceHandler(paymentIntent.status, paymentIntent.id);
 
         } else {
@@ -77,6 +78,22 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
         setLoading(false);
 
     };
+useEffect(() => {
+    const handleBeforeUnload = (event) => {
+        if (!paymentSuccess) {
+            const message = "If you reload, the data you entered will be lost, and your payment has not been processed successfully.";
+            event.preventDefault();
+            event.returnValue = message;  // Standard way to display message
+            return message;  // For some browsers like Chrome
+        }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+}, [paymentSuccess]);
 
     const orderPlaceHandler = async (paymentStatus, paymentId) => {
         if (order?.Account?.SalesRepId) {
@@ -116,9 +133,11 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                         Payment_Status__c: paymentStatus,
                         Transaction_ID__c: paymentId
                     };
+                   
 
                     const response = await OrderPlaced({ order: orderData, cartId: order.id });
                     if (response.err) {
+                        localStorage.removeItem("isEditaAble")
                         Swal.fire({
                             title: 'Order Creation fail',
                             text: response.err[0].message,
@@ -130,11 +149,15 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                         })
                     } else {
                         if (response?.orderId) {
-
+                            localStorage.removeItem("AA0KfX2OoNJvz7x")
+                              
                             localStorage.setItem(
                                 "OpportunityId",
                                 JSON.stringify(response.orderId)
                             );
+                            setPaymentSuccess(true);
+                           
+
                             Swal.fire({
                                 title: 'Payment Successful!',
                                 text: 'Your payment is successful and order has been placed.',
@@ -144,8 +167,15 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                                     confirmButton: 'swal2-confirm'
                                 }
                             }).then(() => {
-                                deleteOrder();
+                               
+                                 deleteOrder();
+                               deleteCartForever()
+                                  localStorage.removeItem("isEditaAble")
+                              setTimeout(()=>{
                                 window.location.href = window.location.origin + '/orderDetails';
+                              },[1300])
+                              
+                               
                             });
 
                         }

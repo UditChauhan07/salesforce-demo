@@ -164,11 +164,11 @@ console.log(selectedsalesRep , "----accordian salesrep")
                           return (
                             <tr className={`${styles.ControlTR} w-full `} key={indexed}>
                               <td className={styles.ControlStyle} style={{ cursor: "pointer" }}>
-                                <ImageHandler
+                                {/* <ImageHandler
                                   image={{ src: value?.ContentDownloadUrl || productImage.images[value?.ProductCode]?.ContentDownloadUrl || productImage.images[value?.ProductCode] || "dummy.png" }}
                                   width={50}
                                   onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
-                                />
+                                /> */}
                               </td>
                               <td
                                 className="text-capitalize linkEffect"

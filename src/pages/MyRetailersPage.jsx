@@ -118,17 +118,22 @@ localStorage.setItem('selectedSalesrepId' , JSON.stringify(selectedSalesRepId))
         <>
           {memoizedPermissions?.modules?.godLevel ?
             <>
-              <FilterItem
-                minWidth="220px"
-                label="salesRep"
-                name="salesRep"
-                value={selectedSalesRepId}
-                options={salesRepList.map((salesRep) => ({
-                  label: salesRep.Id == userData.Sales_Rep__c ? 'My Retailers (' + salesRep.Name + ')' : salesRep.Name,
-                  value: salesRep.Id,
-                }))}
-                onChange={(value) => salesRepHandler(value)}
-              />
+             <FilterItem
+  minWidth="220px"
+  label="salesRep"
+  name="salesRep"
+  value={selectedSalesRepId}
+  options={salesRepList
+    .sort((a, b) => a.Name.localeCompare(b.Name))  // Sort alphabetically by Name
+    .map((salesRep) => ({
+      label: salesRep.Id === userData.Sales_Rep__c
+        ? `My Retailers (${salesRep.Name})`
+        : salesRep.Name,
+      value: salesRep.Id,
+    }))
+  }
+  onChange={(value) => salesRepHandler(value)}
+/>
             </> : null}
 
           <FilterItem

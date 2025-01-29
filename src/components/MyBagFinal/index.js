@@ -66,7 +66,7 @@ function MyBagFinal({ showOrderFor }) {
     }
     setTotal(getOrderTotal() ?? 0);
   }, [order, buttonActive]);
-
+const editValue = localStorage.getItem("isEditaAble")
   const fetchBrandPaymentDetails = async () => {
     try {
       let id = order?.Manufacturer?.id;
@@ -363,6 +363,7 @@ function MyBagFinal({ showOrderFor }) {
                       setorderStatus({ status: true, message: response.err[0].message });
                     } else {
                       await deleteOrder();
+                   
                       if (response?.orderId && typeof response.orderId == "string") {
                         setOrderId(response.orderId);
                         localStorage.setItem("OpportunityId", JSON.stringify(response.orderId));
@@ -1023,7 +1024,7 @@ function MyBagFinal({ showOrderFor }) {
                           {paymentAccordian ? null : "Clear Bag"}
                         </p>
                       ) : null}
-                      {paymentAccordian ? (
+                      {paymentAccordian && !editValue? (
                         <p className={`${Styles.ClearBag}`} style={{ textAlign: "center", cursor: "pointer" }} onClick={onToggle}>
                           Edit Bag
                         </p>

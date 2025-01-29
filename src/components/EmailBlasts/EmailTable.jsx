@@ -119,7 +119,8 @@ console.log(memoizedPermissions?.modules?.godLevel)
         setSearchValue(null)
         setCheckId([])
         GetAuthData().then((user) => {
-            if (memoizedPermissions?.modules?.godLevel) {
+            let userPermisson = JSON.parse(user?.permission)
+            if (userPermisson?.modules?.godLevel){
                 setUser(user)
                 dataStore.getPageData("/report" + month + day + year, () => getEmailBlast({ key: user.access_token, Id: user.Sales_Rep__c, month, day, year, newsletter })).then((list) => {
 
