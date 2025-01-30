@@ -118,7 +118,7 @@ console.log(selectedsalesRep , "----accordian salesrep")
             <thead>
               <tr>
                 {/* <th>Image</th> */}
-                <th style={{ width: "200px" }}>Title</th>
+                <th style={{ width: "200px" , paddingLeft : "22px" }}>Title</th>
                 <th>Product Code</th>
                 <th>UPC</th>
                 <th>List Price</th>
@@ -172,7 +172,7 @@ console.log(selectedsalesRep , "----accordian salesrep")
                               {/* </td> */}
                               <td
                                 className="text-capitalize linkEffect"
-                                style={{ fontSize: "13px", cursor: "pointer" }}
+                                style={{ fontSize: "13px", cursor: "pointer" , paddingLeft : "22px" }}
                                 onMouseEnter={() => setShowName({ index: indexed, type: true })}
                                 onMouseLeave={() => setShowName({ index: indexed })}
                                 onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
