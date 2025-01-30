@@ -995,7 +995,7 @@ function MyBagFinal({ showOrderFor }) {
                             order={order}
                             PONumber={PONumber}
                             orderDesc={orderDesc}
-                            AccountName={order.Account.name}
+                            AccountName={order.Account?.name}
                             AccountNumber={intentRes?.accountNumber?.Account_Number__c}
                           />
                         </CustomAccordion>
