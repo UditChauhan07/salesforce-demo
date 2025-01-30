@@ -29,12 +29,13 @@ const Filters = ({ value, onChange, resetFilter,monthHide=true }) => {
         value={value.month}
         options={[
           {
-            label: "Last 6 Months",
-            value: "last-6-months",
-          },
-          {
+          
             label: "Current Year",
             value: `${new Date().getFullYear()}`,
+          },
+          {
+            label: "Last 6 Months",
+            value: "last-6-months",
           },
           {
             label: `Previous Year`,

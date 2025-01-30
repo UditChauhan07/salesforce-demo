@@ -78,18 +78,30 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
         setLoading(false);
 
     };
-      useEffect(() => {
-        document.addEventListener("keydown", function (event) {
+    useEffect(() => {
+        const handleKeyDown = (event) => {
           if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
             event.preventDefault();
-            alert("Page refresh is disabled during payment.The page that you're looking for used information that you entered. Returning to that page might cause any action you took to be repeated.");
+            alert(
+              "Page refresh is disabled during payment. The page that you're looking for used information that you entered. Returning to that page might cause any action you took to be repeated."
+            );
           }
-        });
-        // window.addEventListener("beforeunload", function (event) {
-        //   event.preventDefault();
-        //   event.returnValue = "Are you sure you want to leave this page? Your payment may not be processed.";
-        // });
-      }, [])
+        };
+      
+        const handleBeforeUnload = (event) => {
+          event.preventDefault();
+          event.returnValue =
+            "Page refresh is disabled during payment. Are you sure you want to leave?";
+        };
+      
+        document.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("beforeunload", handleBeforeUnload);
+      
+        return () => {
+          document.removeEventListener("keydown", handleKeyDown);
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
 
     const orderPlaceHandler = async (paymentStatus, paymentId) => {
         if (order?.Account?.SalesRepId) {

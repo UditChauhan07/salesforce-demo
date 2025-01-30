@@ -33,7 +33,7 @@ function MyBagFinal({ showOrderFor }) {
   const [userData, setUserData] = useState(null);
   const [salesRepData, setSalesRepData] = useState({ Name: null, Id: null });
   const [confirm, setConfirm] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState();
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { getOrderQuantity, updateProductPrice } = useCart();
@@ -54,7 +54,9 @@ function MyBagFinal({ showOrderFor }) {
     PK_KEY: null,
     SK_KEY: null,
   });
+  const [note , setNote] = useState()
   const [isPayNow, setIsPayNow] = useState(false);
+  const [desc , setDesc] = useState()
   const handleNameChange = (event) => {
     const limit = 10;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -68,6 +70,7 @@ function MyBagFinal({ showOrderFor }) {
   }, [order, buttonActive]);
   const editValue = localStorage.getItem("isEditaAble")
   const fetchBrandPaymentDetails = async () => {
+   
     try {
       let id = order?.Manufacturer?.id;
       let AccountID = order?.Account?.id;
@@ -153,12 +156,7 @@ function MyBagFinal({ showOrderFor }) {
 
         setGreenStatus(paymentIntent.status);
 
-        // if (paymentIntent.status === 200 && paymentDetails.PK_KEY !== paymentDetails.SK_KEY && !hasNetPaymentType) {
-        //   setIsPlayAble(1);
-        // } else if (paymentIntent.status === 400 || paymentDetails.PK_KEY === paymentDetails.SK_KEY) {
-        //   setIsPlayAble(0);
-        //   console.log(isPlayAble, "is play able ");
-        // }
+        
         setIsLoading(false);
 
         setPaymentDetails({
@@ -181,6 +179,7 @@ function MyBagFinal({ showOrderFor }) {
 
   useEffect(() => {
     const FetchPoNumber = async () => {
+      setIsLoading(true)
       if (order?.Account?.id && order?.Manufacturer?.id) {
         try {
           const res = await POGenerator();
@@ -188,6 +187,7 @@ function MyBagFinal({ showOrderFor }) {
           console.log({ res, order });
 
           if (res?.poNumber) {
+         
             if (res?.address || res?.brandShipping) {
               let tempOrder = order.Account;
               if (res?.address) {
@@ -220,6 +220,7 @@ function MyBagFinal({ showOrderFor }) {
             }
             keyBasedUpdateCart({ PoNumber: poInit });
             setPONumber(poInit);
+            setIsLoading(false)
           }
         } catch (error) {
           console.error("Error fetching PO number:", error);
@@ -445,12 +446,9 @@ function MyBagFinal({ showOrderFor }) {
     setIsAccordianOpen(true);
     setDetailsAccordian(true);
   };
-  // const handleAccordian = () => {
-  //   setPaymentAccordian(true);
-  //   setdetailsAccordian(false);
-  //   // setDetailsAccordian(false)
-  // };
-  console.warn({ isPayNow });
+  useEffect(() => {
+    setNote(order?.Note || ""); // Order update hone pe note set kare
+  }, [order?.Note]);
 
   if (isOrderPlaced === 1)
     return (
@@ -921,9 +919,9 @@ function MyBagFinal({ showOrderFor }) {
                             </div>
                           ) : null}
                           <div className={Styles.ShipAdress2}>
-                            {/* <label>NOTE</label> */}
+                          
                             <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
-                              {order?.Note}
+                              {note}
                             </textarea>
                           </div>
                           {!PONumberFilled ? (
@@ -997,7 +995,7 @@ function MyBagFinal({ showOrderFor }) {
                             order={order}
                             PONumber={PONumber}
                             orderDesc={orderDesc}
-                            AccountName={order.Account.name}
+                            AccountName={order.Account?.name}
                             AccountNumber={intentRes?.accountNumber?.Account_Number__c}
                           />
                         </CustomAccordion>

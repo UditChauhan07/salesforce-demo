@@ -534,12 +534,13 @@ function Product() {
                       value={productTypeFilter}
                       options={[
                         {
-                          label: "Wholesale",
-                          value: "Wholesale",
-                        },
-                        {
                           label: "PREORDER",
                           value: "Pre-order",
+                         
+                        },
+                        {
+                          label: "Wholesale",
+                          value: "Wholesale",
                         },
                       ]}
                       onChange={(value) => {

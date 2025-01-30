@@ -198,14 +198,14 @@ function ContactDetailedReport() {
                     <div className="d-flex justify-content-end col-1"><hr className={Styles.breakHolder} /></div>
                     {memoizedPermissions?.modules?.godLevel && (
                         <FilterItem
-                            minWidth="200px"
-                            label="Sales Rep"
-                            value={filters.saleRepFilter}
-                            name='Sales Rep'
-                            options={salesReps}
-                            onChange={(value) => handleFilterChange('saleRepFilter', value)}
-                            onFocus={() => setFilters(prev => ({ ...prev, manufacturerFilter: '' }))}
-                        />
+                        minWidth="200px"
+                        label="Sales Rep"
+                        value={filters.saleRepFilter}
+                        name="Sales Rep"
+                        options={[...salesReps].sort((a, b) => a.label.localeCompare(b.label))}
+                        onChange={(value) => handleFilterChange("saleRepFilter", value)}
+                        onFocus={() => setFilters((prev) => ({ ...prev, manufacturerFilter: "" }))}
+                       />
                     )}
 
 
