@@ -54,9 +54,9 @@ function MyBagFinal({ showOrderFor }) {
     PK_KEY: null,
     SK_KEY: null,
   });
-  
+  const [note , setNote] = useState()
   const [isPayNow, setIsPayNow] = useState(false);
-  const [desc , setDesc] = useState(order?.Note)
+  const [desc , setDesc] = useState()
   const handleNameChange = (event) => {
     const limit = 10;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -446,13 +446,9 @@ function MyBagFinal({ showOrderFor }) {
     setIsAccordianOpen(true);
     setDetailsAccordian(true);
   };
-  // const handleAccordian = () => {
-  //   setPaymentAccordian(true);
-  //   setdetailsAccordian(false);
-  //   // setDetailsAccordian(false)
-  // };
-  console.log({orderDesc})
-  console.log({order})
+  useEffect(() => {
+    setNote(order?.Note || ""); // Order update hone pe note set kare
+  }, [order?.Note]);
 
   if (isOrderPlaced === 1)
     return (
@@ -925,7 +921,7 @@ function MyBagFinal({ showOrderFor }) {
                           <div className={Styles.ShipAdress2}>
                           
                             <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
-                              {order?.Note}
+                              {note}
                             </textarea>
                           </div>
                           {!PONumberFilled ? (
