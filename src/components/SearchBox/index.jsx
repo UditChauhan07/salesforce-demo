@@ -144,7 +144,7 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                     const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
 
                     if (count > 0) {
-                        message += `<li class='text-[14px]'>${brand.Name}:${count} contacts</li>`;
+                        message += `<li class='text-[14px]'>${brand.Name}:${count} Subscribers</li>`;
                     }
                 });
                 message += '</ol>';
