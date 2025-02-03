@@ -138,13 +138,13 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
             })
 
             if (newOptions.length) {
-                let message = '<p>Contact List:</p><ol>';
+                let message = "<p class='text-[16px]'>This email will go to:</p><p class='text-[16px]'>Subscribers of Brands:</p><ol>";
                 brandSelected.map(brand => {
                     // Count the number of contacts with the current brandId
                     const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
 
                     if (count > 0) {
-                        message += `<li class='text-[14px]'>You have ${count} contacts with ${brand.Name}.</li>`;
+                        message += `<li class='text-[14px]'>${brand.Name}:${count} contacts</li>`;
                     }
                 });
                 message += '</ol>';
