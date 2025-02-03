@@ -136,7 +136,7 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                     return result.BrandIds?.some(brandId => brandSelectedIds.includes(brandId));
                 }
             })
-            
+
             if (newOptions.length) {
                 let message = '<p>Contact List:</p><ol>';
                 brandSelected.map(brand => {
@@ -144,7 +144,7 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                     const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
 
                     if (count > 0) {
-                        message += `<li>You have ${count} contacts with ${brand.Name}.</li>`;
+                        message += `<li class='text-[14px]'>You have ${count} contacts with ${brand.Name}.</li>`;
                     }
                 });
                 message += '</ol>';
