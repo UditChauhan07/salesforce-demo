@@ -841,7 +841,7 @@ function MyBagFinal({ showOrderFor }) {
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
-                                        {ele?.Name} {errorProduct ? stockAvailable? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small>: <small style={{ color: '#c68282' }}>Oops! This item is currently out of stock.</small>: null}
+                                        {ele?.Name}&nbsp;{errorProduct ? stockAvailable? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small>: <small style={{ color: '#c68282' }}>Oops! This item is currently out of stock.</small>: null}
                                       </h2>
                                       <p>
                                         <span className={Styles.Span1}>{`$${listPrice}`}</span>
