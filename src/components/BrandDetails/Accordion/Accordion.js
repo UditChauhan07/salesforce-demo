@@ -11,9 +11,9 @@ import Swal from "sweetalert2";
 const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
   let selectedsalesRep = localStorage?.getItem('selectedSalesrepId')
-  console.log({selectedsalesRep});
-  
-  if(selectedsalesRep != "undefined") selectedsalesRep = JSON.parse(selectedsalesRep)
+  console.log({ selectedsalesRep });
+
+  if (selectedsalesRep != "undefined") selectedsalesRep = JSON.parse(selectedsalesRep)
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted, updateProductPrice } = useCart();
   const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -215,33 +215,37 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                 <QuantitySelector
                                   min={value.Min_Order_QTY__c || 0}
                                   onChange={(quantity) => {
-                                    if (data.discount.portalProductManage) {
-                                      if (value.Available_Quantity__c) {
-                                        if (quantity) {
-                                          onQuantityChange(value, quantity);
-                                        } else {
-                                          if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
-                                            removeProduct(value.Id);
+                                    if (quantity) {
+                                      if (data.discount.portalProductManage) {
+                                        if (value.Available_Quantity__c) {
+                                          if (quantity) {
+                                            onQuantityChange(value, quantity);
+                                          } else {
+                                            if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
+                                              removeProduct(value.Id);
+                                            }
                                           }
+                                        } else {
+                                          Swal.fire({
+                                            title: "Oops!",
+                                            text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
+                                            icon: "warning",
+                                            confirmButtonColor: "#000", // Black
+                                          });
                                         }
                                       } else {
-                                        Swal.fire({
-                                          title: "Oops!",
-                                          text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
-                                          icon: "warning",
-                                          confirmButtonColor: "#000", // Black
-                                        });
+
+                                        onQuantityChange(value, quantity);
+
                                       }
                                     } else {
-                                      if (quantity) {
-                                        onQuantityChange(value, quantity);
-                                      } else {
-                                        if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
-                                          removeProduct(value.Id);
-                                        }
+                                      if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
+                                        removeProduct(value.Id);
                                       }
                                     }
-                                  }}
+                                  }
+
+                                  }
                                   value={order?.Account?.id === localStorage.getItem("AccountId__c") ? qtyofItem : 0}
                                 />
                               </td>
@@ -282,13 +286,13 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
           </table>
         </div>
       </div>
-      {productDetailId ?<ProductDetails
+      {productDetailId ? <ProductDetails
         productId={productDetailId}
         setProductDetailId={setProductDetailId}
         ManufacturerId={localStorage.getItem("ManufacturerId__c")}
         AccountId={[localStorage.getItem("AccountId__c")]}
         selectedsalesRep={selectedsalesRep}
-      />:null}
+      /> : null}
     </>
   );
 };
