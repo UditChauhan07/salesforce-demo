@@ -11,7 +11,6 @@ import Swal from "sweetalert2";
 const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
   let selectedsalesRep = localStorage?.getItem('selectedSalesrepId')
-  console.log({ selectedsalesRep });
 
   if (selectedsalesRep != "undefined") selectedsalesRep = JSON.parse(selectedsalesRep)
   let Img1 = "/assets/images/dummy.png";
@@ -217,6 +216,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                   onChange={(quantity) => {
                                     if (quantity) {
                                       if (data.discount.portalProductManage) {
+                                        
                                         if (value.Available_Quantity__c<1) {
                                           return Swal.fire({
                                             title: "Oops!",

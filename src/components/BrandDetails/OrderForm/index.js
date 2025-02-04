@@ -373,8 +373,8 @@ const SpreadsheetUploader = ({ rawData, showTable = false, setOrderFromModal, or
                   <th>Product Code</th>
                   <th>Product Category</th>
                   <th>Product UPC</th>
-                  <th>List Price</th>
-                  <th>Sale Price</th>
+                  <th>MSRP</th>
+                  <th>Cost</th>
                   <th>Min Qty</th>
                   <th>Qty</th>
                 </tr>
