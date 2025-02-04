@@ -24,35 +24,38 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     const [accountDetails, setAccountDetails] = useState();
     const [manufacturerId, setManufacturerId] = useState();
     const [clickedProduct, setClickedProduct] = useState(null);
+    
 
     const fetchAccountDetails = async () => {
-        const data = await GetAuthData();
-        let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
-        salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
-        try {
-            const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
-                salesRepId
-                , accessToken
-            }));
-            if(res){
-                setAccountDetails(res?.data?.accountDetails);
+        if (selectedsalesRep) {
+            const data = await GetAuthData();
+            let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
+            salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
+            try {
+                const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+                    salesRepId
+                    , accessToken
+                }));
+                if (res) {
+                    setAccountDetails(res?.data?.accountDetails);
+                }
+            } catch (error) {
+                console.error("Error fetching account details:", error);
             }
-        } catch (error) {
-            console.error("Error fetching account details:", error);
         }
     };
     const fetchProductDetailHandler = () => {
-        if(productId){
+        if (productId) {
             GetAuthData()
-            .then((user) => {
-                const rawData = { productId, key: user?.x_access_token };
-                dataStore.getPageData("/productPage/" + productId, () => getProductDetails({ rawData }))
-                .then((productRes) => {
-                    readyProductDetails(productRes)
+                .then((user) => {
+                    const rawData = { productId, key: user?.x_access_token };
+                    dataStore.getPageData("/productPage/" + productId, () => getProductDetails({ rawData }))
+                        .then((productRes) => {
+                            readyProductDetails(productRes)
+                        })
+                        .catch((err) => console.error("Error fetching product details:", err));
                 })
-                .catch((err) => console.error("Error fetching product details:", err));
-            })
-            .catch((err) => console.error("Error fetching auth data:", err));
+                .catch((err) => console.error("Error fetching auth data:", err));
         }
     }
     const readyProductDetails = (data) => {

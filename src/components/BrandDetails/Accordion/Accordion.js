@@ -10,8 +10,10 @@ import Swal from "sweetalert2";
 
 const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
-  let selectedsalesRep = JSON.parse(localStorage.getItem('selectedSalesrepId'))
-  console.log(selectedsalesRep, "----accordian salesrep")
+  let selectedsalesRep = localStorage?.getItem('selectedSalesrepId')
+  console.log({selectedsalesRep});
+  
+  if(selectedsalesRep != "undefined") selectedsalesRep = JSON.parse(selectedsalesRep)
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted, updateProductPrice } = useCart();
   const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -280,13 +282,13 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
           </table>
         </div>
       </div>
-      <ProductDetails
+      {productDetailId ?<ProductDetails
         productId={productDetailId}
         setProductDetailId={setProductDetailId}
         ManufacturerId={localStorage.getItem("ManufacturerId__c")}
         AccountId={[localStorage.getItem("AccountId__c")]}
         selectedsalesRep={selectedsalesRep}
-      />
+      />:null}
     </>
   );
 };

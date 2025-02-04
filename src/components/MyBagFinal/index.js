@@ -336,7 +336,7 @@ function MyBagFinal({ showOrderFor }) {
       setConfirm(false);
       return Swal.fire({
         title: "Alert!",
-        text: "You’ve added more of products than what’s available in stock. Please update your cart then tring to submit this order.",
+        text: "You've added more products than are available in stock. Please update your cart before submitting your order.",
         icon: "warning",
         confirmButtonColor: "#000", // Black
       });
@@ -471,7 +471,7 @@ function MyBagFinal({ showOrderFor }) {
       setConfirm(false);
       return Swal.fire({
         title: "Alert!",
-        text: "You’ve added more of products than what’s available in stock. Please update your cart then tring to submit this order.",
+        text: "You've added more products than are available in stock. Please update your cart before submitting your order.",
         icon: "warning",
         confirmButtonColor: "#000", // Black
       });
@@ -841,7 +841,7 @@ function MyBagFinal({ showOrderFor }) {
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
-                                        {ele?.Name} {errorProduct ? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small> : null}
+                                        {ele?.Name} {errorProduct ? stockAvailable? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small>: <small style={{ color: '#c68282' }}>Oops! This item is currently out of stock.</small>: null}
                                       </h2>
                                       <p>
                                         <span className={Styles.Span1}>{`$${listPrice}`}</span>
