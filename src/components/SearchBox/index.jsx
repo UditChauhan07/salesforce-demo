@@ -135,27 +135,48 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                 if (result.AccountId) {
                     // If AccountId exists, compare BrandIds with validBrandIds
                     return result.BrandIds?.some(brandId => brandSelectedIds.includes(brandId));
-                }else{
+                } else {
                     return result;
                 }
             })
 
             if (newOptions.length) {
-                let message = "<p class='text-[16px]'>This email will go to:</p><p class='text-[16px]'>Subscribers of Brands:</p><ol>";
+                // let message = "<p class='text-[16px] m-0'>This email will go to:</p><p class='text-[16px] mb-1'>Subscribers of Brands:</p><ol>";
+                // brandSelected.map(brand => {
+                //     // Count the number of contacts with the current brandId
+                //     const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
+
+                //     if (count > 0) {
+                //         message += `<li class='text-[14px]'>${brand.Name}:${count} Subscribers</li>`;
+                //     }
+                // });
+                // message += '</ol>';
+                let message = `
+  <div class="email-content">
+    <p class="text-base mb-2">This email will go to subscribers of Brands:</p>
+    <ul class="brand-list list-inside pl-4">`;
+
                 brandSelected.map(brand => {
                     // Count the number of contacts with the current brandId
                     const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
 
                     if (count > 0) {
-                        message += `<li class='text-[14px]'>${brand.Name}:${count} Subscribers</li>`;
+                        message += `
+        <li class="text-sm mb-1">
+          <strong>${brand.Name}:</strong> ${count} Subscribers
+        </li>`;
                     }
                 });
-                message += '</ol>';
+
+                message += `
+    </ul>
+  </div>`;
+
+
 
                 let check = await Swal.fire({
                     title: 'Alert',
                     html: message,
-                    icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#000',  // Black
                     cancelButtonColor: '#000',   // White
@@ -252,7 +273,7 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                         <option value={0} selected>All Brand</option>
                         {showAll ? manufacturers.map((brand) => (
                             <option style={{ appearance: 'none' }} value={brand.Id}>{brand.Name}</option>
-                        )):brandSelected.map((brand) => (
+                        )) : brandSelected.map((brand) => (
                             <option style={{ appearance: 'none' }} value={brand.Id}>{brand.Name}</option>
                         ))}
                     </select> : null}
