@@ -142,8 +142,8 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                 <th style={{ width: "200px", paddingLeft: "22px" }}>Title</th>
                 <th>Product Code</th>
                 <th>UPC</th>
-                <th>List Price</th>
-                <th style={{ width: "175px" }}>Sale Price</th>
+                <th>MSRP</th>
+                <th style={{ width: "175px" }}>Cost</th>
                 <th>Min Qty</th>
                 <th>Qty</th>
                 <th>Total</th>
