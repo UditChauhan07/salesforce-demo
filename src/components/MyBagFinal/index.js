@@ -806,6 +806,9 @@ function MyBagFinal({ showOrderFor }) {
                               let stockAvailable = 0;
                               if (outoOfStockAllow) {
                                 stockAvailable = checkProduct?.list?.find(item => item.Id === ele?.Id)?.Available_Quantity__c;
+                                if (stockAvailable < 1) {
+                                  stockAvailable = 0;
+                                }
                                 if (ele.qty > stockAvailable) {
                                   errorProduct = true;
                                 }
