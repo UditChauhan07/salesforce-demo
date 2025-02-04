@@ -84,7 +84,8 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
 
         if (!showAll) {
             // Extract the brand IDs from the brands list
-            let validBrandIds = new Set(manufacturers?.map(brand => brand.Id));
+            // let validBrandIds = new Set(manufacturers?.map(brand => brand.Id));
+            let validBrandIds = new Set(brandSelected?.map(brand => brand.Id));
 
 
             let matchedResults = results.filter(result => {
@@ -134,6 +135,8 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                 if (result.AccountId) {
                     // If AccountId exists, compare BrandIds with validBrandIds
                     return result.BrandIds?.some(brandId => brandSelectedIds.includes(brandId));
+                }else{
+                    return result;
                 }
             })
 
@@ -247,7 +250,9 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                     />
                     {manufacturers?.length ? <select className={"brandSearch"} style={{ width: '25%', maxWidth: '200px', height: '45px', marginTop: '8px' }} onChange={brandSelectionHandler}>
                         <option value={0} selected>All Brand</option>
-                        {manufacturers.map((brand) => (
+                        {showAll ? manufacturers.map((brand) => (
+                            <option style={{ appearance: 'none' }} value={brand.Id}>{brand.Name}</option>
+                        )):brandSelected.map((brand) => (
                             <option style={{ appearance: 'none' }} value={brand.Id}>{brand.Name}</option>
                         ))}
                     </select> : null}
