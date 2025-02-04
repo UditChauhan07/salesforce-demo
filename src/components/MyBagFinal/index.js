@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, admins, defaultLoadTime, fetchBeg, getProductImageAll, salesRepIdKey, getBrandPaymentDetails, originAPi } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -15,6 +15,7 @@ import ImageHandler from "../loader/ImageHandler";
 import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
+import Swal from "sweetalert2";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -54,9 +55,10 @@ function MyBagFinal({ showOrderFor }) {
     PK_KEY: null,
     SK_KEY: null,
   });
-  const [note , setNote] = useState()
+  const [outoOfStockAllow, setOutOfStockAllow] = useState(false);
+  const [note, setNote] = useState()
   const [isPayNow, setIsPayNow] = useState(false);
-  const [desc , setDesc] = useState()
+  const [desc, setDesc] = useState()
   const handleNameChange = (event) => {
     const limit = 10;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -70,7 +72,7 @@ function MyBagFinal({ showOrderFor }) {
   }, [order, buttonActive]);
   const editValue = localStorage.getItem("isEditaAble")
   const fetchBrandPaymentDetails = async () => {
-   
+
     try {
       let id = order?.Manufacturer?.id;
       let AccountID = order?.Account?.id;
@@ -156,7 +158,7 @@ function MyBagFinal({ showOrderFor }) {
 
         setGreenStatus(paymentIntent.status);
 
-        
+
         setIsLoading(false);
 
         setPaymentDetails({
@@ -187,7 +189,7 @@ function MyBagFinal({ showOrderFor }) {
           console.log({ res, order });
 
           if (res?.poNumber) {
-         
+
             if (res?.address || res?.brandShipping) {
               let tempOrder = order.Account;
               if (res?.address) {
@@ -292,16 +294,53 @@ function MyBagFinal({ showOrderFor }) {
     }
   }, [order]);
 
-  // const onPriceChangeHander = (product, price = '0') => {
-  //   if (price == '') price = 0;
-  //   setOrderProductPrice(product, price).then((res) => {
-  //     if (res) {
-  //       setBagValue(fetchDataFromBag());
-  //     }
-  //   })
-  // }
+  const [checkProduct, setCheckProduct] = useState({ beingLoading: false, isLoad: false, list: [], discount: {} });
+
+  const CheckOutStockProduct = (order) => {
+    if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId && !checkProduct?.isLoad && !checkProduct.beingLoading) {
+      setCheckProduct({ beingLoading: true, isLoad: false, list: [], discount: {} })
+      console.error("********************* enter ***********************");
+
+      GetAuthData().then(user => {
+        let rawData = {
+          key: user.access_token,
+          Sales_Rep__c: order?.Account?.SalesRepId,
+          Manufacturer: order.Manufacturer.id,
+          AccountId__c: order.Account.id,
+        };
+        getProductList({ rawData }).then((list) => {
+          setOutOfStockAllow(list?.discount?.portalProductManage || false)
+          setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
+        }).catch((err) => {
+          console.log({ err });
+        })
+      })
+    }
+  }
+  useEffect(() => {
+    CheckOutStockProduct(order)
+  }, [order])
 
   const orderPlaceHandler = () => {
+    let OOSPIncludes = false;
+    if (checkProduct.isLoad) {
+      if (outoOfStockAllow && order.items.length) {
+        order.items.map((product) => {
+          if (product.qty > product.Available_Quantity__c) {
+            OOSPIncludes = true;
+          }
+        })
+      }
+    }
+    if (OOSPIncludes) {
+      setConfirm(false);
+      return Swal.fire({
+        title: "Alert!",
+        text: "You’ve added more of products than what’s available in stock. Please update your cart then tring to submit this order.",
+        icon: "warning",
+        confirmButtonColor: "#000", // Black
+      });
+    }
     if (order?.Account?.SalesRepId) {
       setIsOrderPlaced(1);
       setConfirm(false);
@@ -382,6 +421,7 @@ function MyBagFinal({ showOrderFor }) {
     } else {
       alert("no sales rep.");
     }
+
   };
   // console.log(order.Account.name)
   const deleteBag = () => {
@@ -417,6 +457,25 @@ function MyBagFinal({ showOrderFor }) {
   };
 
   const handleAccordian = () => {
+    let OOSPIncludes = false;
+    if (checkProduct.isLoad) {
+      if (outoOfStockAllow && order.items.length) {
+        order.items.map((product) => {
+          if (product.qty > product.Available_Quantity__c) {
+            OOSPIncludes = true;
+          }
+        })
+      }
+    }
+    if (OOSPIncludes) {
+      setConfirm(false);
+      return Swal.fire({
+        title: "Alert!",
+        text: "You’ve added more of products than what’s available in stock. Please update your cart then tring to submit this order.",
+        icon: "warning",
+        confirmButtonColor: "#000", // Black
+      });
+    }
     if (order?.items?.length) {
       if (PONumber.length) {
         if (order?.items?.length > 100) {
@@ -743,9 +802,17 @@ function MyBagFinal({ showOrderFor }) {
                                   listPrice = 0;
                                 }
                               }
+                              let errorProduct = false;
+                              let stockAvailable = 0;
+                              if (outoOfStockAllow) {
+                                stockAvailable = checkProduct?.list?.find(item => item.Id === ele?.Id)?.Available_Quantity__c;
+                                if (ele.qty > stockAvailable) {
+                                  errorProduct = true;
+                                }
+                              }
 
                               return (
-                                <div className={Styles.Mainbox}>
+                                <div className={Styles.Mainbox} style={errorProduct ? { border: '1px solid red', borderRadius: '5px' } : {}}>
                                   <div className={Styles.Mainbox1M}>
                                     {/* <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
                                       <ImageHandler
@@ -774,7 +841,7 @@ function MyBagFinal({ showOrderFor }) {
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
-                                        {ele?.Name}
+                                        {ele?.Name} {errorProduct ? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small> : null}
                                       </h2>
                                       <p>
                                         <span className={Styles.Span1}>{`$${listPrice}`}</span>
@@ -822,6 +889,24 @@ function MyBagFinal({ showOrderFor }) {
                                         min={ele?.Min_Order_QTY__c || 0}
                                         onChange={(quantity) => {
                                           if (!qunatityChange) {
+                                            if (outoOfStockAllow) {
+                                              if (stockAvailable) {
+                                                if (quantity > stockAvailable && quantity>ele.qty) {
+                                                  return Swal.fire({
+                                                    title: "Alert!",
+                                                    text: "Oops! You’re trying to add more than what’s available. We only have " + stockAvailable + " left in stock.",
+                                                    confirmButtonColor: "#000", // Black
+                                                  });
+                                                }
+                                              } else {
+                                                return Swal.fire({
+                                                  title: "Oops!",
+                                                  text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
+                                                  icon: "warning",
+                                                  confirmButtonColor: "#000", // Black
+                                                });
+                                              }
+                                            }
                                             updateProductQty(ele.Id, quantity);
                                           }
                                         }}
@@ -919,7 +1004,7 @@ function MyBagFinal({ showOrderFor }) {
                             </div>
                           ) : null}
                           <div className={Styles.ShipAdress2}>
-                          
+
                             <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
                               {note}
                             </textarea>
