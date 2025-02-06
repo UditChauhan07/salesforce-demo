@@ -181,12 +181,12 @@ export async function POGenerator() {
     let date = new Date();
     const sanitizeString = (str) =>
       str
-        .replace(/[^a-zA-Z0-9 ]/g, "") 
-        .replace(/\s+/g, " ")          
-        .trim(); 
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
     const sanitizedAccountName = sanitizeString(orderDetails.Account?.name || "");
     const sanitizedManufacturerName = sanitizeString(orderDetails.Manufacturer?.name || "");
-   
+
     const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov2", {
       method: 'POST',
       headers: {
@@ -208,7 +208,7 @@ export async function POGenerator() {
 
     const poData = await response.json();
     if (poData.success) {
-      
+
       let res = await poData;
       let poNumber = res.poNumber;
       let address = res.address;
@@ -396,7 +396,7 @@ export async function DestoryAuth() {
         }
       });
       console.log("gclear");
-      
+
 
       // Optionally, show a loading indicator here
       // Example: showLoadingIndicator();
@@ -429,6 +429,37 @@ export async function cartSync({ cart }) {
     return data.data;
   } else {
     return true;
+  }
+}
+
+export async function CartHandler({ op = null, cart }) {
+  let cartUrl = url2;
+  if (op == 'update' || op == 'create') {
+    console.log('***********************************************')
+    cartUrl += 'cuvSzxcfV2LK5ic';
+  } else if (op == 'delete') {
+    cartUrl += 'CDllYsPY4teyTCA';
+  } else {
+    cartUrl += "ZvOE66yNOVlk3TB"
+  }
+  let headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/json",
+  };
+  let response = await fetch(cartUrl, {
+    method: "POST",
+    body: JSON.stringify(cart),
+    headers: headersList,
+  });
+  let data = JSON.parse(await response.text());
+  console.log({data});
+  
+  if (data?.data) {
+    return data.data;
+  }else{
+    if(data.status ==200){
+      return true;
+    }
   }
 }
 
@@ -515,7 +546,7 @@ export async function getTargetReportAll({ user, year, preOrder }) {
       Accept: "*/*",
     };
     let authData = await GetAuthData()
-    let  userPermissions= JSON.parse(authData.permission)
+    let userPermissions = JSON.parse(authData.permission)
     let tried = false;
     let bodyContent = new FormData();
     bodyContent.append("key", user.x_access_token);
@@ -538,7 +569,7 @@ export async function getTargetReportAll({ user, year, preOrder }) {
       DestoryAuth();
     } else {
       let rawRes = { ownerPermission: false, list: data.data };
-    
+
       if (userPermissions?.modules?.godLevel) {
         rawRes.ownerPermission = true;
       }

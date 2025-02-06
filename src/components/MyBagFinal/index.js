@@ -466,6 +466,9 @@ function MyBagFinal({ showOrderFor }) {
     // localStorage.removeItem("AA0KfX2OoNJvz7x")
     deleteOrder()
       .then((res) => {
+        setClearConfim(false);
+        console.log({res});
+        
         if (res) {
           window.location.reload();
         }
