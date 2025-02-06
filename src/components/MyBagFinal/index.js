@@ -298,29 +298,31 @@ function MyBagFinal({ showOrderFor }) {
   const [checkProduct, setCheckProduct] = useState({ beingLoading: false, isLoad: false, list: [], discount: {} });
 
   const CheckOutStockProduct = () => {
-    setCheckProduct(prevState => ({
-      ...prevState,  // Spread the previous state to keep unchanged properties
-      beingLoading: true,
-      isLoad: false,
-    }));
+    if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId) {
+      setCheckProduct(prevState => ({
+        ...prevState,  // Spread the previous state to keep unchanged properties
+        beingLoading: true,
+        isLoad: false,
+      }));
 
-    GetAuthData().then(user => {
-      let rawData = {
-        key: user.access_token,
-        Sales_Rep__c: order?.Account?.SalesRepId,
-        Manufacturer: order.Manufacturer.id,
-        AccountId__c: order.Account.id,
-      };
-      getProductList({ rawData }).then((list) => {
+      GetAuthData().then(user => {
+        let rawData = {
+          key: user.access_token,
+          Sales_Rep__c: order?.Account?.SalesRepId,
+          Manufacturer: order.Manufacturer.id,
+          AccountId__c: order.Account.id,
+        };
+        getProductList({ rawData }).then((list) => {
 
-        setOutOfStockAllow(list?.discount?.portalProductManage || false)
-        setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
-      }).catch((err) => {
-        console.log({ err });
+          setOutOfStockAllow(list?.discount?.portalProductManage || false)
+          setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
+        }).catch((err) => {
+          console.log({ err });
+        })
       })
-    })
+    }
   }
-  useBackgroundUpdater(CheckOutStockProduct, defaultLoadTime);
+  // useBackgroundUpdater(CheckOutStockProduct, defaultLoadTime);
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -880,7 +882,7 @@ function MyBagFinal({ showOrderFor }) {
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
-                                        {ele?.Name}&nbsp;{errorProduct ? stockAvailable? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small>: <small style={{ color: '#c68282' }}>Oops! This item is currently out of stock.</small>: null}
+                                        {ele?.Name}&nbsp;{errorProduct ? stockAvailable ? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small> : <small style={{ color: '#c68282' }}>Oops! This item is currently out of stock.</small> : null}
                                       </h2>
                                       <p>
                                         <span className={Styles.Span1}>{`$${listPrice}`}</span>
@@ -930,7 +932,7 @@ function MyBagFinal({ showOrderFor }) {
                                           if (!qunatityChange) {
                                             if (outoOfStockAllow) {
                                               if (stockAvailable) {
-                                                if (quantity > stockAvailable && quantity>ele.qty) {
+                                                if (quantity > stockAvailable && quantity > ele.qty) {
                                                   return Swal.fire({
                                                     title: "Alert!",
                                                     text: "Oops! You’re trying to add more than what’s available. We only have " + stockAvailable + " left in stock.",
