@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList, defaultLoadTime } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -16,6 +16,7 @@ import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
 import Swal from "sweetalert2";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -296,29 +297,64 @@ function MyBagFinal({ showOrderFor }) {
 
   const [checkProduct, setCheckProduct] = useState({ beingLoading: false, isLoad: false, list: [], discount: {} });
 
-  const CheckOutStockProduct = (order) => {
-    if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId && !checkProduct?.isLoad && !checkProduct.beingLoading) {
-      setCheckProduct({ beingLoading: true, isLoad: false, list: [], discount: {} })
-      console.error("********************* enter ***********************");
+  const CheckOutStockProduct = () => {
+    setCheckProduct(prevState => ({
+      ...prevState,  // Spread the previous state to keep unchanged properties
+      beingLoading: true,
+      isLoad: false,
+    }));
 
-      GetAuthData().then(user => {
-        let rawData = {
-          key: user.access_token,
-          Sales_Rep__c: order?.Account?.SalesRepId,
-          Manufacturer: order.Manufacturer.id,
-          AccountId__c: order.Account.id,
-        };
-        getProductList({ rawData }).then((list) => {
-          setOutOfStockAllow(list?.discount?.portalProductManage || false)
-          setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
-        }).catch((err) => {
-          console.log({ err });
-        })
+    GetAuthData().then(user => {
+      let rawData = {
+        key: user.access_token,
+        Sales_Rep__c: order?.Account?.SalesRepId,
+        Manufacturer: order.Manufacturer.id,
+        AccountId__c: order.Account.id,
+      };
+      getProductList({ rawData }).then((list) => {
+
+        setOutOfStockAllow(list?.discount?.portalProductManage || false)
+        setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
+      }).catch((err) => {
+        console.log({ err });
       })
-    }
+    })
   }
+  useBackgroundUpdater(CheckOutStockProduct, defaultLoadTime);
   useEffect(() => {
-    CheckOutStockProduct(order)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        CheckOutStockProduct();
+        // console.log('Page is active');
+        // Check for updates or fetch data
+      }
+    };
+
+    const handleFocus = () => {
+      // console.log('Window is focused');
+      // Maybe refresh data or resume actions
+    };
+
+    const handleBlur = () => {
+      // console.log('Window is blurred');
+      // Pause any ongoing activities
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+  useEffect(() => {
+    if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId && !checkProduct?.isLoad && !checkProduct.beingLoading) {
+      CheckOutStockProduct()
+    }
   }, [order])
 
   const orderPlaceHandler = () => {
