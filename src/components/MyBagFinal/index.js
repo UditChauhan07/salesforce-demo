@@ -77,7 +77,6 @@ function MyBagFinal({ showOrderFor }) {
     try {
       let id = order?.Manufacturer?.id;
       let AccountID = order?.Account?.id;
-      console.log({ id, AccountID });
 
       const user = await GetAuthData();
       if (id && AccountID) {
@@ -86,7 +85,6 @@ function MyBagFinal({ showOrderFor }) {
           Id: id,
           AccountId: AccountID,
         });
-        console.log({ brandRes });
 
         setIntentRes(brandRes);
 
@@ -1271,7 +1269,7 @@ function MyBagFinal({ showOrderFor }) {
           </div>
         </section>
       )}
-      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} />
+      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId}/>
     </div>
   );
 }

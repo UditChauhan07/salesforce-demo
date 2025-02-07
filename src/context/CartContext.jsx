@@ -83,7 +83,7 @@ const CartProvider = ({ children }) => {
         if (serverCart) {
             localStorage.setItem(orderCartKey, JSON.stringify(serverCart));
             setOrder(serverCart); // Use server cart if available
-        }else{
+        } else {
             setOrder(initialOrder)
         }
     }
@@ -499,11 +499,11 @@ const CartProvider = ({ children }) => {
             // Check if the cart is empty after removing the item
             if (updatedItems.length === 0) {
                 deleteOrder(); // Call deleteOrder() if items array is empty
-                orderRaw= initialOrder;
+                orderRaw = initialOrder;
             }
 
             // Otherwise, update the cart normally
-            orderRaw= {
+            orderRaw = {
                 ...order,
                 items: updatedItems,
                 orderQuantity: order.orderQuantity - (removedItem ? removedItem.qty : 0),
@@ -572,25 +572,32 @@ const CartProvider = ({ children }) => {
 
     const contentApiFunction = async (productList, account, manufacturer, ordertype = 'wholesale') => {
         const res = await deleteOrder();
-        // Directly replace the current order with a new one based on the provided product list
-        const newOrderTotal = productList.reduce((sum, product) => sum + product.price * (product.qty || 1), 0);
-        const newOrderQuantity = productList.reduce((sum, product) => sum + (product.qty || 1), 0);
+        const user = await GetAuthData();
+        if (res) {
 
-        // Set the new order with the account and manufacturer details
-        let cartRaw = {
-            ordertype, // Set the order type; adjust if needed
-            Account: account,
-            Manufacturer: manufacturer,
-            items: productList.map(product => ({ ...product, qty: product.qty || 1 })), // Ensure each product has a qty
-            orderQuantity: newOrderQuantity,
-            total: newOrderTotal,
+            // Directly replace the current order with a new one based on the provided product list
+            const newOrderTotal = productList.reduce((sum, product) => sum + product.price * (product.qty || 1), 0);
+            const newOrderQuantity = productList.reduce((sum, product) => sum + (product.qty || 1), 0);
+
+            // Set the new order with the account and manufacturer details
+            let cartRaw = {
+                ordertype, // Set the order type; adjust if needed
+                Account: account,
+                Manufacturer: manufacturer,
+                items: productList.map(product => ({ ...product, qty: product.qty || 1 })), // Ensure each product has a qty
+                orderQuantity: newOrderQuantity,
+                total: newOrderTotal,
+                CreatedAt:new Date(),
+                CreatedBy:user?.Sales_Rep__c
+            }
+            setOrder(cartRaw);
+            localStorage.setItem(orderCartKey, JSON.stringify(cartRaw));
+            
+            let orderStatus = await CartHandler({
+                cart: cartRaw, op: 'create'
+            })
+            return orderStatus;
         }
-        setOrder(cartRaw);
-        localStorage.setItem(orderCartKey, JSON.stringify(cartRaw));
-        let orderStatus = await CartHandler({
-            cart: cartRaw, op: 'create'
-        })
-        return orderStatus;
     };
 
 

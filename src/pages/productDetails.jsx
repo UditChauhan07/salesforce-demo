@@ -24,9 +24,10 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
     const [accountDetails, setAccountDetails] = useState();
     const [manufacturerId, setManufacturerId] = useState();
     const [clickedProduct, setClickedProduct] = useState(null);
-    
+
 
     const fetchAccountDetails = async () => {
+
         if (selectedsalesRep) {
             const data = await GetAuthData();
             let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
@@ -36,7 +37,10 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                     salesRepId
                     , accessToken
                 }));
+                console.log({ res });
+
                 if (res) {
+
                     setAccountDetails(res?.data?.accountDetails);
                 }
             } catch (error) {
@@ -150,8 +154,9 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
                 name: accountDetails?.Name,
                 id: addProductToAccount,
 
-                address: accountDetails?.ShippingAddress
-
+                address: accountDetails?.ShippingAddress,
+                SalesRepId: accountDetails?.SalesRepId,
+                discount: accountDetails?.Discount
 
             };
             const manufacturer = {
