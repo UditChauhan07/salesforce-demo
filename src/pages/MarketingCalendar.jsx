@@ -135,7 +135,8 @@ const MarketingCalendar = () => {
     const timeoutId = setTimeout(() => {
       const getMonth = new Date().getMonth();
       const element = document.getElementById(monthNames[getMonth]);
-      if (element && selectYear === new Date().getFullYear()) {
+      
+      if (element && (!selectYear||selectYear === new Date().getFullYear())) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }, 3000);
