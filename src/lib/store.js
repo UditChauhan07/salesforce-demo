@@ -435,7 +435,6 @@ export async function cartSync({ cart }) {
 export async function CartHandler({ op = null, cart }) {
   let cartUrl = url2;
   if (op == 'update' || op == 'create') {
-    console.log('***********************************************')
     cartUrl += 'cuvSzxcfV2LK5ic';
   } else if (op == 'delete') {
     cartUrl += 'CDllYsPY4teyTCA';
