@@ -223,7 +223,6 @@ const CartProvider = ({ children }) => {
             // Check if testerInclude or sampleInclude is false and we're adding the wrong type
             const hasTesterInCart = order.items.some(item => item.Category__c === "TESTER");
             const hasSampleInCart = order.items.some(item => item.Category__c?.toUpperCase() === "SAMPLES");
-            console.log({ hasTesterInCart, testerInclude: account.discount?.testerInclude, isTester });
 
             // **Fix: Only trigger alert when testerInclude or sampleInclude is false**
             if ((!account.discount?.testerInclude && isTester && !hasTesterInCart) || (!account.discount?.sampleInclude && isSample && !hasSampleInCart)) {
@@ -587,12 +586,12 @@ const CartProvider = ({ children }) => {
                 items: productList.map(product => ({ ...product, qty: product.qty || 1 })), // Ensure each product has a qty
                 orderQuantity: newOrderQuantity,
                 total: newOrderTotal,
-                CreatedAt:new Date(),
-                CreatedBy:user?.Sales_Rep__c
+                CreatedAt: new Date(),
+                CreatedBy: user?.Sales_Rep__c
             }
             setOrder(cartRaw);
             localStorage.setItem(orderCartKey, JSON.stringify(cartRaw));
-            
+
             let orderStatus = await CartHandler({
                 cart: cartRaw, op: 'create'
             })

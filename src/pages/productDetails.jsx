@@ -12,7 +12,7 @@ import { originAPi } from "../lib/store";
 import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
-const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true, selectedsalesRep }) => {
+const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true, selectedsalesRep = null }) => {
     const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
     const [product, setProduct] = useState({ isLoaded: false, data: [], discount: {} });
     const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -27,25 +27,22 @@ const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPop
 
 
     const fetchAccountDetails = async () => {
+        const data = await GetAuthData();
+        let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
+        salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
 
-        if (selectedsalesRep) {
-            const data = await GetAuthData();
-            let { Sales_Rep__c: salesRepId, x_access_token: accessToken } = data;
-            salesRepId = selectedsalesRep ? selectedsalesRep : salesRepId
-            try {
-                const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
-                    salesRepId
-                    , accessToken
-                }));
-                console.log({ res });
+        try {
+            const res = await dataStore.getPageData("accountDetails" + salesRepId, () => axios.post(`${originAPi}/beauty/v3/23n38hhduu`, {
+                salesRepId
+                , accessToken
+            }));
 
-                if (res) {
+            if (res) {
 
-                    setAccountDetails(res?.data?.accountDetails);
-                }
-            } catch (error) {
-                console.error("Error fetching account details:", error);
+                setAccountDetails(res?.data?.accountDetails);
             }
+        } catch (error) {
+            console.error("Error fetching account details:", error);
         }
     };
     const fetchProductDetailHandler = () => {
