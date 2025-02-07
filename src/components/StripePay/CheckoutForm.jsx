@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { GetAuthData, OrderPlaced } from '../../lib/store';
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
 import { useCart } from '../../context/CartContext';
@@ -15,7 +15,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
     const [cardHolderName, setCardHolderName] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [cardErrors, setCardErrors] = useState({});
-    const { order, deleteOrder , deleteCartForever } = useCart();
+    const { order, deleteOrder, deleteCartForever } = useCart();
     const [orderDesc, setOrderDesc] = useState(null);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const handleCardInput = (event) => {
@@ -49,7 +49,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
             card: cardElement,
             billing_details: { name: cardHolderName },
         });
-        localStorage.setItem('isEditaAble' , 1)
+        localStorage.setItem('isEditaAble', 1)
         if (error) {
             setErrorMessage(error.message);
             setLoading(false);
@@ -68,7 +68,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-           
+
             await orderPlaceHandler(paymentIntent.status, paymentIntent.id);
 
         } else {
@@ -80,28 +80,28 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
     };
     useEffect(() => {
         const handleKeyDown = (event) => {
-          if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
-            event.preventDefault();
-            alert(
-              "Page refresh is disabled during payment. The page that you're looking for used information that you entered. Returning to that page might cause any action you took to be repeated."
-            );
-          }
+            if (event.key === "F5" || (event.ctrlKey && event.key === "r")) {
+                event.preventDefault();
+                alert(
+                    "Page refresh is disabled during payment. The page that you're looking for used information that you entered. Returning to that page might cause any action you took to be repeated."
+                );
+            }
         };
-      
+
         const handleBeforeUnload = (event) => {
-          event.preventDefault();
-          event.returnValue =
-            "Page refresh is disabled during payment. Are you sure you want to leave?";
+            event.preventDefault();
+            event.returnValue =
+                "Page refresh is disabled during payment. Are you sure you want to leave?";
         };
-      
+
         document.addEventListener("keydown", handleKeyDown);
         window.addEventListener("beforeunload", handleBeforeUnload);
-      
+
         return () => {
-          document.removeEventListener("keydown", handleKeyDown);
-          window.removeEventListener("beforeunload", handleBeforeUnload);
+            document.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-      }, []);
+    }, []);
 
     const orderPlaceHandler = async (paymentStatus, paymentId) => {
         if (order?.Account?.SalesRepId) {
@@ -141,7 +141,7 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                         Payment_Status__c: paymentStatus,
                         Transaction_ID__c: paymentId
                     };
-                   
+
 
                     const response = await OrderPlaced({ order: orderData, cartId: order.id });
                     if (response.err) {
@@ -158,13 +158,13 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                     } else {
                         if (response?.orderId) {
                             localStorage.removeItem("AA0KfX2OoNJvz7x")
-                              
+
                             localStorage.setItem(
                                 "OpportunityId",
                                 JSON.stringify(response.orderId)
                             );
                             setPaymentSuccess(true);
-                           
+
 
                             Swal.fire({
                                 title: 'Payment Successful!',
@@ -174,16 +174,16 @@ const CheckoutForm = ({ amount, clientSecretkKey, PONumber, orderDes }) => {
                                 customClass: {
                                     confirmButton: 'swal2-confirm'
                                 }
-                            }).then(() => {
-                               
-                                 deleteOrder();
-                               deleteCartForever()
-                                  localStorage.removeItem("isEditaAble")
-                              setTimeout(()=>{
-                                window.location.href = window.location.origin + '/orderDetails';
-                              },[1300])
-                              
-                               
+                            }).then(async () => {
+
+                                deleteOrder();
+                                await deleteCartForever()
+                                localStorage.removeItem("isEditaAble")
+                                setTimeout(() => {
+                                    window.location.href = window.location.origin + '/orderDetails';
+                                }, [1300])
+
+
                             });
 
                         }

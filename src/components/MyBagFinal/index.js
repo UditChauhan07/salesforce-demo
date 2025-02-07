@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, admins, defaultLoadTime, fetchBeg, getProductImageAll, salesRepIdKey, getBrandPaymentDetails, originAPi } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList, defaultLoadTime } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -15,6 +15,8 @@ import ImageHandler from "../loader/ImageHandler";
 import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
+import Swal from "sweetalert2";
+import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -54,9 +56,10 @@ function MyBagFinal({ showOrderFor }) {
     PK_KEY: null,
     SK_KEY: null,
   });
-  const [note , setNote] = useState()
+  const [outoOfStockAllow, setOutOfStockAllow] = useState(false);
+  const [note, setNote] = useState()
   const [isPayNow, setIsPayNow] = useState(false);
-  const [desc , setDesc] = useState()
+  const [desc, setDesc] = useState()
   const handleNameChange = (event) => {
     const limit = 10;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
@@ -70,11 +73,10 @@ function MyBagFinal({ showOrderFor }) {
   }, [order, buttonActive]);
   const editValue = localStorage.getItem("isEditaAble")
   const fetchBrandPaymentDetails = async () => {
-   
+
     try {
       let id = order?.Manufacturer?.id;
       let AccountID = order?.Account?.id;
-      console.log({ id, AccountID });
 
       const user = await GetAuthData();
       if (id && AccountID) {
@@ -83,7 +85,6 @@ function MyBagFinal({ showOrderFor }) {
           Id: id,
           AccountId: AccountID,
         });
-        console.log({ brandRes });
 
         setIntentRes(brandRes);
 
@@ -156,7 +157,7 @@ function MyBagFinal({ showOrderFor }) {
 
         setGreenStatus(paymentIntent.status);
 
-        
+
         setIsLoading(false);
 
         setPaymentDetails({
@@ -184,10 +185,8 @@ function MyBagFinal({ showOrderFor }) {
         try {
           const res = await POGenerator();
 
-          console.log({ res, order });
-
           if (res?.poNumber) {
-         
+
             if (res?.address || res?.brandShipping) {
               let tempOrder = order.Account;
               if (res?.address) {
@@ -218,7 +217,6 @@ function MyBagFinal({ showOrderFor }) {
             if (isPreOrder) {
               poInit = `PRE-${poInit}`;
             }
-            keyBasedUpdateCart({ PoNumber: poInit });
             setPONumber(poInit);
             setIsLoading(false)
           }
@@ -235,8 +233,11 @@ function MyBagFinal({ showOrderFor }) {
       }
     } else {
       setIsLoading(false);
+      setOrderShipment([]);
+      setPONumber(null)
     }
   }, [order]);
+
 
   const [productImage, setProductImage] = useState({ isLoaded: false, images: {} });
   // let total = 0;
@@ -292,16 +293,90 @@ function MyBagFinal({ showOrderFor }) {
     }
   }, [order]);
 
-  // const onPriceChangeHander = (product, price = '0') => {
-  //   if (price == '') price = 0;
-  //   setOrderProductPrice(product, price).then((res) => {
-  //     if (res) {
-  //       setBagValue(fetchDataFromBag());
-  //     }
-  //   })
-  // }
+  const [checkProduct, setCheckProduct] = useState({ beingLoading: false, isLoad: false, list: [], discount: {} });
+
+  const CheckOutStockProduct = () => {
+    if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId) {
+      setCheckProduct(prevState => ({
+        ...prevState,  // Spread the previous state to keep unchanged properties
+        beingLoading: true,
+        isLoad: false,
+      }));
+
+      GetAuthData().then(user => {
+        let rawData = {
+          key: user.access_token,
+          Sales_Rep__c: order?.Account?.SalesRepId,
+          Manufacturer: order.Manufacturer.id,
+          AccountId__c: order.Account.id,
+        };
+        getProductList({ rawData }).then((list) => {
+
+          setOutOfStockAllow(list?.discount?.portalProductManage || false)
+          setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
+        }).catch((err) => {
+          console.log({ err });
+        })
+      })
+    }
+  }
+  // useBackgroundUpdater(CheckOutStockProduct, defaultLoadTime);
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        CheckOutStockProduct();
+        // console.log('Page is active');
+        // Check for updates or fetch data
+      }
+    };
+
+    const handleFocus = () => {
+      // console.log('Window is focused');
+      // Maybe refresh data or resume actions
+    };
+
+    const handleBlur = () => {
+      // console.log('Window is blurred');
+      // Pause any ongoing activities
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+  useEffect(() => {
+    if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId && !checkProduct?.isLoad && !checkProduct.beingLoading) {
+      CheckOutStockProduct()
+    }
+  }, [order])
 
   const orderPlaceHandler = () => {
+    let OOSPIncludes = false;
+    if (checkProduct.isLoad) {
+      if (outoOfStockAllow && order.items.length) {
+        order.items.map((product) => {
+          if (product.qty > product.Available_Quantity__c) {
+            OOSPIncludes = true;
+          }
+        })
+      }
+    }
+    if (OOSPIncludes) {
+      setConfirm(false);
+      return Swal.fire({
+        title: "Alert!",
+        text: "You've added more products than are available in stock. Please update your cart before submitting your order.",
+        icon: "warning",
+        confirmButtonColor: "#000", // Black
+      });
+    }
     if (order?.Account?.SalesRepId) {
       setIsOrderPlaced(1);
       setConfirm(false);
@@ -382,12 +457,16 @@ function MyBagFinal({ showOrderFor }) {
     } else {
       alert("no sales rep.");
     }
+
   };
   // console.log(order.Account.name)
   const deleteBag = () => {
     // localStorage.removeItem("AA0KfX2OoNJvz7x")
     deleteOrder()
       .then((res) => {
+        setClearConfim(false);
+        console.log({ res });
+
         if (res) {
           window.location.reload();
         }
@@ -417,6 +496,25 @@ function MyBagFinal({ showOrderFor }) {
   };
 
   const handleAccordian = () => {
+    let OOSPIncludes = false;
+    if (checkProduct.isLoad) {
+      if (outoOfStockAllow && order.items.length) {
+        order.items.map((product) => {
+          if (product.qty > product.Available_Quantity__c) {
+            OOSPIncludes = true;
+          }
+        })
+      }
+    }
+    if (OOSPIncludes) {
+      setConfirm(false);
+      return Swal.fire({
+        title: "Alert!",
+        text: "You've added more products than are available in stock. Please update your cart before submitting your order.",
+        icon: "warning",
+        confirmButtonColor: "#000", // Black
+      });
+    }
     if (order?.items?.length) {
       if (PONumber.length) {
         if (order?.items?.length > 100) {
@@ -696,7 +794,7 @@ function MyBagFinal({ showOrderFor }) {
                         type="text"
                         value={PONumber}
 
-                        onChange={handleNameChange} // Correctly handles input changes
+                        // onChange={handleNameChange} // Correctly handles input changes
                         placeholder="Enter PO Number"
                         style={{ borderBottom: "1px solid black" }}
                         id="limit_input"
@@ -706,18 +804,19 @@ function MyBagFinal({ showOrderFor }) {
                             e.preventDefault(); // Prevent space character from being entered
                           }
                         }}
+                        onBlur={handleNameChange}
                       />
                     )}
                   </h5>
 
-                  {!isPOEditable && !qunatityChange && (
+                  {!isPOEditable && !qunatityChange && order.items?.length ? (
                     <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" viewBox="0 0 21 20" fill="none" onClick={() => setIsPOEditable(true)} style={{ cursor: "pointer" }}>
                       <path
                         d="M19.3078 10.6932V19.2841C19.3078 19.6794 18.9753 20 18.5652 20H0.742642C0.332504 20 0 19.6794 0 19.2841V2.10217C0 1.70682 0.332504 1.38627 0.742642 1.38627H9.65389C10.064 1.38627 10.3965 1.70682 10.3965 2.10217C10.3965 2.49754 10.064 2.81809 9.65389 2.81809H1.48519V18.5682H17.8226V10.6932C17.8226 10.2979 18.1551 9.97731 18.5652 9.97731C18.9753 9.97731 19.3078 10.2979 19.3078 10.6932ZM17.9926 5.11422L15.6952 2.89943L7.72487 10.5832L7.09297 13.4072L10.0223 12.7981L17.9926 5.11422ZM21 2.2148L18.7027 0L16.8541 1.78215L19.1515 3.99692L21 2.2148Z"
                         fill="black"
                       />
                     </svg>
-                  )}
+                  ) : null}
                 </div>
               </div>
 
@@ -743,9 +842,20 @@ function MyBagFinal({ showOrderFor }) {
                                   listPrice = 0;
                                 }
                               }
+                              let errorProduct = false;
+                              let stockAvailable = 0;
+                              if (outoOfStockAllow) {
+                                stockAvailable = checkProduct?.list?.find(item => item.Id === ele?.Id)?.Available_Quantity__c;
+                                if (stockAvailable < 1) {
+                                  stockAvailable = 0;
+                                }
+                                if (ele.qty > stockAvailable) {
+                                  errorProduct = true;
+                                }
+                              }
 
                               return (
-                                <div className={Styles.Mainbox}>
+                                <div className={Styles.Mainbox} style={errorProduct ? { border: '1px solid red', borderRadius: '5px' } : {}}>
                                   <div className={Styles.Mainbox1M}>
                                     {/* <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
                                       <ImageHandler
@@ -774,7 +884,7 @@ function MyBagFinal({ showOrderFor }) {
                                         }}
                                         style={{ cursor: "pointer" }}
                                       >
-                                        {ele?.Name}
+                                        {ele?.Name}&nbsp;{errorProduct ? stockAvailable ? <small style={{ color: '#c68282' }}>Hurry! Only {stockAvailable} units left in stock.</small> : <small style={{ color: '#c68282' }}>Oops! This item is currently out of stock.</small> : null}
                                       </h2>
                                       <p>
                                         <span className={Styles.Span1}>{`$${listPrice}`}</span>
@@ -822,6 +932,24 @@ function MyBagFinal({ showOrderFor }) {
                                         min={ele?.Min_Order_QTY__c || 0}
                                         onChange={(quantity) => {
                                           if (!qunatityChange) {
+                                            if (outoOfStockAllow) {
+                                              if (stockAvailable) {
+                                                if (quantity > stockAvailable && quantity > ele.qty) {
+                                                  return Swal.fire({
+                                                    title: "Alert!",
+                                                    text: "Oops! You’re trying to add more than what’s available. We only have " + stockAvailable + " left in stock.",
+                                                    confirmButtonColor: "#000", // Black
+                                                  });
+                                                }
+                                              } else {
+                                                return Swal.fire({
+                                                  title: "Oops!",
+                                                  text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
+                                                  icon: "warning",
+                                                  confirmButtonColor: "#000", // Black
+                                                });
+                                              }
+                                            }
                                             updateProductQty(ele.Id, quantity);
                                           }
                                         }}
@@ -919,8 +1047,8 @@ function MyBagFinal({ showOrderFor }) {
                             </div>
                           ) : null}
                           <div className={Styles.ShipAdress2}>
-                          
-                            <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
+
+                            <textarea onBlur={(e) => keyBasedUpdateCart({ Note: e.target.value })} readOnly={order.items?.length == 0} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
                               {note}
                             </textarea>
                           </div>
@@ -1066,7 +1194,7 @@ function MyBagFinal({ showOrderFor }) {
                         ) : null}
                         <div className={Styles.ShipAdress2}>
                           {/* <label>NOTE</label> */}
-                          <textarea onKeyUp={(e) => keyBasedUpdateCart({ Note: e.target.value })} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
+                          <textarea onBlur={(e) => keyBasedUpdateCart({ Note: e.target.value })} readOnly={order.items?.length == 0} placeholder="NOTE" className="placeholder:font-[Arial-500] text-[14px] tracking-[1.12px] ">
                             {order?.Note}
                           </textarea>
                         </div>
@@ -1141,7 +1269,7 @@ function MyBagFinal({ showOrderFor }) {
           </div>
         </section>
       )}
-      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} />
+      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId}/>
     </div>
   );
 }

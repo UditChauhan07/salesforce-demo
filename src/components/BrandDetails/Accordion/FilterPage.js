@@ -26,7 +26,7 @@ function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, 
           Minimum order Amount: ${data?.discount?.MinOrderAmount || 0}
         </h2>
 
-        <h2>
+        {data?.discount?.applyDiscount ? <h2>
           <svg xmlns="http://www.w3.org/2000/svg" width="19" height="17" viewBox="0 0 19 17" fill="none">
             <path
               d="M8.46138 16.9962V9.61826C8.46138 9.48892 8.57073 9.38409 8.70564 9.38409H10.7875C10.9224 9.38409 11.0318 9.48876 11.0318 9.61826V17C15.3985 16.3966 18.6599 12.8092 18.6599 8.54682C18.6599 3.83426 14.6624 0 9.74887 0C4.8331 0 0.833496 3.83422 0.833496 8.54682C0.833496 12.8071 4.09409 16.3926 8.4616 16.9962H8.46138ZM9.74659 3.76445C10.7751 3.76445 11.6118 4.56671 11.6118 5.5527C11.6118 6.53868 10.7751 7.34078 9.74659 7.34078C8.71813 7.34078 7.88141 6.53881 7.88141 5.55282C7.88141 4.56667 8.71813 3.76441 9.74659 3.76441V3.76445Z"
@@ -34,7 +34,7 @@ function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, 
             />
           </svg>
           Discount Offer: {data?.discount?.margin || 0}%
-        </h2>
+        </h2> : null}
         {productTypeFilter == "Wholesale" ?
           <div className="mt-4">
             <div className="pt-1 pb-1">
@@ -118,7 +118,7 @@ function FilterPage({ data, formattedData, setCategoryFilters, categoryFilters, 
                               }}
                               id={`category-${key}`}
                             />
-                            <label htmlFor={`category-${key}`} style={{width:'84%',wordWrap:'break-word'}} className="text-uppercase">{key != "null" ? key : "No Category"}</label>
+                            <label htmlFor={`category-${key}`} style={{ width: '84%', wordWrap: 'break-word' }} className="text-uppercase">{key != "null" ? key : "No Category"}</label>
                           </div>
                         </div>
                       </div>

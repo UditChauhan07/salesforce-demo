@@ -135,7 +135,8 @@ const MarketingCalendar = () => {
     const timeoutId = setTimeout(() => {
       const getMonth = new Date().getMonth();
       const element = document.getElementById(monthNames[getMonth]);
-      if (element && selectYear === new Date().getFullYear()) {
+      
+      if (element && (!selectYear||selectYear === new Date().getFullYear())) {
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }, 3000);
@@ -257,11 +258,11 @@ const MarketingCalendar = () => {
         temp["Product Description"] = item.Description;
         temp["Product Size"] = item.Size_Volume_Weight__c;
         temp["Product Ship Date"] = item.Ship_Date__c
-          ? `${item.Ship_Date__c.split("-")[2] === '15' ? 'TBD' : item.Ship_Date__c.split("-")[2]}/${monthNames[parseInt(item.Ship_Date__c.split("-")[1], 10) - 1].toUpperCase()}/${item.Ship_Date__c.split("-")[0]}`
-          : 'NA';
+          ? `${item.Ship_Date__c.split("-")[2] == 27 ? 'TBD' : item.Ship_Date__c.split("-")[2]}/${monthNames[parseInt(item.Ship_Date__c.split("-")[1], 10) - 1].toUpperCase()}/${item.Ship_Date__c.split("-")[0]}`
+          : 'TBD';
         temp["OCD Date"] = item.Launch_Date__c
           ? `${item.Launch_Date__c.split("-")[2]}/${monthNames[parseInt(item.Launch_Date__c.split("-")[1], 10) - 1].toUpperCase()}/${item.Launch_Date__c.split("-")[0]}`
-          : 'NA';
+          : 'TBD';
         temp["Product Brand"] = item.ManufacturerName__c;
         temp["Product Price"] = item.usdRetail__c;
         finalData.push(temp);

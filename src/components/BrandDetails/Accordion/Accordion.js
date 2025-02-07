@@ -6,11 +6,13 @@ import ModalPage from "../../Modal UI";
 import ProductDetails from "../../../pages/productDetails";
 import { useCart } from "../../../context/CartContext";
 import ImageHandler from "../../loader/ImageHandler";
+import Swal from "sweetalert2";
 
 const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
-let selectedsalesRep = JSON.parse(localStorage.getItem('selectedSalesrepId'))
-console.log(selectedsalesRep , "----accordian salesrep")
+  let selectedsalesRep = localStorage?.getItem('selectedSalesrepId')
+
+  if (selectedsalesRep != "undefined") selectedsalesRep = JSON.parse(selectedsalesRep)
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, addOrder, removeProduct, deleteOrder, isProductCarted, isCategoryCarted, updateProductPrice } = useCart();
   const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);
@@ -26,10 +28,28 @@ console.log(selectedsalesRep , "----accordian salesrep")
   }
 
   const onQuantityChange = (element, quantity) => {
+    let checkProduct = isProductCarted(element.Id);
+    if (data.discount.portalProductManage) {
+      if (element.Available_Quantity__c) {
+        if (quantity > element.Available_Quantity__c && quantity > checkProduct?.items?.qty) {
+          return Swal.fire({
+            title: "Alert!",
+            text: "Oops! You’re trying to add more than what’s available. We only have " + element.Available_Quantity__c + " left in stock.",
+            confirmButtonColor: "#000", // Black
+          });
+        }
+      } else {
+        return Swal.fire({
+          title: "Oops!",
+          text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
+          confirmButtonColor: "#000", // Black
+        });
+      }
+    }
     if (!quantity) {
       quantity = element.Min_Order_QTY__c;
     }
-    let checkProduct = isProductCarted(element.Id);
+
     if (checkProduct) {
       if (order?.Account?.id === localStorage.getItem("AccountId__c")) {
         let cartStatus = updateProductQty(element.Id, quantity);
@@ -118,11 +138,11 @@ console.log(selectedsalesRep , "----accordian salesrep")
             <thead>
               <tr>
                 {/* <th>Image</th> */}
-                <th style={{ width: "200px" , paddingLeft : "22px" }}>Title</th>
+                <th style={{ width: "200px", paddingLeft: "22px" }}>Title</th>
                 <th>Product Code</th>
                 <th>UPC</th>
-                <th>List Price</th>
-                <th style={{ width: "175px" }}>Sale Price</th>
+                <th>MSRP</th>
+                <th style={{ width: "175px" }}>Cost</th>
                 <th>Min Qty</th>
                 <th>Qty</th>
                 <th>Total</th>
@@ -164,7 +184,7 @@ console.log(selectedsalesRep , "----accordian salesrep")
                           return (
                             <tr className={`${styles.ControlTR} w-full `} key={indexed}>
                               {/* <td className={styles.ControlStyle} style={{ cursor: "pointer" }}> */}
-                                {/* <ImageHandler
+                              {/* <ImageHandler
                                   image={{ src: value?.ContentDownloadUrl || productImage.images[value?.ProductCode]?.ContentDownloadUrl || productImage.images[value?.ProductCode] || "dummy.png" }}
                                   width={50}
                                   onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
@@ -172,7 +192,7 @@ console.log(selectedsalesRep , "----accordian salesrep")
                               {/* </td> */}
                               <td
                                 className="text-capitalize linkEffect"
-                                style={{ fontSize: "13px", cursor: "pointer" , paddingLeft : "22px" }}
+                                style={{ fontSize: "13px", cursor: "pointer", paddingLeft: "22px" }}
                                 onMouseEnter={() => setShowName({ index: indexed, type: true })}
                                 onMouseLeave={() => setShowName({ index: indexed })}
                                 onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
@@ -195,13 +215,27 @@ console.log(selectedsalesRep , "----accordian salesrep")
                                   min={value.Min_Order_QTY__c || 0}
                                   onChange={(quantity) => {
                                     if (quantity) {
+                                      if (data.discount.portalProductManage) {
+                                        
+                                        if (value.Available_Quantity__c<1) {
+                                          return Swal.fire({
+                                            title: "Oops!",
+                                            text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
+                                            icon: "warning",
+                                            confirmButtonColor: "#000", // Black
+                                          });
+                                        }
+                                      }
                                       onQuantityChange(value, quantity);
+
                                     } else {
                                       if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
                                         removeProduct(value.Id);
                                       }
                                     }
-                                  }}
+                                  }
+
+                                  }
                                   value={order?.Account?.id === localStorage.getItem("AccountId__c") ? qtyofItem : 0}
                                 />
                               </td>
@@ -242,13 +276,13 @@ console.log(selectedsalesRep , "----accordian salesrep")
           </table>
         </div>
       </div>
-      <ProductDetails
+      {productDetailId ? <ProductDetails
         productId={productDetailId}
         setProductDetailId={setProductDetailId}
         ManufacturerId={localStorage.getItem("ManufacturerId__c")}
         AccountId={[localStorage.getItem("AccountId__c")]}
-        selectedsalesRep = {selectedsalesRep}
-      />
+        selectedsalesRep={selectedsalesRep}
+      /> : null}
     </>
   );
 };

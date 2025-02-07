@@ -3,56 +3,57 @@ import './MultiSelectSearch.css';
 import { UserIcon } from '../../lib/svg';
 import ToggleSwitch from '../ToggleButton';
 import Loading from '../Loading';
+import Swal from 'sweetalert2';
 let limit = 500;
 
-const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, manufacturers = [], setWarning, brandSelected = [],manufacturersList=[],errorMessage }) => {
+const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, manufacturers = [], setWarning, brandSelected = [], manufacturersList = [], errorMessage }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showSelected, setShowSelected] = useState(false);
     const [brand, setBrand] = useState();
     const [showAll, stShowAll] = useState(false);
     const [isLoadings, setIsLoading] = useState(loading ? true : false);
-    const [alert,setAlert]=useState(false);
+    const [alert, setAlert] = useState(false);
     // Handle selecting or deselecting an item
     const handleSelect = (item) => {
         const isSelected = selectedValues.some(selected => selected.Id === item.Id);
-    
+
         // Check if selected values exceed the limit of 250
         if (!isSelected && selectedValues.length >= limit) {
             // alert("You cannot select more than 250 items.");
-            errorMessage?.("You cannot select more than "+limit+" items.")
+            errorMessage?.("You cannot select more than " + limit + " items.")
             return; // Prevent further selection
         }
-    
+
         if (item?.AccountId && manufacturers.length && !isSelected) {
             const isBrandMatched = item.BrandIds.some(brandId =>
                 brandSelected.some(brand => brand.Id === brandId)
             );
-    
+
             if (!isBrandMatched) {
                 setWarning?.(item.Id);
             }
         }
-    
+
         const newSelectedValues = isSelected
             ? selectedValues.filter(selected => selected.Id !== item.Id) // Deselect item
             : [...selectedValues, item]; // Select item
-    
+
         onChange?.(newSelectedValues); // Notify parent component of selection change
     };
-    
+
 
     // Filter options based on search term
     const [filteredOptions, setFilteredOptions] = useState();
-  
+
     useEffect(() => {
         setIsLoading(true)
         // Call the filtering function when searchTerm or brand changes
-        var results = options.filter(function(option) {
+        var results = options.filter(function (option) {
             var brandMatch = true;
             var nameMatch = false;
             var titleMatch = false;
             var accountNameMatch = false;
-            
+
             // Check for brand match
             if (brand) {
                 if (option && option.BrandIds) {
@@ -61,29 +62,30 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                     brandMatch = false;
                 }
             }
-            
+
             // Check for name match
             if (option && option.Name) {
                 nameMatch = option.Name.toLowerCase().includes(searchTerm.toLowerCase());
             }
-    
+
             // Check for title match
             if (option && option.Title) {
                 titleMatch = option.Title.toLowerCase().includes(searchTerm.toLowerCase());
             }
-    
+
             // Check for account name match
             if (option && option.Account && option.Account.Name) {
                 accountNameMatch = option.Account.Name.toLowerCase().includes(searchTerm.toLowerCase());
             }
-    
+
             // Return true if brandMatch is true and any of the other conditions match
             return brandMatch && (nameMatch || titleMatch || accountNameMatch);
         });
 
         if (!showAll) {
             // Extract the brand IDs from the brands list
-            let validBrandIds = new Set(manufacturers?.map(brand => brand.Id));
+            // let validBrandIds = new Set(manufacturers?.map(brand => brand.Id));
+            let validBrandIds = new Set(brandSelected?.map(brand => brand.Id));
 
 
             let matchedResults = results.filter(result => {
@@ -111,29 +113,97 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
         }
     }, [loading])
 
-
-    const AutoSelectChangeHandler = () => {
+    const AutoSelectChangeHandler = async () => {
         // Calculate how many more items can be selected without exceeding the limit
         const remainingSelections = limit - selectedValues.length;
-    
+
         // Filter out options that are already selected
-        const newOptions = filteredOptions.filter(
+        let newOptions = filteredOptions.filter(
             option => !selectedValues.some(selected => selected.Id === option.Id)
         );
-    
+
         // Check if adding new options would exceed the 250-item limit
-        if (newOptions.length > remainingSelections) {
+
+        if (!brand) {
             // alert(`You can only select up to 250 items. You have ${remainingSelections} remaining.`);
-            errorMessage?.(`You can only select up to ${limit} items. You have ${remainingSelections} remaining.`)
-            return; // Prevent adding more than the limit
+            // errorMessage?.(`You can only select up to ${limit} items. You have ${remainingSelections} remaining.`)
+
+            const brandSelectedIds = brandSelected.map(brand => brand.Id);
+
+            newOptions = newOptions.filter(result => {
+                // Check if AccountId exists
+                if (result.AccountId) {
+                    // If AccountId exists, compare BrandIds with validBrandIds
+                    return result.BrandIds?.some(brandId => brandSelectedIds.includes(brandId));
+                } else {
+                    return result;
+                }
+            })
+
+            if (newOptions.length) {
+                // let message = "<p class='text-[16px] m-0'>This email will go to:</p><p class='text-[16px] mb-1'>Subscribers of Brands:</p><ol>";
+                // brandSelected.map(brand => {
+                //     // Count the number of contacts with the current brandId
+                //     const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
+
+                //     if (count > 0) {
+                //         message += `<li class='text-[14px]'>${brand.Name}:${count} Subscribers</li>`;
+                //     }
+                // });
+                // message += '</ol>';
+                let message = `
+  <div class="email-content">
+    <p class="text-base mb-2">This email will go to subscribers of Brands:</p>
+    <ul class="brand-list list-inside pl-4">`;
+
+                brandSelected.map(brand => {
+                    // Count the number of contacts with the current brandId
+                    const count = newOptions.filter(c => c.BrandIds.includes(brand.Id)).length;
+
+                    if (count > 0) {
+                        message += `
+        <li class="text-sm mb-1">
+          <strong>${brand.Name}:</strong> ${count} Subscribers
+        </li>`;
+                    }
+                });
+
+                message += `
+    </ul>
+  </div>`;
+
+
+
+                let check = await Swal.fire({
+                    title: 'Alert',
+                    html: message,
+                    showCancelButton: true,
+                    confirmButtonColor: '#000',  // Black
+                    cancelButtonColor: '#000',   // White
+                    confirmButtonText: 'ACCEPT',
+                    cancelButtonText: 'CANCEL',
+                    background: '#f9f9f9',
+                    color: '#333',
+                }).then((result) => {
+                    return result.isConfirmed;  // Returns true if user confirms, false otherwise
+                });
+
+
+                if (!check) {
+                    return; // Prevent adding more than the limit
+                }
+            } else {
+                errorMessage?.(`You already selected all contact of selected Brand.`)
+                return;
+            }
         }
-    
+
         // If there are any new options to add, call onChange with the updated list
         if (newOptions.length > 0) {
             onChange?.([...selectedValues, ...newOptions]);
         }
     };
-    
+
     const resetSelectChangeHandler = () => {
         onChange?.([]);
     }
@@ -147,34 +217,34 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
     }
 
     const brandNames = (brandSelected?.map((brand) => brand.Name) || [])
-    ?.reduce((acc, curr, index, arr) => {
-        if (index === 0) {
-            return curr; // For the first brand, just return the name without a comma
-        } else if (index === arr.length - 1) {
-            return `${acc} and ${curr}`; // For the last brand, add "and" before the name
-        }
-        return `${acc}, ${curr}`; // For the middle brands, add commas
-    }, '');
+        ?.reduce((acc, curr, index, arr) => {
+            if (index === 0) {
+                return curr; // For the first brand, just return the name without a comma
+            } else if (index === arr.length - 1) {
+                return `${acc} and ${curr}`; // For the last brand, add "and" before the name
+            }
+            return `${acc}, ${curr}`; // For the middle brands, add commas
+        }, '');
 
     const BrandNameGenerator = (Brandids) => {
         // Filter manufacturers based on Brandids and extract names
         const selectedBrands = manufacturersList
             ?.filter(brand => Brandids.includes(brand.Id))
             ?.map(brand => brand.Name) || [];
-        
+
         // Ensure brandSelected is correctly referenced or set to selectedBrands
         const brandSelected = selectedBrands || [];
-    
+
         // Handle cases based on the number of brands selected
         if (brandSelected.length === 0) return ''; // No brands selected
         if (brandSelected.length === 1) return brandSelected[0]; // Only one brand
         if (brandSelected.length === 2) return `${brandSelected[0]} and ${brandSelected[1]}`; // Two brands
-        
+
         // More than two brands, format with commas and 'and' before the last one
         return brandSelected.slice(0, -1).join(', ') + `, and ${brandSelected[brandSelected.length - 1]}`;
     };
-    
-    
+
+
     return (
         <div className="multi-select-container">
             <header>
@@ -201,7 +271,9 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                     />
                     {manufacturers?.length ? <select className={"brandSearch"} style={{ width: '25%', maxWidth: '200px', height: '45px', marginTop: '8px' }} onChange={brandSelectionHandler}>
                         <option value={0} selected>All Brand</option>
-                        {manufacturers.map((brand) => (
+                        {showAll ? manufacturers.map((brand) => (
+                            <option style={{ appearance: 'none' }} value={brand.Id}>{brand.Name}</option>
+                        )) : brandSelected.map((brand) => (
                             <option style={{ appearance: 'none' }} value={brand.Id}>{brand.Name}</option>
                         ))}
                     </select> : null}
@@ -220,7 +292,7 @@ const MultiSelectSearch = ({ options, selectedValues, onChange, loading = null, 
                             >
                                 <div className="user-avatar"><UserIcon width={25} height={25} /></div>
                                 <div className="user-info">
-                                    <span className="user-name d-flex align-items-center">{(!brandSelected.some(brand => option.BrandIds?.includes(brand.Id)) && selectedValues.some(selected => selected.Id === option.Id)&&option.AccountId) ? <div className='redBlock mr-1' title="the subscriber doesn't have the selected brand"></div> : null}{option.Name}</span>
+                                    <span className="user-name d-flex align-items-center">{(!brandSelected.some(brand => option.BrandIds?.includes(brand.Id)) && selectedValues.some(selected => selected.Id === option.Id) && option.AccountId) ? <div className='redBlock mr-1' title="the subscriber doesn't have the selected brand"></div> : null}{option.Name}</span>
                                     <span className="user-email maxSizeDiv">{option.Email}</span>
                                     {option?.Title ? <span className="user-etc maxSizeDiv"><b className="text-['Arial']">Title:&nbsp;</b>{option?.Title}</span> : null}
                                     {option?.Phone ? <span className="user-etc"><b>Phone:&nbsp;</b>{option?.Phone}</span> : null}
