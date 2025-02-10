@@ -199,6 +199,9 @@ function MyBagFinal({ showOrderFor }) {
           if (res?.shippingMethod) {
             setOwnShipping(res?.shippingMethod);
           }
+          if (res?.freeShipping) {
+            setFreeShipping(res?.freeShipping)
+          }
           if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
             if (res?.address) {
@@ -216,9 +219,6 @@ function MyBagFinal({ showOrderFor }) {
               if (!isSelect) {
                 tempOrder = { ...tempOrder, shippingMethod: null };
               }
-            }
-            if (res?.freeShipping) {
-              setFreeShipping(res?.freeShipping)
             }
             keyBasedUpdateCart({ Account: tempOrder });
             if (res?.brandShipping) {

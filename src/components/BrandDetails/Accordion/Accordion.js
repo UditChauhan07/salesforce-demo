@@ -216,8 +216,9 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                   onChange={(quantity) => {
                                     if (quantity) {
                                       if (data.discount.portalProductManage) {
+                                        console.log({cartProduct,quantity});
                                         
-                                        if (value.Available_Quantity__c<1 && quantity > cartProduct?.items?.qty) {
+                                        if (value.Available_Quantity__c<1 && quantity > (cartProduct?.items?.qty||0)) {
                                           return Swal.fire({
                                             title: "Oops!",
                                             text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
