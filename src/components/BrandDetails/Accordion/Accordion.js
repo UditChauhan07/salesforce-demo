@@ -217,7 +217,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                     if (quantity) {
                                       if (data.discount.portalProductManage) {
                                         
-                                        if (value.Available_Quantity__c<1) {
+                                        if (value.Available_Quantity__c<1 && quantity > cartProduct?.items?.qty) {
                                           return Swal.fire({
                                             title: "Oops!",
                                             text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
@@ -229,7 +229,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                       onQuantityChange(value, quantity);
 
                                     } else {
-                                      if (order?.Account?.id === localStorage.getItem("AccountId__c") && isProductCarted(value.Id)) {
+                                      if (order?.Account?.id === localStorage.getItem("AccountId__c") &&cartProduct ) {
                                         removeProduct(value.Id);
                                       }
                                     }

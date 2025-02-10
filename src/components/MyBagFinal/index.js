@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList, defaultLoadTime } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList, defaultLoadTime, FreeShipHandler } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -17,6 +17,7 @@ import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
 import Swal from "sweetalert2";
 import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
+import { BiCheckboxChecked } from "react-icons/bi";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -178,6 +179,15 @@ function MyBagFinal({ showOrderFor }) {
       return null;
     }
   };
+
+  const FetchFreeShipHandler = () => {
+    if (order?.Manufacturer?.id) {
+      FreeShipHandler({ brandId: order?.Manufacturer?.id }).then((res) => {
+          setFreeShipping(res)
+        freeShippingHandler({shipObj:res,orderObj:order})
+      })
+    }
+  }
   const FetchPoNumber = async () => {
     setIsLoading(true)
     if (order?.Account?.id && order?.Manufacturer?.id) {
@@ -233,57 +243,112 @@ function MyBagFinal({ showOrderFor }) {
   };
   const freeShippingHandler = async ({ shipObj, orderObj }) => {
     // Check if the order is eligiable for shipping address
-    if (shipObj && orderObj.total) {
+    if (shipObj) {
       if (shipObj?.type) {
+        let tempOrder = order.Account;
+        if ((shipObj?.start && shipObj?.end) || shipObj?.amount) {
+          let date = new Date();
+          let start = new Date(shipObj?.start);
+          let end = new Date(shipObj?.end);
+          date.setHours(0, 0, 0, 0);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(0, 0, 0, 0);
 
-      }
-      let tempOrder = order.Account;
-      if (orderObj?.total >= shipObj?.amount && !order?.Account?.shippingMethod?.freeApplied) {
-        console.log("************ amount true **************");
-        tempOrder.shippingMethod = {
-          cal: 0,
-          method: "FedEx",
-          name: "Free Shipping",
-          number: null,
-          freeApplied: true
-        };
-        keyBasedUpdateCart({ Account: tempOrder });
-      } else if (shipObj?.start && shipObj?.end) {
-        console.log("************ date true **************");
-        
-        let date = new Date();
-        let start = new Date(shipObj?.start);
-        let end = new Date(shipObj?.end);
-        if (date >= start && date <= end && !order?.Account?.shippingMethod?.freeApplied) {
-          tempOrder.shippingMethod = {
-            cal: 0,
-            method: "FedEx",
-            name: "Free Shipping",
-            number: null,
-            freeApplied: true
-          };
-          keyBasedUpdateCart({ Account: tempOrder });
+
+          if (orderObj?.total >= shipObj?.amount && shipObj?.type == "Amount Based") {
+            if (!order?.Account?.shippingMethod?.freeApplied) {
+              console.log("************ amount true **************");
+              tempOrder.shippingMethod = {
+                cal: 0,
+                method: "FedEx",
+                name: "Free Shipping",
+                number: null,
+                freeApplied: true
+              };
+              keyBasedUpdateCart({ Account: tempOrder });
+            }
+          } else if (date >= start && date <= end && shipObj?.type == "Date Range Based") {
+            if (!order?.Account?.shippingMethod?.freeApplied) {
+              console.log("************ date true **************");
+              tempOrder.shippingMethod = {
+                cal: 0,
+                method: "FedEx",
+                name: "Free Shipping",
+                number: null,
+                freeApplied: true
+              };
+              keyBasedUpdateCart({ Account: tempOrder });
+            }
+          } else {
+            if (orderObj?.Account?.shippingMethod?.freeApplied) {
+              console.log("************ escape **************");
+              if (ownShipping?.number || ownShipping?.method) {
+                tempOrder.shippingMethod = ownShipping
+              } else {
+                tempOrder.shippingMethod = null;
+              }
+              keyBasedUpdateCart({ Account: tempOrder });
+            }
+          }
         }
       } else {
-        console.log("************ escape **************");
-        if (orderObj?.Account?.shippingMethod?.freeApplied) {
-          if (ownShipping?.number || ownShipping?.method) {
-            tempOrder.shippingMethod = ownShipping
+        if (shipObj?.start && shipObj?.end && shipObj?.amount && false) {
+          let date = new Date();
+          let start = new Date(shipObj?.start);
+          let end = new Date(shipObj?.end);
+          date.setHours(0, 0, 0, 0);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(0, 0, 0, 0);
+          let tempOrder = order.Account;
+          if (orderObj?.total >= shipObj?.amount && (date >= start && date <= end)) {
+            if (!orderObj?.Account?.shippingMethod?.freeApplied) {
+              console.log("************ both apply **************");
+              tempOrder.shippingMethod = {
+                cal: 0,
+                method: "FedEx",
+                name: "Free Shipping",
+                number: null,
+                freeApplied: true
+              };
+              keyBasedUpdateCart({ Account: tempOrder });
+            }
           } else {
-            tempOrder.shippingMethod = null;
+            if (orderObj?.Account?.shippingMethod?.freeApplied) {
+              console.log("************ escape **************");
+              if (ownShipping?.number || ownShipping?.method) {
+                tempOrder.shippingMethod = ownShipping
+              } else {
+                tempOrder.shippingMethod = null;
+              }
+              keyBasedUpdateCart({ Account: tempOrder });
+            }
           }
-          console.log({tempOrder,ownShipping});
-          
-          keyBasedUpdateCart({ Account: tempOrder });
+        }else{
+          if (orderObj?.Account?.shippingMethod?.freeApplied) {
+            console.log("************ escape **************");
+            let tempOrder = order.Account;
+            if (ownShipping?.number || ownShipping?.method) {
+              tempOrder.shippingMethod = ownShipping
+            } else {
+              tempOrder.shippingMethod = null;
+            }
+            keyBasedUpdateCart({ Account: tempOrder });
+          }
         }
-        // await FetchPoNumber()
+      }
+    }else{
+      if (orderObj?.Account?.shippingMethod?.freeApplied) {
+        console.log("************ escape **************");
+        let tempOrder = order.Account;
+        if (ownShipping?.number || ownShipping?.method) {
+          tempOrder.shippingMethod = ownShipping
+        } else {
+          tempOrder.shippingMethod = null;
+        }
+        keyBasedUpdateCart({ Account: tempOrder });
       }
     }
-    console.log({orderObj});
-    
   }
-  // console.warn({ free: freeShipping, order });
-
   useEffect(() => {
     if (order?.Account?.id && order?.Manufacturer?.id) {
       fetchBrandPaymentDetails();
@@ -352,9 +417,9 @@ function MyBagFinal({ showOrderFor }) {
     if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0 && total > 0) {
       setButtonActive(true);
     }
-    // if (freeShipping) {
-    //   freeShippingHandler({ shipObj: freeShipping, orderObj: order })
-    // }
+    if (freeShipping) {
+      // freeShippingHandler({ shipObj: freeShipping, orderObj: order })
+    }
   }, [order]);
 
   const [checkProduct, setCheckProduct] = useState({ beingLoading: false, isLoad: false, list: [], discount: {} });
@@ -389,6 +454,7 @@ function MyBagFinal({ showOrderFor }) {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         CheckOutStockProduct();
+        // FetchFreeShipHandler();
         // console.log('Page is active');
         // Check for updates or fetch data
       }
@@ -545,8 +611,6 @@ function MyBagFinal({ showOrderFor }) {
     if (price == "") price = 0;
     updateProductPrice(productId, price || 0);
   };
-
-  const hasPaymentType = intentRes?.accountManufacturerData?.some((item) => item.Payment_Type__c);
 
   const handlePayNow = () => {
     setIsPayNow(true);
@@ -868,7 +932,7 @@ function MyBagFinal({ showOrderFor }) {
                             e.preventDefault(); // Prevent space character from being entered
                           }
                         }}
-                        onBlur={handleNameChange}
+                        onChange={handleNameChange}
                       />
                     )}
                   </h5>
@@ -1006,12 +1070,14 @@ function MyBagFinal({ showOrderFor }) {
                                                   });
                                                 }
                                               } else {
-                                                return Swal.fire({
-                                                  title: "Oops!",
-                                                  text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
-                                                  icon: "warning",
-                                                  confirmButtonColor: "#000", // Black
-                                                });
+                                                if (quantity > ele.qty) {
+                                                  return Swal.fire({
+                                                    title: "Oops!",
+                                                    text: "The product you're trying to add to your cart is currently out of stock. Please check back soon",
+                                                    icon: "warning",
+                                                    confirmButtonColor: "#000", // Black
+                                                  });
+                                                }
                                               }
                                             }
                                             updateProductQty(ele.Id, quantity);
@@ -1106,8 +1172,14 @@ function MyBagFinal({ showOrderFor }) {
                           ) : null}
                           {orderShipment.length > 0 ? (
                             <div className={Styles.PaymentType}>
-                              <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
-                              {order?.Account?.shippingMethod?.freeApplied ? (<p>Free shipping Applied</p>) : (<ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />)}
+                              {order?.Account?.shippingMethod?.freeApplied ? (
+                                <p className="d-flex align-items-center m-0"><BiCheckboxChecked size={22} />Free shipping Applied</p>
+                              ) : (
+                                <>
+                                  <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
+                                  <ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />
+                                </>
+                              )}
                             </div>
                           ) : null}
                           <div className={Styles.ShipAdress2}>
@@ -1252,8 +1324,14 @@ function MyBagFinal({ showOrderFor }) {
                         ) : null}
                         {orderShipment.length > 0 ? (
                           <div className={Styles.PaymentType}>
-                            <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
-                            {order?.Account?.shippingMethod?.freeApplied ? (<p>Free shipping Applied</p>) : (<ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />)}
+                            {order?.Account?.shippingMethod?.freeApplied ? (
+                              <p className="d-flex align-items-center m-0"><BiCheckboxChecked size={22} />Free shipping Applied</p>
+                            ) : (
+                              <>
+                                <label className={Styles.shipLabelHolder}>Select Shipping method:</label>
+                                <ShipmentHandler data={orderShipment} total={total} setIsSelect={setIsSelect} />
+                              </>
+                            )}
                           </div>
                         ) : null}
                         <div className={Styles.ShipAdress2}>

@@ -174,6 +174,32 @@ export async function getAllAccountOrders({ key, accountIds, month, date = null 
   }
 }
 
+export async function FreeShipHandler({ brandId }) {
+  let user = await GetAuthData();
+  let accessToken = user?.x_access_token || null;
+  if (accessToken) {
+    let headersList = {
+      Accept: "*/*",
+      "Content-Type": "application/json",
+    };
+    let response = await fetch(originAPi + "qX8COmFYnyAj4e2/kSutd4qwJEYbKSo", {
+      method: "POST",
+      body: JSON.stringify({ key: accessToken, brandId }),
+      headers: headersList,
+    });
+    let data = JSON.parse(await response.text());
+
+    if (data.status == 200) {
+      return data?.freeShipping || false;
+    } else {
+      return data.message;
+    }
+  } else {
+    DestoryAuth();
+    return false;
+  }
+}
+
 export async function POGenerator() {
   try {
 
@@ -217,7 +243,7 @@ export async function POGenerator() {
       let checkBrandAllow = res?.checkBrandAllow;
       let freeShipping = res?.freeShipping;
 
-      return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow,freeShipping };
+      return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow, freeShipping };
     } else {
       console.error('Failed to generate PO number:', poData.message);
       return null;
@@ -446,18 +472,18 @@ export async function CartHandler({ op = null, cart }) {
     Accept: "*/*",
     "Content-Type": "application/json",
   };
-  
+
   let response = await fetch(cartUrl, {
     method: "POST",
     body: JSON.stringify(cart),
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
-  
+
   if (data?.data) {
     return data.data;
-  }else{
-    if(data.status ==200){
+  } else {
+    if (data.status == 200) {
       return true;
     }
   }
