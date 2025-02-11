@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./index.module.css";
 import Loading from "../Loading";
 import useLogin from "../../api/useLogin";
@@ -9,6 +9,7 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { LoginFormSchema } from "../../validation schema/LoginValidation";
 import TextError from "../../validation schema/TextError";
 import { EmailIcon, PasswordIcon } from "../../lib/svg";
+import StylesModal from "../Modal UI/Styles.module.css";
 
 const LoginUI = () => {
   const api = useLogin();
@@ -17,12 +18,16 @@ const LoginUI = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [salesRepLogin, setSalesRepLogin] = useState(true);
+  const [tokenAccess, setTokenAccess] = useState(false)
+  const [token, setToken] = useState();
+  const [tokenError, setTokenError] = useState(false);
+  const [retryCredentials, setRetryCredentials] = useState(null);
   const initialValues = {
     email: localStorage.getItem("emailB2B") || "",
     password: localStorage.getItem("passwordB2B") || "",
     remember: true,
   };
-
+  useEffect(() => { }, [retryCredentials, token, tokenAccess])
   const onSubmit = async (values, action) => {
     setLoading(true);
     const apiData = await api.mutateLogin(values.email, values.password);
@@ -33,19 +38,83 @@ const LoginUI = () => {
         localStorage.setItem("passwordB2B", values.password);
       }
       localStorage.setItem("Name", apiData?.data?.Name);
+      localStorage.setItem("token", token)
 
       localStorage.setItem("Api Data", JSON.stringify(apiData));
       const fetched = localStorage.getItem("Api Data");
       setUserValue(JSON.parse(fetched));
       navigate("/dashboard");
     } else if (apiData?.status === 400) {
-      setModalOpen(true);
-      navigate("/login");
+      console.log({ 'token required': apiData?.data?.error });
+
+      if (apiData?.data?.error == "invalid_grant") {
+        let storeToken = localStorage.getItem("token");
+        console.log({ storeToken });
+        if (storeToken) {
+          setToken(storeToken);
+          setRetryCredentials(values);
+          setTimeout(() => {
+            loginRetry(storeToken,values)
+          }, 1000);
+        } else {
+          setRetryCredentials(values);
+          setTokenAccess(true);
+        }
+      } else {
+        setModalOpen(true);
+        navigate("/login");
+      }
     } else {
       navigate("/login");
     }
     action.resetForm();
   };
+
+  const loginRetry = async (retryToken = null,loginCredentials=null) => {
+    
+    const { email, password, remember } = loginCredentials||retryCredentials;
+    if (!email||!password) {
+      console.error("No credentials available for retry.");
+      return;
+    }
+    if (token || retryToken) {
+      handleClose();
+      setLoading(true);
+      const apiData = await api.mutateLogin(email, password + (token||retryToken));
+      setLoading(false);
+      console.log({ apiData, email,password,token,retryToken });
+
+      if (apiData?.status === 200) {
+        if (remember) {
+          localStorage.setItem("emailB2B", email);
+          localStorage.setItem("passwordB2B", password);
+        }
+        localStorage.setItem("Name", apiData?.data?.Name);
+        localStorage.setItem("token", token)
+
+        localStorage.setItem("Api Data", JSON.stringify(apiData));
+        const fetched = localStorage.getItem("Api Data");
+        setUserValue(JSON.parse(fetched));
+        navigate("/dashboard");
+      } else if (apiData?.status === 400) {
+        console.log({ 'token required': apiData?.data?.error });
+        if (apiData?.data?.error == "invalid_grant") {
+          let storeToken = localStorage.getItem("token");
+          if (storeToken) {
+            localStorage.removeItem("token")
+          }
+          setTokenAccess(true);
+        } else {
+          setModalOpen(true);
+          navigate("/login");
+        }
+      } else {
+        navigate("/login");
+      }
+    } else {
+      setTokenError(true);
+    }
+  }
   const handleSalesRepLogin = () => {
     // salesRepLogin ? navigate("/register-salesrep") : navigate("/register");
     setSalesRepLogin(true);
@@ -53,6 +122,10 @@ const LoginUI = () => {
   const handleRetailerLogin = () => {
     setSalesRepLogin(false);
   };
+  useEffect(() => {
+
+  }, [token])
+  const handleClose = () => setTokenAccess(false);
   return (
     <>
       {loading ? (
@@ -67,6 +140,42 @@ const LoginUI = () => {
           onClose={() => setLoading(false)}
         />
       ) : null}
+      {tokenAccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="max-w-md p-4 shadow-lg rounded-2xl bg-white">
+            <div>
+              <h2 className="text-xl font-bold mb-2">
+                Security Token Verification Needed by Salesforce
+              </h2>
+              <p className="mb-2">
+                Salesforce now requires a security token for logging into integrated apps. Check your email for a message with the subject "Your new Salesforce security token" from "support@salesforce.com".
+              </p>
+              <p className="m-auto mb-4">
+                <input
+                  type="text"
+                  className="shadow-none outline-0 border-bottom border-dark form-control"
+                  onChange={(e) => setToken(e.target.value || null)}
+                  placeholder="Enter your security token"
+                />
+                {tokenError && <p className="text-danger text-[12px] mt-1">* Please enter your Token.</p>}
+              </p>
+              <div className="flex justify-center space-x-4 mt-2">
+                <button variant="secondary" className={StylesModal.modalButton} onClick={handleClose}>
+                  Cancel
+                </button>
+                <button className={StylesModal.modalButton} onClick={() => {
+                  if (token) {
+                    loginRetry();
+                  } else {
+                    setTokenError(true);
+                  }
+                }}>OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Formik initialValues={initialValues} validationSchema={LoginFormSchema} onSubmit={onSubmit}>
         <div>
           <div className="container">
@@ -137,7 +246,7 @@ const LoginUI = () => {
 
             <div className={styles.PolicyA}>
               <p>
-                By signing in or clicking "Login", you agree to our <a href="https://beautyfashionsales.com/terms-and-services" style={{color:'#000',fontWeight:'bold'}}>Terms of Service </a> Please also read our<a href="https://beautyfashionsales.com/privacy-policy" style={{color:'#000',fontWeight:'bold'}}> Privacy Policy </a>
+                By signing in or clicking "Login", you agree to our <a href="https://beautyfashionsales.com/terms-and-services" style={{ color: '#000', fontWeight: 'bold' }}>Terms of Service </a> Please also read our<a href="https://beautyfashionsales.com/privacy-policy" style={{ color: '#000', fontWeight: 'bold' }}> Privacy Policy </a>
               </p>
             </div>
           </div>

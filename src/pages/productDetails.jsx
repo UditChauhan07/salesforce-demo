@@ -13,6 +13,7 @@ import dataStore from "../lib/dataStore";
 import useBackgroundUpdater from "../utilities/Hooks/useBackgroundUpdater";
 
 const ProductDetails = ({ productId, setProductDetailId, AccountId = null, isPopUp = true, selectedsalesRep = null }) => {
+    
     const { updateProductQty, addOrder, removeProduct, isProductCarted } = useCart();
     const [product, setProduct] = useState({ isLoaded: false, data: [], discount: {} });
     const [replaceCartModalOpen, setReplaceCartModalOpen] = useState(false);

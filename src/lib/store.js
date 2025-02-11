@@ -2,7 +2,7 @@ import axios from "axios";
 import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
-export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
+export const originAPi = process.env.REACT_APP_OA_URL || "https://staging.beautyfashionsales.com/"
 // export const originAPi =  "http://localhost:5001"
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
@@ -418,7 +418,7 @@ export async function DestoryAuth() {
     if (status) {
       // Clear localStorage except for specified keys
       Object.keys(localStorage).forEach((key) => {
-        if (key !== "passwordB2B" && key !== "emailB2B") {
+        if (key !== "passwordB2B" && key !== "emailB2B" && key !== "token") {
           localStorage.removeItem(key);
         }
       });
