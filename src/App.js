@@ -55,6 +55,7 @@ import { CartProvider } from "./context/CartContext";
 import ProductPage from "./components/ProductPage/ProductPage";
 import { AnimatePresence } from 'framer-motion';
 import ProductOrder from "./pages/ProductOrder";
+import LearnMore from "./pages/LearnMore";
 function App() {
   // const Redirect = ({ href }) => {
   //   window.location.href = href;
@@ -116,6 +117,7 @@ function App() {
               <Route path="/account-contact-detailed-Report" element={<ContactDetailedReport />} />
               <Route path='/productPage/:id' element={<ProductPage />} />
               <Route path='/public/product/order' element={<ProductOrder/>} />
+              <Route path="/learn-more" element={<LearnMore/>}/>
               <Route path="*" element={<PageNotFound />}></Route>
 
               {/* 1234 */}
