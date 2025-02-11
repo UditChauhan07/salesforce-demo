@@ -54,7 +54,7 @@ const LoginUI = () => {
           setToken(storeToken);
           setRetryCredentials(values);
           setTimeout(() => {
-            loginRetry(storeToken,values)
+            loginRetry(storeToken, values)
           }, 1000);
         } else {
           setRetryCredentials(values);
@@ -70,19 +70,19 @@ const LoginUI = () => {
     action.resetForm();
   };
 
-  const loginRetry = async (retryToken = null,loginCredentials=null) => {
-    
-    const { email, password, remember } = loginCredentials||retryCredentials;
-    if (!email||!password) {
+  const loginRetry = async (retryToken = null, loginCredentials = null) => {
+
+    const { email, password, remember } = loginCredentials || retryCredentials;
+    if (!email || !password) {
       console.error("No credentials available for retry.");
       return;
     }
     if (token || retryToken) {
       handleClose();
       setLoading(true);
-      const apiData = await api.mutateLogin(email, password + (token||retryToken));
+      const apiData = await api.mutateLogin(email, password + (token || retryToken));
       setLoading(false);
-      console.log({ apiData, email,password,token,retryToken });
+      console.log({ apiData, email, password, token, retryToken });
 
       if (apiData?.status === 200) {
         if (remember) {
