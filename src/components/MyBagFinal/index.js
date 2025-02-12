@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Styles from "./Styles.module.css";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import { Link, useNavigate } from "react-router-dom";
-import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList, defaultLoadTime, FreeShipHandler } from "../../lib/store";
+import { GetAuthData, OrderPlaced, POGenerator, ShareDrive, fetchBeg, getProductImageAll, getBrandPaymentDetails, originAPi, getProductList, FreeShipHandler } from "../../lib/store";
 import { useCart } from "../../context/CartContext";
 import OrderLoader from "../loader";
 import ModalPage from "../Modal UI";
@@ -16,7 +16,6 @@ import ShipmentHandler from "./ShipmentHandler";
 import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
 import Swal from "sweetalert2";
-import useBackgroundUpdater from "../../utilities/Hooks/useBackgroundUpdater";
 import { BiCheckboxChecked } from "react-icons/bi";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
@@ -199,9 +198,9 @@ function MyBagFinal({ showOrderFor }) {
           if (res?.shippingMethod) {
             setOwnShipping(res?.shippingMethod);
           }
-          if (res?.freeShipping) {
-            setFreeShipping(res?.freeShipping)
-          }
+          // if (res?.freeShipping) {
+          //   setFreeShipping(res?.freeShipping)
+          // }
           if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
             if (res?.address) {
@@ -260,7 +259,7 @@ function MyBagFinal({ showOrderFor }) {
               console.log("************ amount true **************");
               tempOrder.shippingMethod = {
                 cal: 0,
-                method: "FedEx",
+                method: "Free Shipping",
                 name: "Free Shipping",
                 number: null,
                 freeApplied: true
@@ -272,7 +271,7 @@ function MyBagFinal({ showOrderFor }) {
               console.log("************ date true **************");
               tempOrder.shippingMethod = {
                 cal: 0,
-                method: "FedEx",
+                method: "Free Shipping",
                 name: "Free Shipping",
                 number: null,
                 freeApplied: true
@@ -1411,7 +1410,7 @@ function MyBagFinal({ showOrderFor }) {
           </div>
         </section>
       )}
-      <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId} />
+      {productDetailId?<ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId} />:null}
     </div>
   );
 }

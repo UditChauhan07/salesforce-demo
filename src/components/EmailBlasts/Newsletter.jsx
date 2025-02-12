@@ -34,7 +34,10 @@ const Newsletter = () => {
             return b.Day - a.Day;
         });
 
-        setEmailReport({ isLoad: true, data: report })
+        setEmailReport((prevState) => ({ ...prevState, data: report }));
+        setTimeout(() => {
+            setEmailReport((prevState) => ({ ...prevState, isLoad: true }));
+        }, 3500); // Adjust time as needed
     }
 
     useEffect(() => {

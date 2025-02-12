@@ -59,18 +59,22 @@ const CartProvider = ({ children }) => {
     const fetchCartFromServer = async () => {
         try {
             const user = await GetAuthData();
-            const getOrder = { CreatedBy: user?.Sales_Rep__c };
-            const cart = await CartHandler({ cart: getOrder });
+            if (user) {
+                if (user?.Sales_Rep__c) {
+                    const getOrder = { CreatedBy: user?.Sales_Rep__c };
+                    const cart = await CartHandler({ cart: getOrder });
 
 
-            // Validate if the fetched cart has essential content like Account and Manufacturer
-            if (cart.Account?.id && cart.Manufacturer?.id) {
-                // setOrder(cart); // Set the fetched cart if valid
-                // localStorage.setItem(orderCartKey, JSON.stringify(cart)); // Store in local storage
-                return cart;
-            } else {
-                // setOrder(initialOrder); // Use initial order if no valid cart is found
-                return false;
+                    // Validate if the fetched cart has essential content like Account and Manufacturer
+                    if (cart?.Account?.id && cart?.Manufacturer?.id) {
+                        // setOrder(cart); // Set the fetched cart if valid
+                        // localStorage.setItem(orderCartKey, JSON.stringify(cart)); // Store in local storage
+                        return cart;
+                    } else {
+                        // setOrder(initialOrder); // Use initial order if no valid cart is found
+                        return false;
+                    }
+                }
             }
         } catch (err) {
             console.error('Error fetching cart:', err);

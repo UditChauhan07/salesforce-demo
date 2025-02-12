@@ -418,7 +418,7 @@ export async function DestoryAuth() {
     if (status) {
       // Clear localStorage except for specified keys
       Object.keys(localStorage).forEach((key) => {
-        if (key !== "passwordB2B" && key !== "emailB2B") {
+        if (key !== "passwordB2B" && key !== "emailB2B" && key !== "token") {
           localStorage.removeItem(key);
         }
       });
@@ -462,7 +462,7 @@ export async function cartSync({ cart }) {
 export async function CartHandler({ op = null, cart }) {
   let cartUrl = url2;
   if (op == 'update' || op == 'create') {
-    cartUrl += 'cuvSzxcfV2LK5ic';
+    cartUrl += 'WdNhFjhMj08ReQp';
   } else if (op == 'delete') {
     cartUrl += 'CDllYsPY4teyTCA';
   } else {
@@ -479,7 +479,8 @@ export async function CartHandler({ op = null, cart }) {
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
-
+  console.log({data});
+  
   if (data?.data) {
     return data.data;
   } else {
