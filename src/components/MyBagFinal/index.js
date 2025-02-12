@@ -198,9 +198,9 @@ function MyBagFinal({ showOrderFor }) {
           if (res?.shippingMethod) {
             setOwnShipping(res?.shippingMethod);
           }
-          if (res?.freeShipping) {
-            setFreeShipping(res?.freeShipping)
-          }
+          // if (res?.freeShipping) {
+          //   setFreeShipping(res?.freeShipping)
+          // }
           if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
             if (res?.address) {
@@ -417,7 +417,7 @@ function MyBagFinal({ showOrderFor }) {
       setButtonActive(true);
     }
     if (freeShipping) {
-      freeShippingHandler({ shipObj: freeShipping, orderObj: order })
+      // freeShippingHandler({ shipObj: freeShipping, orderObj: order })
     }
   }, [order]);
 
