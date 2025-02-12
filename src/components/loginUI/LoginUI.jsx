@@ -38,16 +38,15 @@ const LoginUI = () => {
         localStorage.setItem("passwordB2B", values.password);
       }
       localStorage.setItem("Name", apiData?.data?.Name);
-      localStorage.setItem("token", token)
+      // localStorage.setItem("token", token)
 
       localStorage.setItem("Api Data", JSON.stringify(apiData));
       const fetched = localStorage.getItem("Api Data");
       setUserValue(JSON.parse(fetched));
       navigate("/dashboard");
     } else if (apiData?.status === 400) {
-      console.log({ 'token required': apiData?.data?.error });
 
-      if (apiData?.data?.error == "invalid_grant") {
+      if (apiData?.data?.error == "invalid_grant" && false) {
         let storeToken = localStorage.getItem("token");
         console.log({ storeToken });
         if (storeToken) {
