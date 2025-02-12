@@ -87,19 +87,20 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
                     return (
                         !searchValue?.length ||
                         [
-                            contact.Account,
-                            contact.Brands,
-                            contact.ContactEmail,
-                            contact.ContactName,
+                            contact.Account?.toLowerCase(),
+                            contact.Brands?.toLowerCase(),
+                            contact.ContactEmail?.toLowerCase(),
+                            contact.ContactName?.toLowerCase(),
                             DateConvert(contact.Date, true)
                         ].some(property => {
                             const propertyValue = property?.toLowerCase();
-                            return propertyValue.includes(searchValue);
+                            return propertyValue.includes(searchValue?.toLowerCase());
                         })
                     );
                 })
         )
     }, [data, searchValue]);
+    
 
     function checkedAll(value) {
         setChecked(!checked)
@@ -373,7 +374,7 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
                                         <td>{contact.ContactName}</td>
                                         <td>{contact.ContactEmail}</td>
                                         <td>{DateConvert(contact.Date, true)}</td>
-                                        <td>{contact.mailStatus == 1 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#90EE90] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer p-1">Send</p> : contact.mailStatus == 2 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#FF474C] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer p-1">Failed</p> : <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#efef68] text-center rounded-lg text-[#000] text-sm cursor-pointer p-1" title={`No action is needed\n our system is processing your emails in chunks to ensure smooth delivery.`}>Not Sent</p>}</td>
+                                        <td>{contact.mailStatus == 1 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#90EE90] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer p-1">Send</p> : contact.mailStatus == 2 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#FF474C] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer p-1" title="Email addresses are either missing or not in a valid format.">Failed</p> : <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#efef68] text-center rounded-lg text-[#000] text-sm cursor-pointer p-1" title={`No action is needed\n our system is processing your emails in chunks to ensure smooth delivery.`}>Not Sent</p>}</td>
                                     </tr>
                                 )
                             }) : <tr className="text-center" style={{ height: '200px' }}><td colSpan={6}>No data found.</td></tr>}
