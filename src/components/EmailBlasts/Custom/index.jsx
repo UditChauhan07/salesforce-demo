@@ -270,17 +270,17 @@ const MultiStepForm = () => {
         setLoading(true);
         const loadData = async () => {
             try {
+                let user = await GetAuthData();
+                const token = user?.x_access_token;
+                if (!token) {
+                    throw new Error('Access token is not available');
+                }
+                
+                const response = await fetchNewsletterData({ token });
+                
+                ShareDrive(response, false, contactLocalKey)
+                const contactList = response.contactList;
                 if (!Subscribers.isLoaded) {
-                    let user = await GetAuthData();
-                    const token = user?.x_access_token;
-                    if (!token) {
-                        throw new Error('Access token is not available');
-                    }
-
-                    const response = await fetchNewsletterData({ token });
-
-                    ShareDrive(response, false, contactLocalKey)
-                    const contactList = response.contactList;
                     // const contactList = response.contactList.filter(item => item.BrandIds && item.BrandIds.length);
                     setSubscribers({ isLoaded: true, users: response.userList, contacts: contactList })
                     setAllSubscribers([...response.userList, ...contactList])
@@ -301,9 +301,8 @@ const MultiStepForm = () => {
 
                 setLoading(false);
             }, 1000);
-        } else {
-            loadData();
         }
+        loadData();
 
     }, [currentStep]);
     useEffect(() => {

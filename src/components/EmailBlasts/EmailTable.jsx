@@ -30,38 +30,37 @@ const EmailTable = ({ month, day, year, setFilter, setMonthList, setDayList, new
     const [searchValue, setSearchValue] = useState();
     const [checked, setChecked] = useState(false)
     const [checkAll, setCheckedAll] = useState(false);
-  const [permissions , setPermissions] = useState()
-  useEffect(() => {
-    async function fetchPermissions() {
-      try {
-        const user = await GetAuthData(); // Fetch user data
-        const userPermissions = await getPermissions(); // Fetch permissions
-        setPermissions(userPermissions); // Set permissions in state
-      } catch (err) {
-        console.error("Error fetching permissions", err);
-      }
-    }
+    const [permissions, setPermissions] = useState()
+    useEffect(() => {
+        async function fetchPermissions() {
+            try {
+                const user = await GetAuthData(); // Fetch user data
+                const userPermissions = await getPermissions(); // Fetch permissions
+                setPermissions(userPermissions); // Set permissions in state
+            } catch (err) {
+                console.error("Error fetching permissions", err);
+            }
+        }
 
-    fetchPermissions(); // Fetch permissions on mount
-  }, []);
-
-  // Memoize permissions to avoid unnecessary re-calculations
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
-console.log(memoizedPermissions?.modules?.godLevel)
-
+        fetchPermissions(); // Fetch permissions on mount
+    }, []);
 
     const reportReady = (data) => {
+        console.log({data});
+        
         let contactList = JSON.parse(data || "[]")
         // let contactList = sortArrayHandler(JSON.parse(list || "[]") || [], g => g?.updatedAt, 'desc')
-
-        setContactList({ isLoaded: true, data: contactList })
+        setContactList((prevState) => ({ ...prevState, data: contactList }));
+        setTimeout(() => {
+            setContactList((prevState) => ({ ...prevState, isLoaded: true }));
+        }, 3500); // Adjust time as needed
     }
     useEffect(() => {
         dataStore.subscribe("/report" + month + day + year, reportReady);
         getDataHandler();
-        return ()=>dataStore.unsubscribe("/report" + month + day + year, reportReady);
+        return () => dataStore.unsubscribe("/report" + month + day + year, reportReady);
     }, [day, month, year])
-
+    
     const resentHandler = () => {
         if (checkId.length) {
             setContactList({ isLoaded: false, data: [] })
@@ -120,10 +119,11 @@ console.log(memoizedPermissions?.modules?.godLevel)
         setCheckId([])
         GetAuthData().then((user) => {
             let userPermisson = JSON.parse(user?.permission)
-            if (userPermisson?.modules?.godLevel){
+            if (userPermisson?.modules?.godLevel) {
                 setUser(user)
                 dataStore.getPageData("/report" + month + day + year, () => getEmailBlast({ key: user.access_token, Id: user.Sales_Rep__c, month, day, year, newsletter })).then((list) => {
-
+                    console.log({list});
+                    
                     reportReady(list);
 
 
@@ -230,8 +230,7 @@ console.log(memoizedPermissions?.modules?.godLevel)
         const data = new Blob([excelBuffer], { type: fileType });
         FileSaver.saveAs(data, `Subscribers List for ${months[month - 1]} ${day}, ${year}'s NewLetter ${new Date().toDateString()}` + fileExtension);
     }
-    console.log({ mailList, data });
-
+    
     return (
         <div>
             <ModalPage
@@ -374,7 +373,7 @@ console.log(memoizedPermissions?.modules?.godLevel)
                                         <td>{contact.ContactName}</td>
                                         <td>{contact.ContactEmail}</td>
                                         <td>{DateConvert(contact.Date, true)}</td>
-                                        <td>{contact.mailStatus == 1 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#90EE90] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer">Send</p> : contact.mailStatus == 2 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#FF474C] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer">Failed</p> : <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#efef68] text-center rounded-lg text-[#000] text-sm cursor-pointer">Not Sent</p>}</td>
+                                        <td>{contact.mailStatus == 1 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#90EE90] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer p-1">Send</p> : contact.mailStatus == 2 ? <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#FF474C] text-center rounded-lg text-[#ffffff] text-sm cursor-pointer p-1">Failed</p> : <p onClick={() => { getEmailBodyHandler(contact.id) }} className="bg-[#efef68] text-center rounded-lg text-[#000] text-sm cursor-pointer p-1" title={`No action is needed\n our system is processing your emails in chunks to ensure smooth delivery.`}>Not Sent</p>}</td>
                                     </tr>
                                 )
                             }) : <tr className="text-center" style={{ height: '200px' }}><td colSpan={6}>No data found.</td></tr>}
