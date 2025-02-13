@@ -17,6 +17,7 @@ import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
 import Swal from "sweetalert2";
 import { BiCheckboxChecked } from "react-icons/bi";
+import { useMemo } from "react";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -182,8 +183,8 @@ function MyBagFinal({ showOrderFor }) {
   const FetchFreeShipHandler = () => {
     if (order?.Manufacturer?.id) {
       FreeShipHandler({ brandId: order?.Manufacturer?.id }).then((res) => {
-          setFreeShipping(res)
-        freeShippingHandler({shipObj:res,orderObj:order})
+        setFreeShipping(res)
+        freeShippingHandler({ shipObj: res, orderObj: order })
       })
     }
   }
@@ -198,9 +199,9 @@ function MyBagFinal({ showOrderFor }) {
           if (res?.shippingMethod) {
             setOwnShipping(res?.shippingMethod);
           }
-          // if (res?.freeShipping) {
-          //   setFreeShipping(res?.freeShipping)
-          // }
+          if (res?.freeShipping) {
+            setFreeShipping(res?.freeShipping)
+          }
           if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
             if (res?.address) {
@@ -322,7 +323,7 @@ function MyBagFinal({ showOrderFor }) {
               keyBasedUpdateCart({ Account: tempOrder });
             }
           }
-        }else{
+        } else {
           if (orderObj?.Account?.shippingMethod?.freeApplied) {
             console.log("************ escape **************");
             let tempOrder = order.Account;
@@ -335,7 +336,7 @@ function MyBagFinal({ showOrderFor }) {
           }
         }
       }
-    }else{
+    } else {
       if (orderObj?.Account?.shippingMethod?.freeApplied) {
         console.log("************ escape **************");
         let tempOrder = order.Account;
@@ -417,7 +418,7 @@ function MyBagFinal({ showOrderFor }) {
       setButtonActive(true);
     }
     if (freeShipping) {
-      // freeShippingHandler({ shipObj: freeShipping, orderObj: order })
+      freeShippingHandler({ shipObj: freeShipping, orderObj: order })
     }
   }, [order]);
 
@@ -440,7 +441,7 @@ function MyBagFinal({ showOrderFor }) {
         };
         getProductList({ rawData }).then((list) => {
 
-          setOutOfStockAllow(list?.discount?.portalProductManage || false)
+          setOutOfStockAllow((list?.discount?.portalProductManage&&iswholeSale)?true : false)
           setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
         }).catch((err) => {
           console.log({ err });
@@ -480,6 +481,9 @@ function MyBagFinal({ showOrderFor }) {
       window.removeEventListener('blur', handleBlur);
     };
   }, []);
+  const iswholeSale = useMemo(() => {
+    return order?.ordertype == "wholesale"
+  }, [order])
   useEffect(() => {
     if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId && !checkProduct?.isLoad && !checkProduct.beingLoading) {
       CheckOutStockProduct()
@@ -1410,7 +1414,7 @@ function MyBagFinal({ showOrderFor }) {
           </div>
         </section>
       )}
-      {productDetailId?<ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId} />:null}
+      {productDetailId ? <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId} /> : null}
     </div>
   );
 }
