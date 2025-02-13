@@ -201,6 +201,7 @@ function MyBagFinal({ showOrderFor }) {
           }
           if (res?.freeShipping && iswholeSale) {
             setFreeShipping(res?.freeShipping)
+            freeShippingHandler({shipObj:res?.freeShipping,orderObj:order})
           }
           if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
@@ -257,7 +258,7 @@ function MyBagFinal({ showOrderFor }) {
 
           if (orderObj?.total >= shipObj?.amount && shipObj?.type == "Amount Based") {
             if (!order?.Account?.shippingMethod?.freeApplied) {
-              console.log("************ amount true **************");
+              // console.log("************ amount true **************");
               tempOrder.shippingMethod = {
                 cal: 0,
                 method: "Free Shipping",
@@ -269,7 +270,7 @@ function MyBagFinal({ showOrderFor }) {
             }
           } else if (date >= start && date <= end && shipObj?.type == "Date Range Based") {
             if (!order?.Account?.shippingMethod?.freeApplied) {
-              console.log("************ date true **************");
+              // console.log("************ date true **************");
               tempOrder.shippingMethod = {
                 cal: 0,
                 method: "Free Shipping",
@@ -281,7 +282,7 @@ function MyBagFinal({ showOrderFor }) {
             }
           } else {
             if (orderObj?.Account?.shippingMethod?.freeApplied) {
-              console.log("************ escape **************");
+              // console.log("************ escape **************");
               if (ownShipping?.number || ownShipping?.method) {
                 tempOrder.shippingMethod = ownShipping
               } else {
@@ -325,7 +326,7 @@ function MyBagFinal({ showOrderFor }) {
           }
         } else {
           if (orderObj?.Account?.shippingMethod?.freeApplied) {
-            console.log("************ escape **************");
+            // console.log("************ escape **************");
             let tempOrder = order.Account;
             if (ownShipping?.number || ownShipping?.method) {
               tempOrder.shippingMethod = ownShipping
@@ -338,7 +339,7 @@ function MyBagFinal({ showOrderFor }) {
       }
     } else {
       if (orderObj?.Account?.shippingMethod?.freeApplied) {
-        console.log("************ escape **************");
+        // console.log("************ escape **************");
         let tempOrder = order.Account;
         if (ownShipping?.number || ownShipping?.method) {
           tempOrder.shippingMethod = ownShipping
@@ -453,6 +454,7 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
+        setIsPOEditable(false);
         CheckOutStockProduct();
         FetchFreeShipHandler();
         // console.log('Page is active');
