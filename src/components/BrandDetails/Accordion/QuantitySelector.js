@@ -43,7 +43,6 @@ const QuantitySelector = ({ onChange, value = 0, min = 0 }) => {
     const limit = 4;
     setLimitInput(event.target.value.slice(0, limit));
   };
-  console.log(limitInput);
   return (
     <div className={`${Styles.ButtonControl}w-[85px] h-[27px] flex `}>
       {qtyErrorModalOpen ? (

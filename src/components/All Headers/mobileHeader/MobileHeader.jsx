@@ -1,51 +1,15 @@
-import React, { useState, useEffect , useMemo } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MdKeyboardArrowRight } from "react-icons/md";
 import { CustomerServiceIcon, OrderStatusIcon } from "../../../lib/svg";
 import styles from "./index.module.css";
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { BiMailSend } from "react-icons/bi";
-import { GetAuthData, admins, getSessionStatus } from "../../../lib/store";
-import { getPermissions } from "../../../lib/permission";
-const MobileHeader = () => {
+const MobileHeader = ({userName}) => {
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(null);
   const [show, setShow] = useState(false);
-  const [userName, setUserName] = useState(localStorage.getItem("Name"));
-const [permissions , setPermissions] = useState()
-  useEffect(() => {
-    async function fetchPermissions() {
-      try {
-        const user = await GetAuthData(); // Fetch user data
-        const userPermissions = await getPermissions(); // Fetch permissions
-        setPermissions(userPermissions); // Set permissions in state
-      } catch (err) {
-        console.error("Error fetching permissions", err);
-      }
-    }
-
-    fetchPermissions(); // Fetch permissions on mount
-  }, []);
-
-  // Memoize permissions to avoid unnecessary re-calculations
-  const memoizedPermissions = useMemo(() => permissions, [permissions]);
-console.log(memoizedPermissions?.modules?.godLevel)
-
-
-  useEffect(() => {
-    GetAuthData().then((user) => {
-      getSessionStatus({ key: user?.x_access_token, salesRepId: user?.Sales_Rep__c }).then((status) => {
-        if (memoizedPermissions?.modules?.godLevel) {
-
-        }
-        setUserName(status?.data?.Name)
-      }).catch((statusErr) => {
-        console.log({ statusErr });
-      })
-    }).catch((userErr) => {
-      console.log({ userErr });
-    })
-  }, [])
+  
   const togglePanel = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
@@ -170,48 +134,48 @@ console.log(memoizedPermissions?.modules?.godLevel)
                       {activeIndex === 2 && (
                         <div className={styles.panelContent2}>
                           <ul>
-                         <li>
-                        <Link to="/sales-report" className={` linkStyle ${styles.text}`}>
-                          Sales Report
-                        </Link>
-                      </li>
-                      <li>
-                        <Link to="/newness-report" className={` linkStyle ${styles.text}`}>
-                          Newness Report
-                        </Link>
-                      </li>
-                      <li>
-                  <Link
-                    to="/comparison-report"
-                    className={` linkStyle ${styles.text}`}
-                    // onClick={() => {
-                    //   navigate("/comparison-report");
-                    // }}
-                  >
-                    Comparison Report
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/comparison-report"
-                    className={` linkStyle ${styles.text}`}
-                    // onClick={() => {
-                    //   navigate("/comparison");
-                    // }}
-                   style={{lineHeight: "1px"}}>Yearly Comparison Report
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/Target-Report"
-                    className={` linkStyle ${styles.text}`}
-                    // onClick={() => {
-                    //   navigate("/Target-Report");
-                    // }}
-                  >
-                    Target Report
-                  </Link>
-                </li>
+                            <li>
+                              <Link to="/sales-report" className={` linkStyle ${styles.text}`}>
+                                Sales Report
+                              </Link>
+                            </li>
+                            <li>
+                              <Link to="/newness-report" className={` linkStyle ${styles.text}`}>
+                                Newness Report
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/comparison-report"
+                                className={` linkStyle ${styles.text}`}
+                              // onClick={() => {
+                              //   navigate("/comparison-report");
+                              // }}
+                              >
+                                Comparison Report
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/comparison-report"
+                                className={` linkStyle ${styles.text}`}
+                                // onClick={() => {
+                                //   navigate("/comparison");
+                                // }}
+                                style={{ lineHeight: "1px" }}>Yearly Comparison Report
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/Target-Report"
+                                className={` linkStyle ${styles.text}`}
+                              // onClick={() => {
+                              //   navigate("/Target-Report");
+                              // }}
+                              >
+                                Target Report
+                              </Link>
+                            </li>
 
                           </ul>
 
@@ -234,10 +198,10 @@ console.log(memoizedPermissions?.modules?.godLevel)
 
                       <li>
                         <Link to="/top-products" className={`p-1 px-2 linkStyle ${styles.text}`}>
-                        Popular selling products
+                          Popular selling products
                         </Link>
                       </li>
-                    
+
                       <li>
                         <Link to="/marketing-calendar" className={`p-1 px-2 linkStyle ${styles.text}`}>
                           Marketing Calendar
