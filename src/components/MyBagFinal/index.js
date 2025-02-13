@@ -454,7 +454,7 @@ function MyBagFinal({ showOrderFor }) {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         CheckOutStockProduct();
-        // FetchFreeShipHandler();
+        FetchFreeShipHandler();
         // console.log('Page is active');
         // Check for updates or fetch data
       }
