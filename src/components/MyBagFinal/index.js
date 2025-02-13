@@ -199,7 +199,7 @@ function MyBagFinal({ showOrderFor }) {
           if (res?.shippingMethod) {
             setOwnShipping(res?.shippingMethod);
           }
-          if (res?.freeShipping) {
+          if (res?.freeShipping && iswholeSale) {
             setFreeShipping(res?.freeShipping)
           }
           if (res?.address || res?.brandShipping) {
@@ -243,7 +243,7 @@ function MyBagFinal({ showOrderFor }) {
   };
   const freeShippingHandler = async ({ shipObj, orderObj }) => {
     // Check if the order is eligiable for shipping address
-    if (shipObj) {
+    if (shipObj && iswholeSale) {
       if (shipObj?.type) {
         let tempOrder = order.Account;
         if ((shipObj?.start && shipObj?.end) || shipObj?.amount) {
@@ -417,7 +417,7 @@ function MyBagFinal({ showOrderFor }) {
     if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0 && total > 0) {
       setButtonActive(true);
     }
-    if (freeShipping) {
+    if (freeShipping && iswholeSale) {
       freeShippingHandler({ shipObj: freeShipping, orderObj: order })
     }
   }, [order]);
