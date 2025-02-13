@@ -441,7 +441,7 @@ function MyBagFinal({ showOrderFor }) {
         };
         getProductList({ rawData }).then((list) => {
 
-          setOutOfStockAllow((list?.discount?.portalProductManage&&iswholeSale)?true : false)
+          setOutOfStockAllow((list?.discount?.portalProductManage && iswholeSale) ? true : false)
           setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
         }).catch((err) => {
           console.log({ err });
@@ -495,7 +495,8 @@ function MyBagFinal({ showOrderFor }) {
     if (checkProduct.isLoad) {
       if (outoOfStockAllow && order.items.length) {
         order.items.map((product) => {
-          if (product.qty > product.Available_Quantity__c) {
+          const foundItem = checkProduct.list?.find(item => item.Id === product.Id);
+          if (product.qty > (foundItem?.Available_Quantity__c || 0)) {
             OOSPIncludes = true;
           }
         })
@@ -631,7 +632,8 @@ function MyBagFinal({ showOrderFor }) {
     if (checkProduct.isLoad) {
       if (outoOfStockAllow && order.items.length) {
         order.items.map((product) => {
-          if (product.qty > product.Available_Quantity__c) {
+          const foundItem = checkProduct.list?.find(item => item.Id === product.Id);
+          if (product.qty > (foundItem?.Available_Quantity__c || 0)) {
             OOSPIncludes = true;
           }
         })
