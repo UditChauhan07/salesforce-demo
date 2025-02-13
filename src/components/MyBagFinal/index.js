@@ -17,6 +17,7 @@ import CustomAccordion from "../CustomAccordian/CustomAccordain";
 import StripePay from "../StripePay";
 import Swal from "sweetalert2";
 import { BiCheckboxChecked } from "react-icons/bi";
+import { useMemo } from "react";
 function MyBagFinal({ showOrderFor }) {
   let Img1 = "/assets/images/dummy.png";
   const { order, updateProductQty, removeProduct, deleteOrder, keyBasedUpdateCart, getOrderTotal } = useCart();
@@ -182,8 +183,8 @@ function MyBagFinal({ showOrderFor }) {
   const FetchFreeShipHandler = () => {
     if (order?.Manufacturer?.id) {
       FreeShipHandler({ brandId: order?.Manufacturer?.id }).then((res) => {
-          setFreeShipping(res)
-        freeShippingHandler({shipObj:res,orderObj:order})
+        setFreeShipping(res)
+        freeShippingHandler({ shipObj: res, orderObj: order })
       })
     }
   }
@@ -198,9 +199,10 @@ function MyBagFinal({ showOrderFor }) {
           if (res?.shippingMethod) {
             setOwnShipping(res?.shippingMethod);
           }
-          // if (res?.freeShipping) {
-          //   setFreeShipping(res?.freeShipping)
-          // }
+          if (res?.freeShipping && iswholeSale) {
+            setFreeShipping(res?.freeShipping)
+            freeShippingHandler({shipObj:res?.freeShipping,orderObj:order})
+          }
           if (res?.address || res?.brandShipping) {
             let tempOrder = order.Account;
             if (res?.address) {
@@ -242,7 +244,7 @@ function MyBagFinal({ showOrderFor }) {
   };
   const freeShippingHandler = async ({ shipObj, orderObj }) => {
     // Check if the order is eligiable for shipping address
-    if (shipObj) {
+    if (shipObj && iswholeSale) {
       if (shipObj?.type) {
         let tempOrder = order.Account;
         if ((shipObj?.start && shipObj?.end) || shipObj?.amount) {
@@ -256,7 +258,7 @@ function MyBagFinal({ showOrderFor }) {
 
           if (orderObj?.total >= shipObj?.amount && shipObj?.type == "Amount Based") {
             if (!order?.Account?.shippingMethod?.freeApplied) {
-              console.log("************ amount true **************");
+              // console.log("************ amount true **************");
               tempOrder.shippingMethod = {
                 cal: 0,
                 method: "Free Shipping",
@@ -268,7 +270,7 @@ function MyBagFinal({ showOrderFor }) {
             }
           } else if (date >= start && date <= end && shipObj?.type == "Date Range Based") {
             if (!order?.Account?.shippingMethod?.freeApplied) {
-              console.log("************ date true **************");
+              // console.log("************ date true **************");
               tempOrder.shippingMethod = {
                 cal: 0,
                 method: "Free Shipping",
@@ -280,7 +282,7 @@ function MyBagFinal({ showOrderFor }) {
             }
           } else {
             if (orderObj?.Account?.shippingMethod?.freeApplied) {
-              console.log("************ escape **************");
+              // console.log("************ escape **************");
               if (ownShipping?.number || ownShipping?.method) {
                 tempOrder.shippingMethod = ownShipping
               } else {
@@ -322,9 +324,9 @@ function MyBagFinal({ showOrderFor }) {
               keyBasedUpdateCart({ Account: tempOrder });
             }
           }
-        }else{
+        } else {
           if (orderObj?.Account?.shippingMethod?.freeApplied) {
-            console.log("************ escape **************");
+            // console.log("************ escape **************");
             let tempOrder = order.Account;
             if (ownShipping?.number || ownShipping?.method) {
               tempOrder.shippingMethod = ownShipping
@@ -335,9 +337,9 @@ function MyBagFinal({ showOrderFor }) {
           }
         }
       }
-    }else{
+    } else {
       if (orderObj?.Account?.shippingMethod?.freeApplied) {
-        console.log("************ escape **************");
+        // console.log("************ escape **************");
         let tempOrder = order.Account;
         if (ownShipping?.number || ownShipping?.method) {
           tempOrder.shippingMethod = ownShipping
@@ -416,8 +418,8 @@ function MyBagFinal({ showOrderFor }) {
     if (order?.Account?.id && order?.Manufacturer?.id && order?.items?.length > 0 && total > 0) {
       setButtonActive(true);
     }
-    if (freeShipping) {
-      // freeShippingHandler({ shipObj: freeShipping, orderObj: order })
+    if (freeShipping && iswholeSale) {
+      freeShippingHandler({ shipObj: freeShipping, orderObj: order })
     }
   }, [order]);
 
@@ -440,7 +442,7 @@ function MyBagFinal({ showOrderFor }) {
         };
         getProductList({ rawData }).then((list) => {
 
-          setOutOfStockAllow(list?.discount?.portalProductManage || false)
+          setOutOfStockAllow((list?.discount?.portalProductManage && iswholeSale) ? true : false)
           setCheckProduct({ isLoad: true, list: list?.data?.records || [], discount: list?.discount || {} })
         }).catch((err) => {
           console.log({ err });
@@ -452,8 +454,9 @@ function MyBagFinal({ showOrderFor }) {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
+        setIsPOEditable(false);
         CheckOutStockProduct();
-        // FetchFreeShipHandler();
+        FetchFreeShipHandler();
         // console.log('Page is active');
         // Check for updates or fetch data
       }
@@ -480,6 +483,9 @@ function MyBagFinal({ showOrderFor }) {
       window.removeEventListener('blur', handleBlur);
     };
   }, []);
+  const iswholeSale = useMemo(() => {
+    return order?.ordertype == "wholesale"
+  }, [order])
   useEffect(() => {
     if (order?.Account?.id && order?.Manufacturer?.id && order?.Account?.SalesRepId && !checkProduct?.isLoad && !checkProduct.beingLoading) {
       CheckOutStockProduct()
@@ -491,7 +497,8 @@ function MyBagFinal({ showOrderFor }) {
     if (checkProduct.isLoad) {
       if (outoOfStockAllow && order.items.length) {
         order.items.map((product) => {
-          if (product.qty > product.Available_Quantity__c) {
+          const foundItem = checkProduct.list?.find(item => item.Id === product.Id);
+          if (product.qty > (foundItem?.Available_Quantity__c || 0)) {
             OOSPIncludes = true;
           }
         })
@@ -627,7 +634,8 @@ function MyBagFinal({ showOrderFor }) {
     if (checkProduct.isLoad) {
       if (outoOfStockAllow && order.items.length) {
         order.items.map((product) => {
-          if (product.qty > product.Available_Quantity__c) {
+          const foundItem = checkProduct.list?.find(item => item.Id === product.Id);
+          if (product.qty > (foundItem?.Available_Quantity__c || 0)) {
             OOSPIncludes = true;
           }
         })
@@ -1410,7 +1418,7 @@ function MyBagFinal({ showOrderFor }) {
           </div>
         </section>
       )}
-      {productDetailId?<ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId} />:null}
+      {productDetailId ? <ProductDetails productId={productDetailId} setProductDetailId={setProductDetailId} AccountId={bagValue?.Account?.id} ManufacturerId={bagValue?.Manufacturer?.id} selectedsalesRep={order?.Account?.SalesRepId} /> : null}
     </div>
   );
 }

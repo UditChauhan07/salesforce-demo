@@ -86,6 +86,7 @@ function Product() {
       setCategoryFilters([]);
     }
   }, [productTypeFilter]);
+  
 
   const formattedData = useMemo(() => groupProductDataByCategory(productList.data), [productList.data]);
   const formattedFilterData = useMemo(() => {
@@ -616,7 +617,7 @@ function Product() {
                             border: "1px dashed black",
                           }}
                         >
-                          <Accordion data={productList} formattedData={formattedFilterData} productImage={productImage} productCartSchema={productCartSchema} salesRepId={salesRepId}></Accordion>
+                          <Accordion data={productList} formattedData={formattedFilterData} productImage={productImage} productCartSchema={productCartSchema} salesRepId={salesRepId} isWholeSales={productTypeFilter=="Wholesale"}></Accordion>
                         </div>
                         <div className={`${styles.TotalSide} `}>
                           <div className="d-flex align-items-start flex-column">

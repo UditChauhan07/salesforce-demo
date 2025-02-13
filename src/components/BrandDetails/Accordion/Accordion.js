@@ -8,7 +8,7 @@ import { useCart } from "../../../context/CartContext";
 import ImageHandler from "../../loader/ImageHandler";
 import Swal from "sweetalert2";
 
-const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {} }) => {
+const Accordion = ({ salesRepId, data, formattedData, productImage = [], productCartSchema = {},isWholeSales=false }) => {
   const { testerInclude, sampleInclude } = productCartSchema || true;
   let selectedsalesRep = localStorage?.getItem('selectedSalesrepId')
 
@@ -26,10 +26,11 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
     if (price == '') price = 0;
     updateProductPrice(productId, price || 0)
   }
+  
 
   const onQuantityChange = (element, quantity) => {
     let checkProduct = isProductCarted(element.Id);
-    if (data.discount.portalProductManage) {
+    if (data.discount.portalProductManage && isWholeSales) {
       if (element.Available_Quantity__c) {
         if (quantity > element.Available_Quantity__c && quantity > checkProduct?.items?.qty) {
           return Swal.fire({
@@ -215,7 +216,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                                   min={value.Min_Order_QTY__c || 0}
                                   onChange={(quantity) => {
                                     if (quantity) {
-                                      if (data.discount.portalProductManage) {
+                                      if (data.discount.portalProductManage && isWholeSales) {
                                         console.log({cartProduct,quantity});
                                         
                                         if (value.Available_Quantity__c<1 && quantity > (cartProduct?.items?.qty||0)) {
