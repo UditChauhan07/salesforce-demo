@@ -141,6 +141,7 @@ function MyBagFinal({ showOrderFor }) {
           ];
           // Check paymentIntent status and payment types
           const paymentTypes = brandRes.accountManufacturerData.map((item) => item.Payment_Type__c);
+          console.log(paymentTypes , "payment types")
           const hasNetPaymentType = paymentTypes.some((type) => terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase())));
           if (!hasNetPaymentType) {
             setIsPlayAble(1);
