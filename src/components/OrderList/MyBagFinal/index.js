@@ -30,6 +30,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [reason, setReason] = useState();
   const [restrict, setRestrict] = useState();
   const [canRegenerate, setCanRegenerate] = useState(false);
+  const [generateLink , setGeneratePaymentLink] = useState(false)
   const terms = [
     "Net",
     "terms:2%",
@@ -87,8 +88,13 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const hasNetPaymentType = paymentTypes.some((type) =>
       terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase()))
   );
+  console.log({hasNetPaymentType})
+  console.log(OrderData?.PBL_Status__c , "pbl")
+  if(!hasNetPaymentType){
+    setGeneratePaymentLink(true)
+  }
     console.log({hasNetPaymentType})
-      if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c && !hasNetPaymentType) {
+      if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c ) {
         if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
           setCanRegenerate(true);
         }
@@ -590,7 +596,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
 
                             </div>
                             : null}
-                          {OrderData?.Status__c !== "Order Cancelled"  && OrderData?.Type === "Wholesale Numbers"  &&canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
+                          {OrderData?.Status__c !== "Order Cancelled"  && OrderData?.Type === "Wholesale Numbers"  &&canRegenerate  && OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
                             <div className={Styles.ShipBut}>
                               <button
                                 role="link"
@@ -600,8 +606,19 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
                               </button> </div>
                           ) : null}
+                        
                         </div>
                       </> : null}
+                      {generateLink && !OrderData.PBL_Status__c && OrderData?.Status__c !== "Order Cancelled"  && OrderData?.Type === "Wholesale Numbers"   && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
+                            <div className={Styles.ShipBut}>
+                              <button
+                                role="link"
+                                onClick={handleRegenerateOrder}
+                                disabled={buttonLoading} // Disable button when loading
+                              >
+                                {buttonLoading ? 'Processing...' : 'Generate Payment Link'}
+                              </button> </div>
+                          ) : null}
                     <div className={Styles.ShipAdress2}>
                       {/* <label>NOTE</label> */}
                       <p
