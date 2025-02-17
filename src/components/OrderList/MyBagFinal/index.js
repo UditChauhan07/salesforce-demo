@@ -4,7 +4,7 @@ import Styles from "./Styles.module.css";
 import axios from "axios";
 import Loading from "../../Loading";
 import { Link, useNavigate } from "react-router-dom";
-import { DestoryAuth, GetAuthData, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
+import { DestoryAuth,  ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
 import { MdOutlineDownload } from "react-icons/md";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
@@ -83,14 +83,14 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   );
   setCanRegenerate(OrderData?.PBL_Status__c)
   setPaymentType(hasNetPaymentType)
-  console.log({hasNetPaymentType})
+  
     }
     
   }, [OrderData]);
 
   const handleRegenerateOrder = async () => {
     setIsButtonLoading(true);
-    ; // Button ko turant hide karne ke liye
+    
   
     const Key = JSON.parse(localStorage.getItem('Api Data'));
     try {
@@ -161,9 +161,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   };
 
 
-  // useEffect(()=>{
-  //   handleRegenerateOrder()
-  // } , [])
   const OrderId = JSON.parse(localStorage.getItem("OpportunityId"));
 
   const Key = JSON.parse(localStorage.getItem("Api Data"));
@@ -566,6 +563,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 onClick={() => {
                                   if (!buttonLoading) {
                                     openInNewTab(OrderData.PBL_Status__c)
+                                 
                                   }
                                 }}>Payment Link</button> : null}
 
