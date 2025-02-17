@@ -68,10 +68,15 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     "Check",
     "Wire"
   ];
+  // Check paymentIntent status and payment types
   useEffect(() => {
 
+    const createdDate = new Date(OrderData?.PBL_generation_Date__c);
+    const currentDate = new Date();
+    const timeDifference = currentDate - createdDate; // in milliseconds
     
-   
+    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
+    
     if (OrderData?.Id) {
       const paymentTypes = Array.isArray(OrderData?.Payment_Type__c) 
       ? OrderData.Payment_Type__c 
@@ -84,6 +89,15 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   setCanRegenerate(OrderData?.PBL_Status__c)
   setPaymentType(hasNetPaymentType)
   
+
+  if(!hasNetPaymentType){
+    setGeneratePaymentLink(true)
+  }
+//   if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c ) {
+//         if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
+//           setCanRegenerate(true);
+//         }
+//       }
     }
     
   }, [OrderData]);
@@ -348,7 +362,9 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     }
     setConfirm("Invoice")
   }
+
   console.log({ OrderData });
+  // console.log({hasNetPaymentType})
 
 
 
@@ -566,9 +582,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                  
                                   }
                                 }}>Payment Link</button> : null}
-
-                            </div>
-                            : null}
                          
                         </div>
                       </> : null}
