@@ -3,7 +3,7 @@ import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
 export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
-// export const originAPi =  "http://localhost:5001"
+// export const originAPi =  "http://localhost:3004"
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;
@@ -126,6 +126,29 @@ export function PublicCheck() {
     return false;
   }
 }
+export async function getPaymentLinkDetails({ Id, key }) {
+  try {
+    let response = await fetch(`${originAPi}/stripe/PnX9vXceof`, {
+      method: "POST", // Use POST method
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Id : Id, key : key }), // Send the required data
+    });
+
+    let data = await response.json(); // Parse the JSON response
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to fetch payment details");
+    }
+
+    return data; // Return the API response
+
+  } catch (error) {
+    console.error("Error fetching payment details:", error);
+    return { success: false, error: error.message };
+  }
+} 
 
 export function fetchBeg() {
   let orderStr = localStorage.getItem("AA0KfX2OoNJvz7x");
