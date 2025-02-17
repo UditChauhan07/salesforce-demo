@@ -35,7 +35,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     "Net",
     "terms:2%",
     "TERMS:215",
-    // "TERMS:210",
+    "TERMS:210",
     "TERMS:245",
     "TERMS:410",
     "TERMS:50%",
