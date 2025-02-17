@@ -35,7 +35,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     "Net",
     "terms:2%",
     "TERMS:215",
-    "TERMS:210",
+    // "TERMS:210",
     "TERMS:245",
     "TERMS:410",
     "TERMS:50%",
@@ -71,12 +71,8 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   // Check paymentIntent status and payment types
   useEffect(() => {
 
-    const createdDate = new Date(OrderData?.PBL_generation_Date__c);
-    const currentDate = new Date();
-    const timeDifference = currentDate - createdDate; // in milliseconds
     
-    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
-    
+   
     if (OrderData?.Id) {
       const paymentTypes = Array.isArray(OrderData?.Payment_Type__c) 
       ? OrderData.Payment_Type__c 
@@ -89,15 +85,6 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   setCanRegenerate(OrderData?.PBL_Status__c)
   setPaymentType(hasNetPaymentType)
   
-
-  if(!hasNetPaymentType){
-    setGeneratePaymentLink(true)
-  }
-//   if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c ) {
-//         if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
-//           setCanRegenerate(true);
-//         }
-//       }
     }
     
   }, [OrderData]);
@@ -567,7 +554,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                             {OrderData.Tracking__c}
                           </p>}
                       </div></>}
-                    {OrderData?.Payment_Status__c || OrderData?.Transaction_ID__c || OrderData?.PBL_Status__c || canRegenerate ?
+                      {OrderData?.Payment_Status__c || OrderData?.Transaction_ID__c || OrderData?.PBL_Status__c || canRegenerate ?
                       <>
                         <h2 style={{ marginTop: '10px' }}>Payment Details</h2>
                         <div className={Styles.paymentCheck}>
@@ -582,6 +569,9 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                  
                                   }
                                 }}>Payment Link</button> : null}
+
+                            </div>
+                            : null}
                          
                         </div>
                       </> : null}
