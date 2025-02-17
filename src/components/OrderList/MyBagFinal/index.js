@@ -29,97 +29,134 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [helpId, setHelpId] = useState();
   const [reason, setReason] = useState();
   const [restrict, setRestrict] = useState();
-  const [canRegenerate, setCanRegenerate] = useState(false);
-
+  const [paymentType, setPaymentType] = useState();
+  const [canRegenerate, setCanRegenerate] = useState(true);
+  const terms = [
+    "Net",
+    "terms:2%",
+    "TERMS:215",
+    "TERMS:210",
+    "TERMS:245",
+    "TERMS:410",
+    "TERMS:50%",
+    "TERMS:505",
+    "TERMS:AFT",
+    "TERMS:AMA",
+    "TERMS:BR",
+    "TERMS:BRA",
+    "TERMS:CAT",
+    "TERMS:COD",
+    "TERMS:F30",
+    "TERMS:FA3",
+    "TERMS:GIF",
+    "TERMS:KLA",
+    "TERMS:LOG",
+    "TERMS:N12",
+    "TERMS:N15",
+    "TERMS:N20",
+    "TERMS:N30",
+    "TERMS:N45",
+    "TERMS:N60",
+    "TERMS:N75",
+    "TERMS:N90",
+    "TERMS:NO",
+    "TERMS:NT",
+    "TERMS:OFF",
+    "TERMS:PAY",
+    "TERMS:SHO",
+    "TERMS:UNK",
+    "Check",
+    "Wire"
+  ];
   useEffect(() => {
 
-    const createdDate = new Date(OrderData?.PBL_generation_Date__c);
-    const currentDate = new Date();
-    const timeDifference = currentDate - createdDate; // in milliseconds
-
-    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
+    
+   
     if (OrderData?.Id) {
-      if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) {
-        if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
-          setCanRegenerate(true);
-        }
-      }
+      const paymentTypes = Array.isArray(OrderData?.Payment_Type__c) 
+      ? OrderData.Payment_Type__c 
+      : [OrderData?.Payment_Type__c]; 
+   
+       const hasNetPaymentType = paymentTypes.some((type) =>
+      terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase()))
+     
+  );
+  setCanRegenerate(OrderData?.PBL_Status__c)
+  setPaymentType(hasNetPaymentType)
+  console.log({hasNetPaymentType})
     }
+    
   }, [OrderData]);
 
-
   const handleRegenerateOrder = async () => {
-    setIsButtonLoading(true)
-    const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
+    setIsButtonLoading(true);
+    ; // Button ko turant hide karne ke liye
+  
     const Key = JSON.parse(localStorage.getItem('Api Data'));
-    const calValue = OrderData?.Shipment_cost__c / OrderData?.Amount
-    const payload = {
-      orderId,
-      info: {
-        ManufacturerId__c: OrderData?.ManufacturerId__c,
-        Account_Name : OrderData?.Name , 
-        key: Key?.data?.x_access_token,
-        currency: 'usd',
-        Po_Num : OrderData?.PO_Number__c,
-        Account_Num : OrderData?.Account_Number__c , 
-        list: OrderData?.OpportunityLineItems.map(product => ({
-          ProductCode: product.ProductCode,
-          price: product?.UnitPrice, // Convert to cents
-          qty: product.Quantity,
-        })),
-        shippingMethod: {
-          method: 'UPS',
-          cal: calValue, // Convert to cents
-        },
-      },
-    };
-
     try {
-      const response = await fetch(`${originAPi}/beauty/4eIAaY2H/regenerate-payment-link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const response = await axios.post(
+        `${originAPi}/beauty/4eIAaY2H/regenerate-random-payment-link`,
+        { 
+          orderId: OrderData?.Id, 
+          manufacturerId: OrderData?.ManufacturerId__c, 
+          key: Key?.data?.x_access_token 
+        }
+      );
+  
       await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const data = await response.json();
-
-      if (response.ok) {
+  console.log({response})
+      if (response.data.status === 200) {
+      
         Swal.fire({
           title: "Success!",
-          text: "Payment link has been regenerated successfully.",
+          text: "Payment link has been generated successfully.",
           icon: "success",
           confirmButtonText: "OK",
-          customClass: {
-            confirmButton: 'swal-center-button', // Add a custom class to the button
-          },
-
+          customClass: { confirmButton: 'swal-center-button' },
           allowOutsideClick: false,
-
-          preConfirm: () => {
-            setTimeout(() => {
-              window.location.reload()
-            }, [1500])
-              ; // Refresh the page on OK
-          },
+        }).then(() => {
+        
+           window.location.href = origin + "/orderDetails"
+           window.location.reload()
+       
         });
+       
       } else {
-        Swal.fire({
-          title: "Failed!",
-          text: "You can Generated Payment Link after 24 hours",
-          icon: "Falied",
-          confirmButtonText: "OK",
-          customClass: {
-            confirmButton: 'swal-center-button', // Add a custom class to the button
-          }
-        })
-        console.error('Error:', data);
+        if(response.data.status === 325){
+          Swal.fire({
+            title: "Warning!",
+            text: "Payment link exists for this order",
+            icon: "warning",
+            confirmButtonText: "OK",
+            customClass: { confirmButton: 'swal-center-button' },
+            allowOutsideClick: false,
+          }).then(() => {
+          
+           
+         
+          });
+        }else{
+          Swal.fire({
+            title: "Error!",
+            text: "Error genrating payment link!",
+            icon: "error",
+            confirmButtonText: "OK",
+            customClass: { confirmButton: 'swal-center-button' },
+            allowOutsideClick: false,
+          }).then(() => {
+          
+           
+         
+          });
+
+        }
+        
       }
     } catch (error) {
       console.error('Error:', error);
-    }
-    finally {
-      setIsButtonLoading(false)
+    
+    } finally {
+      setIsButtonLoading(false);
     }
   };
 
@@ -210,12 +247,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   };
 
   useEffect(() => {
-    // let rawData = {key:Key.data.access_token,id:OrderId}
-    // getOrderDetailsBasedId({rawData}).then((res)=>{
-    //   console.warn({res});
-    // }).catch((error)=>{
-    //   console.warn({error});
-    // })
+  
     getOrderDetails();
   }, []);
 
@@ -539,18 +571,24 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
 
                             </div>
                             : null}
-                          {OrderData?.Status__c !== "Order Cancelled"  && OrderData.PBL_Status__c && OrderData?.Type === "Wholesale Numbers"  &&canRegenerate && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
-                            <div className={Styles.ShipBut}>
-                              <button
-                                role="link"
-                                onClick={handleRegenerateOrder}
-                                disabled={buttonLoading} // Disable button when loading
-                              >
-                                {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
-                              </button> </div>
-                          ) : null}
+                         
                         </div>
                       </> : null}
+                      { !canRegenerate && !OrderData?.PBL_Status__c && OrderData?.Status__c !== "Order Cancelled"  
+  && OrderData?.Type === "Wholesale Numbers"  
+  && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') 
+  && !OrderData?.Transaction_ID__c) && !paymentType ? ( 
+    <div className={Styles.ShipBut}>
+      <button
+        role="link"
+        onClick={handleRegenerateOrder}
+        disabled={buttonLoading} // Disable button when loading
+      >
+        {buttonLoading ? 'Processing...' : 'Generate Payment Link'}
+      </button> 
+    </div>
+  ) : null 
+}
                     <div className={Styles.ShipAdress2}>
                       {/* <label>NOTE</label> */}
                       <p
