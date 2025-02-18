@@ -98,7 +98,7 @@ function App() {
               <Route path="/linkdin" element={<Linkdin />}></Route>
               <Route path="/join-us" element={<JoinUs />}></Route>
               <Route path="logout" element={<Logout />}></Route>
-              <Route path="/lead" element={<SignUp />}></Route>
+              <Route path="/sign-up" element={<SignUp />}></Route>
               <Route path="/orderDetails" element={<MyBagOrder />}></Route>
               {/* <Route path="/customerService" element={<CustomerServiceForm />}></Route> */}
               <Route path="/customerService" element={<CustomerService />}></Route>
