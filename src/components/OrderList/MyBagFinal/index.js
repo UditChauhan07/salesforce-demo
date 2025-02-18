@@ -4,7 +4,7 @@ import Styles from "./Styles.module.css";
 import axios from "axios";
 import Loading from "../../Loading";
 import { Link, useNavigate } from "react-router-dom";
-import { DestoryAuth, GetAuthData, ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
+import { DestoryAuth,  ShareDrive, defaultLoadTime, getOrderDetailsInvoice, getOrderIdDetails, getProductImageAll, originAPi, supportShare } from "../../../lib/store";
 import { MdOutlineDownload } from "react-icons/md";
 import LoaderV2 from "../../loader/v2";
 import ProductDetails from "../../../pages/productDetails";
@@ -29,8 +29,8 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   const [helpId, setHelpId] = useState();
   const [reason, setReason] = useState();
   const [restrict, setRestrict] = useState();
-  const [canRegenerate, setCanRegenerate] = useState(false);
-  const [generateLink , setGeneratePaymentLink] = useState(false)
+  const [paymentType, setPaymentType] = useState();
+  const [canRegenerate, setCanRegenerate] = useState(true);
   const terms = [
     "Net",
     "terms:2%",
@@ -69,119 +69,99 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
     "Wire"
   ];
   // Check paymentIntent status and payment types
-
   useEffect(() => {
 
-    const createdDate = new Date(OrderData?.PBL_generation_Date__c);
-    const currentDate = new Date();
-    const timeDifference = currentDate - createdDate; // in milliseconds
     
-    // Check if 10 minutes have passed (10 minutes = 10 * 60 * 1000 milliseconds)
-    
+   
     if (OrderData?.Id) {
       const paymentTypes = Array.isArray(OrderData?.Payment_Type__c) 
       ? OrderData.Payment_Type__c 
       : [OrderData?.Payment_Type__c]; 
-  
-
-  
-  const hasNetPaymentType = paymentTypes.some((type) =>
+   
+       const hasNetPaymentType = paymentTypes.some((type) =>
       terms.some((term) => type?.toLowerCase().startsWith(term.toLowerCase()))
+     
   );
-  console.log({hasNetPaymentType})
-  console.log(OrderData?.PBL_Status__c , "pbl")
-  if(!hasNetPaymentType){
-    setGeneratePaymentLink(true)
-  }
-    console.log({hasNetPaymentType})
-      if ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c ) {
-        if (timeDifference >= 24 * 60 * 60 * 1000 || !OrderData?.PBL_generation_Date__c) {
-          setCanRegenerate(true);
-        }
-      }
+  setCanRegenerate(OrderData?.PBL_Status__c)
+  setPaymentType(hasNetPaymentType)
+  
     }
+    
   }, [OrderData]);
 
-
   const handleRegenerateOrder = async () => {
-    setIsButtonLoading(true)
-    const orderId = JSON.parse(localStorage.getItem('OpportunityId'));
+    setIsButtonLoading(true);
+    
+  
     const Key = JSON.parse(localStorage.getItem('Api Data'));
-    const calValue = OrderData?.Shipment_cost__c / OrderData?.Amount
-    const payload = {
-      orderId,
-      info: {
-        ManufacturerId__c: OrderData?.ManufacturerId__c,
-        Account_Name : OrderData?.Name , 
-        key: Key?.data?.x_access_token,
-        currency: 'usd',
-        Po_Num : OrderData?.PO_Number__c,
-        Account_Num : OrderData?.Account_Number__c , 
-        list: OrderData?.OpportunityLineItems.map(product => ({
-          ProductCode: product.ProductCode,
-          price: product?.UnitPrice, // Convert to cents
-          qty: product.Quantity,
-        })),
-        shippingMethod: {
-          method: 'UPS',
-          cal: calValue, // Convert to cents
-        },
-      },
-    };
-
     try {
-      const response = await fetch(`${originAPi}/beauty/4eIAaY2H/regenerate-payment-link`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const response = await axios.post(
+        `${originAPi}/beauty/4eIAaY2H/regenerate-random-payment-link`,
+        { 
+          orderId: OrderData?.Id, 
+          manufacturerId: OrderData?.ManufacturerId__c, 
+          key: Key?.data?.x_access_token 
+        }
+      );
+  
       await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const data = await response.json();
-
-      if (response.ok) {
+  console.log({response})
+      if (response.data.status === 200) {
+      
         Swal.fire({
           title: "Success!",
-          text: "Payment link has been regenerated successfully.",
+          text: "Payment link has been generated successfully.",
           icon: "success",
           confirmButtonText: "OK",
-          customClass: {
-            confirmButton: 'swal-center-button', // Add a custom class to the button
-          },
-
+          customClass: { confirmButton: 'swal-center-button' },
           allowOutsideClick: false,
-
-          preConfirm: () => {
-            setTimeout(() => {
-              window.location.reload()
-            }, [1500])
-              ; // Refresh the page on OK
-          },
+        }).then(() => {
+        
+           window.location.href = origin + "/orderDetails"
+           window.location.reload()
+       
         });
+       
       } else {
-        Swal.fire({
-          title: "Failed!",
-          text: "You can Generated Payment Link after 24 hours",
-          icon: "Falied",
-          confirmButtonText: "OK",
-          customClass: {
-            confirmButton: 'swal-center-button', // Add a custom class to the button
-          }
-        })
-        console.error('Error:', data);
+        if(response.data.status === 325){
+          Swal.fire({
+            title: "Warning!",
+            text: "Payment link exists for this order",
+            icon: "warning",
+            confirmButtonText: "OK",
+            customClass: { confirmButton: 'swal-center-button' },
+            allowOutsideClick: false,
+          }).then(() => {
+          
+           
+         
+          });
+        }else{
+          Swal.fire({
+            title: "Error!",
+            text: "Error genrating payment link!",
+            icon: "error",
+            confirmButtonText: "OK",
+            customClass: { confirmButton: 'swal-center-button' },
+            allowOutsideClick: false,
+          }).then(() => {
+          
+           
+         
+          });
+
+        }
+        
       }
     } catch (error) {
       console.error('Error:', error);
-    }
-    finally {
-      setIsButtonLoading(false)
+    
+    } finally {
+      setIsButtonLoading(false);
     }
   };
 
 
-  // useEffect(()=>{
-  //   handleRegenerateOrder()
-  // } , [])
   const OrderId = JSON.parse(localStorage.getItem("OpportunityId"));
 
   const Key = JSON.parse(localStorage.getItem("Api Data"));
@@ -265,12 +245,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
   };
 
   useEffect(() => {
-    // let rawData = {key:Key.data.access_token,id:OrderId}
-    // getOrderDetailsBasedId({rawData}).then((res)=>{
-    //   console.warn({res});
-    // }).catch((error)=>{
-    //   console.warn({error});
-    // })
+  
     getOrderDetails();
   }, []);
 
@@ -579,7 +554,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                             {OrderData.Tracking__c}
                           </p>}
                       </div></>}
-                    {OrderData?.Payment_Status__c || OrderData?.Transaction_ID__c || OrderData?.PBL_Status__c || canRegenerate ?
+                      {OrderData?.Payment_Status__c || OrderData?.Transaction_ID__c || OrderData?.PBL_Status__c || canRegenerate ?
                       <>
                         <h2 style={{ marginTop: '10px' }}>Payment Details</h2>
                         <div className={Styles.paymentCheck}>
@@ -591,34 +566,30 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 onClick={() => {
                                   if (!buttonLoading) {
                                     openInNewTab(OrderData.PBL_Status__c)
+                                 
                                   }
                                 }}>Payment Link</button> : null}
 
                             </div>
                             : null}
-                          {OrderData?.Status__c !== "Order Cancelled"  && OrderData?.Type === "Wholesale Numbers"  &&canRegenerate  && OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
-                            <div className={Styles.ShipBut}>
-                              <button
-                                role="link"
-                                onClick={handleRegenerateOrder}
-                                disabled={buttonLoading} // Disable button when loading
-                              >
-                                {buttonLoading ? 'Processing...' : 'Regenerate Payment Link'}
-                              </button> </div>
-                          ) : null}
-                        
+                         
                         </div>
                       </> : null}
-                      {generateLink && !OrderData.PBL_Status__c && OrderData?.Status__c !== "Order Cancelled"  && OrderData?.Type === "Wholesale Numbers"   && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ? (
-                            <div className={Styles.ShipBut}>
-                              <button
-                                role="link"
-                                onClick={handleRegenerateOrder}
-                                disabled={buttonLoading} // Disable button when loading
-                              >
-                                {buttonLoading ? 'Processing...' : 'Generate Payment Link'}
-                              </button> </div>
-                          ) : null}
+                      { !canRegenerate && !OrderData?.PBL_Status__c && OrderData?.Status__c !== "Order Cancelled"  
+  && OrderData?.Type === "Wholesale Numbers"  
+  && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') 
+  && !OrderData?.Transaction_ID__c) && !paymentType ? ( 
+    <div className={Styles.ShipBut}>
+      <button
+        role="link"
+        onClick={handleRegenerateOrder}
+        disabled={buttonLoading} // Disable button when loading
+      >
+        {buttonLoading ? 'Processing...' : 'Generate Payment Link'}
+      </button> 
+    </div>
+  ) : null 
+}
                     <div className={Styles.ShipAdress2}>
                       {/* <label>NOTE</label> */}
                       <p

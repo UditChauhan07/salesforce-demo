@@ -64,7 +64,7 @@ function MyBagFinal({ showOrderFor }) {
   const [freeShipping, setFreeShipping] = useState(false);
   const [ownShipping, setOwnShipping] = useState({});
   const handleNameChange = (event) => {
-    const limit = 10;
+    const limit = 12;
     const value = event.target.value.slice(0, limit); // Restrict to 11 characters
     setPONumber(value);
   };

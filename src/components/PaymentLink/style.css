@@ -1,0 +1,391 @@
+.full-section{
+    /* height: 100%; */
+    width: 100%;
+    display: flex;
+    gap: 50px;
+    align-items: start;
+    margin: 0px auto 0px auto;
+    justify-content: center;
+    /* flex-wrap: wrap; */
+   max-width: 1400px;
+    padding: 60px 0;
+    /* display: -webkit-box; */
+    /* background-color: #878787; */
+    padding: 30px 30px;
+
+}
+.detail-section {
+    
+    width: 40%;
+   gap: 20px;
+
+    /* display: grid; */
+  
+    padding: 40px 10px;
+    /* border: 1px solid #dadada; */
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+.GridSperata{
+    display: grid;
+    gap: 0px;
+   
+}
+
+.stripeCard{
+    max-width: 1400px;
+    /* background-color: #f4f5fc; */
+    background-color: #fff;
+    padding: 0 20px;
+    margin: auto;
+    /* height: 100vh; */
+}
+
+
+.detailed-sub-section{
+  /* background-color: #ebf6fb; */
+    /* height: 100%; */
+    padding: 0px 0px;
+    width:100% !important;
+    border-radius:10px ;
+}
+
+.detailed-sub-section ul{
+padding: 0;
+}
+
+.NamePrice{
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #1a1a1ae6;
+    font-weight: 500;
+    margin: 0 0 0px 0;
+}
+
+.NamePrice p{
+    margin: 0;
+}
+
+.QuantySmall p{
+    margin: 0;
+}
+
+.QuantySmall{
+    display: flex;
+    justify-content: space-between;
+color: #1a1a1a80;
+font-size: 12px;
+margin: 0 0 16px 0;
+}
+
+.pay-button{
+    color:  rgb(0, 0, 0);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.payment-section{
+  box-shadow: -8px 0 15px 0 rgba(199, 199, 199, 0.18);  
+  
+  padding: 40px 30px ;
+  border-radius: 10px;
+  background-color: #ffffff;
+  width: 60%;
+  max-width: 520px;
+}
+.payment-section input[type='text']:focus{
+outline: none;
+box-shadow: 0 0 0 1px rgba(50,151,211,0.7),0 1px 1px 0 rgba(0,0,0,0.07),0 0 0 4px rgba(50,151,211,0.3) !important ;
+}
+
+.totpara1{
+    font-size: 16px;
+    color: #1a1a1a99;
+    margin: 0;
+}
+
+.totpara2{
+    font-size: 36px;
+    color: #1a1a1ae6;
+    font-weight: 600;
+}
+
+
+.pay-green{
+    color:#011e0f ;
+    background-color: #00d66f;
+}
+
+.Divider{
+    position: relative;
+    text-align: center;
+    padding: 0 0px;
+}
+
+.Divider hr{
+    color: #aaaaaa;   
+}
+
+
+
+.Divider p{
+    position: absolute;
+    top: -13px;
+    left: 0;
+    right: 0;
+   
+
+}
+
+
+.Divider p span{
+    background-color: #fff;
+    padding: 5px 10px;
+
+}
+
+.paymentL label{
+color:#1a1a1ab3;
+font-size: 16px;
+font-weight: 500;
+width: 100%;
+}
+
+.PerINfo{
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.CardElem{
+    display: flex;
+    gap: 0px;
+    margin: -1px 0 0 0 !important;
+    padding: 0;
+}
+
+.CardElem label{
+    width: 100%;
+}
+
+
+
+.CardElem .carBor{
+    border: 1px solid #dee2e6;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 5px;
+    height: 40px;
+}
+
+.carBor1{
+    border: 1px solid #dee2e6;
+    height: 40px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.carBor2{
+    height: 40px;
+
+    border: 1px solid #dee2e6;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 0px;
+}
+
+.payBtn{
+    margin: 40px 0 0 0 !important;
+}
+
+.labeREl{
+    position: relative;
+}
+
+.labeREl .imgControl {
+    display: flex;
+    position: absolute;
+    gap: 1px;
+    right: 6px;
+    top: 29px;
+    background-color: #ffffff;
+      padding: 5px 0 6px 150px;
+}
+
+.countryBorder{
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.countryBorder select{
+    
+    height: 39px;
+    width: 100%;
+    outline: none;
+}
+
+.countryBorder select:focus{
+    box-shadow: 0 0 0 1px rgba(50,151,211,0.7),0 1px 1px 0 rgba(0,0,0,0.07),0 0 0 4px rgba(50,151,211,0.3) !important ;
+
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border: solid #000;
+
+}
+
+.TermAndCondition{
+    display: flex;
+    gap: 5px;
+}
+
+
+.TermAndCondition{
+box-shadow: 0 0 0 1px #e0e0e0,0 2px 4px 0 rgba(0,0,0,0.07),0 1px 1.5px 0 rgba(0,0,0,0.05);
+padding: 10px 10px;
+border-radius: 5px;
+}
+
+.accountNAME {
+    margin: 0 0 16px 0px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+    text-align: start;
+    
+
+}
+
+.carBor1 .OffsetContainer{
+    display: none !important;
+}
+#link-pay{
+    display: none !important;
+}
+span#link-pay-text {
+    color: red !important;
+  }
+
+
+
+
+.paymentDetel{
+    font-size: 18px;
+    font-weight: 600;
+    color: #000;
+    margin: 0 0 16px 0;
+}
+
+
+
+
+@media(max-width:1220px){
+    .stripeCard{
+        height: 100%;
+}
+.detail-section{
+    margin: auto;
+}
+
+.payment-section{
+    margin: auto;
+}
+
+}
+
+@media(max-width:880px){
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 80px;
+              }
+}
+
+@media (max-width :800px){
+    .payment-section  , .detail-section{
+        width: 95%;
+        height: max-content;
+    }
+
+    .labeREl .imgControl {
+       
+        padding: 5px 0 6px 310px;
+       
+            }
+
+   
+    .accountNAME strong{
+        font-size: 20px;
+    }
+  
+    .full-section{
+        display: grid;
+        justify-content: unset;
+    }
+
+    .payment-section{
+        max-width: unset !important;
+    }
+}
+
+
+@media(max-width:736px){
+
+    .full-section {
+     
+        padding: 30px 0px;
+    }
+
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 266px;
+              }
+}
+
+@media(max-width:694px){
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 216px;
+              }
+}
+
+@media(max-width:630px){
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 180px;
+              }
+}
+
+@media(max-width:598px){
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 130px;
+              }
+}
+
+@media(max-width:554px){
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 80px;
+              }
+}
+
+
+@media(max-width:510px){
+    .labeREl .imgControl {
+       
+          padding: 5px 0 6px 30px;
+              }
+}
+
+
+
+
+
