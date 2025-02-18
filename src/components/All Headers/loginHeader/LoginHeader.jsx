@@ -36,7 +36,7 @@ const LoginHeader = () => {
                   </div>
                   {/* <img src={"/assets/images/dropDownArrow.svg"} alt="img" /> */}
                 </p>
-                <p className={`m-0 ${style.language}`} style={{cursor:"pointer"}} onClick={()=>navigate("/lead")}>Sign up</p>
+                <p className={`m-0 ${style.language}`} style={{cursor:"pointer"}} onClick={()=>navigate("/sign-up")}>Sign up</p>
               </div>
             </div>
             <hr className={`${styles.hr} shadow-sm`}></hr>

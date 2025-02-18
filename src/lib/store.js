@@ -133,7 +133,7 @@ export async function getPaymentLinkDetails({ Id, key }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ Id : Id, key : key }), // Send the required data
+      body: JSON.stringify({ Id: Id, key: key }), // Send the required data
     });
 
     let data = await response.json(); // Parse the JSON response
@@ -148,7 +148,7 @@ export async function getPaymentLinkDetails({ Id, key }) {
     console.error("Error fetching payment details:", error);
     return { success: false, error: error.message };
   }
-} 
+}
 
 export function fetchBeg() {
   let orderStr = localStorage.getItem("AA0KfX2OoNJvz7x");
@@ -225,51 +225,59 @@ export async function FreeShipHandler({ brandId }) {
 
 export async function POGenerator() {
   try {
-
-    let orderDetails = fetchBeg();
-    let date = new Date();
-    const sanitizeString = (str) =>
-      str
-        .replace(/[^a-zA-Z0-9 ]/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
-    const sanitizedAccountName = sanitizeString(orderDetails.Account?.name || "");
-    const sanitizedManufacturerName = sanitizeString(orderDetails.Manufacturer?.name || "");
-
-    const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov2", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        accountName: sanitizedAccountName,
-        manufacturerName: sanitizedManufacturerName,
-        orderDate: date.toISOString(),
-        accountId: orderDetails.Account?.id,  // Make sure this is passed
-        manufacturerId: orderDetails.Manufacturer?.id // Ensure this is passed
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+    let user = await GetAuthData();
+    let key = user?.x_access_token || null;
+    if (key) {
+      let orderDetails = fetchBeg();
+      let date = new Date();
+      const sanitizeString = (str) =>
+        str
+          .replace(/[^a-zA-Z0-9 ]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+      const sanitizedAccountName = sanitizeString(orderDetails.Account?.name || "");
+      const sanitizedManufacturerName = sanitizeString(orderDetails.Manufacturer?.name || "");
 
 
-    const poData = await response.json();
-    if (poData.success) {
+      const response = await fetch(originAPi + "/qX8COmFYnyAj4e2/generatepov3", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key,
+          accountName: sanitizedAccountName,
+          manufacturerName: sanitizedManufacturerName,
+          orderDate: date.toISOString(),
+          accountId: orderDetails.Account?.id,  // Make sure this is passed
+          manufacturerId: orderDetails.Manufacturer?.id // Ensure this is passed
+        }),
+      });
 
-      let res = await poData;
-      let poNumber = res.poNumber;
-      let address = res.address;
-      let brandShipping = res?.brandShipping;
-      let shippingMethod = res?.shippingMethod;
-      let checkBrandAllow = res?.checkBrandAllow;
-      let freeShipping = res?.freeShipping;
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-      return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow, freeShipping };
+
+      const poData = await response.json();
+      if (poData.success) {
+
+        let res = await poData;
+        let poNumber = res.poNumber;
+        let address = res.address;
+        let brandShipping = res?.brandShipping;
+        let shippingMethod = res?.shippingMethod;
+        let checkBrandAllow = res?.checkBrandAllow;
+        let freeShipping = res?.freeShipping;
+
+        return { poNumber, address, brandShipping, shippingMethod, checkBrandAllow, freeShipping };
+      } else {
+        console.error('Failed to generate PO number:', poData.message);
+        return null;
+      }
     } else {
-      console.error('Failed to generate PO number:', poData.message);
       return null;
+      console.error('Invalid key');
     }
   } catch (error) {
     console.error('Error generating PO number:', error.message);
@@ -502,8 +510,8 @@ export async function CartHandler({ op = null, cart }) {
     headers: headersList,
   });
   let data = JSON.parse(await response.text());
-  console.log({data});
-  
+  console.log({ data });
+
   if (data?.data) {
     return data.data;
   } else {
