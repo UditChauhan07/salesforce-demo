@@ -12,7 +12,7 @@ import ModalPage from "../Modal UI";
 import QuantitySelector from "../BrandDetails/Accordion/QuantitySelector";
 import ImageHandler from "../loader/ImageHandler";
 
-const TopProductCard = ({ data, productImages, to = null, accountDetails = {} }) => {
+const TopProductCard = ({ data, accountDetails = {} }) => {
 
   const navigate = useNavigate();
   const [productDetailId, setProductDetailId] = useState(null);
@@ -185,7 +185,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails = {} })
   };
 
 
-  useEffect(() => { }, [productDetailId, productImages]);
+  useEffect(() => { }, [productDetailId]);
   return (
     <section>
       <ModalPage
@@ -312,7 +312,7 @@ const TopProductCard = ({ data, productImages, to = null, accountDetails = {} })
                         setBrand(product.ManufacturerId__c);
                         setsalesRepId(accountDetails?.[product.ManufacturerId__c]?.SalesRepId ?? null);
                       }}
-                      image={{ src: product.ProductImage ? product.ProductImage : productImages?.images?.[product.ProductCode]?.ContentDownloadUrl ?? "\\assets\\images\\dummy.png" }}
+                      Id={product.Id}
                       className={Styles.imgHolder}
                     />
                   </div>

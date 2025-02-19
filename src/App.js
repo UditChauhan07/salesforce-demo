@@ -117,9 +117,9 @@ function App() {
               <Route path="/AuditReport" element={<AuditReport />} />
               <Route path="/account-contact-detailed-Report" element={<ContactDetailedReport />} />
               <Route path='/productPage/:id' element={<ProductPage />} />
-              <Route path='/public/product/order' element={<ProductOrder/>} />
-              <Route path="/learn-more" element={<LearnMore/>}/>
-              <Route path = '/paymentLink/:order_Id/:randomToken'  element = {<PaymentLink/>} />  
+              <Route path='/public/product/order' element={<ProductOrder />} />
+              <Route path="/learn-more" element={<LearnMore />} />
+              <Route path='/paymentLink/:order_Id/:randomToken' element={<PaymentLink />} />
               <Route path="*" element={<PageNotFound />}></Route>
 
               {/* 1234 */}

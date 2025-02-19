@@ -2,6 +2,7 @@ import axios from "axios";
 import LZString from 'lz-string';
 import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
+import { addImageToDB } from "./indexedDBUtils";
 export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
 // export const originAPi =  "http://localhost:3004"
 export const defaultLoadTime = 1800000;
@@ -988,6 +989,40 @@ export async function getProductImageAll({ rawData }) {
     DestoryAuth();
   } else {
     return data.data;
+  }
+}
+
+export async function fetchProductImageAll({ Id = "'all'" }) {
+  let headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/json",
+  };
+  let url = originAPi + `EAZ7KKgTyBDsI4M/Vds0rHtc7XSWUlF/${Id}/WpCcbIpvCe7SqqT,IFSmK2b7XXOFIbH/kkCCtq4PqLYtJJn`
+
+  let response = await fetch(url, {
+    headers: headersList,
+  });
+  let data = JSON.parse(await response.text()) || {};
+  let productId = Object.keys(data);
+  if (productId.length) {
+    let status = false;
+    Promise.all(productId.map(async (element) => {
+
+      if (data[element]) {
+
+        let productImage = [];
+        if (Array.isArray(data[element])) {
+          productImage = data[element];
+        }
+        if(productImage.length){
+          status =true
+        }
+        return await addImageToDB(element, productImage);
+      }
+    }))    
+    return status;
+  } else {
+    return false;
   }
 }
 
