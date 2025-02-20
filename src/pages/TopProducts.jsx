@@ -35,76 +35,16 @@ const TopProducts = () => {
   const [manufacturerFilter, setManufacturerFilter] = useState();
   const [selectedMonth, setSelectedMonth] = useState();
   const [searchText, setSearchText] = useState();
-  const [productImages, setProductImages] = useState({});
-  const [isLoaded, setIsLoaded] = useState(false);
   const [accountDetails, setAccountDetails] = useState()
 
   const navigate = useNavigate()
 
 
   const readyTopProducthandle = (products) => {
-    let data = ShareDrive();
-    if (!data) {
-      data = {};
-    }
-    if (manufacturerFilter) {
-      if (!data[manufacturerFilter]) {
-        data[manufacturerFilter] = {};
-      }
-      if (Object.values(data[manufacturerFilter]).length > 0) {
-        setIsLoaded(true)
-        setProductImages({ isLoaded: true, images: data[manufacturerFilter] })
-      } else {
-        setIsLoaded(true)
-        setProductImages({ isLoaded: false, images: {} })
-      }
-    }
     let result = products.data.sort(function (a, b) {
       return b.Sales - a.Sales;
     });
     setTopProductList({ isLoaded: true, data: result, message: products.message })
-    if (result.length > 0) {
-      let productCode = "";
-      let manuProdutcode = {};
-      result?.map((product, index) => {
-        productCode += `'${product.ProductCode}'`
-        if (result.length - 1 != index) productCode += ', ';
-        manuProdutcode[product.ProductCode] = product.ManufacturerId__c;
-      })
-      getProductImageAll({ rawData: { codes: productCode } }).then((res) => {
-        console.log({ res });
-
-        if (res) {
-          if (manufacturerFilter) {
-            if (data[manufacturerFilter]) {
-              data[manufacturerFilter] = { ...data[manufacturerFilter], ...res }
-            } else {
-              data[manufacturerFilter] = res
-            }
-            ShareDrive(data)
-          } else {
-            if (manuProdutcode) {
-              let ProductCodeList = Object.keys(res);
-              if (ProductCodeList.length) {
-                ProductCodeList.map((code) => {
-                  if (manuProdutcode[code]) {
-                    data[manuProdutcode[code]] = { ...data[manuProdutcode[code]], ...res[code] };
-                  }
-                })
-                ShareDrive(data)
-              }
-            }
-          }
-          setProductImages({ isLoaded: true, images: res });
-          setIsLoaded(true)
-        } else {
-          setIsLoaded(true)
-          setProductImages({ isLoaded: true, images: {} });
-        }
-      }).catch((err) => {
-        console.log({ err });
-      })
-    }
   }
 
   useEffect(() => {
@@ -163,7 +103,6 @@ const TopProducts = () => {
     })
   }
   const btnHandler = ({ month, manufacturerId }) => {
-    setIsLoaded(false)
     setTopProductList({ isLoaded: false, data: [], message: null })
     setManufacturerFilter(manufacturerId);
     setSelectedMonth(month);
@@ -236,7 +175,7 @@ const TopProducts = () => {
           </div>
         </div>
         :
-        <TopProductCard data={topProductList.data} isLoaded={isLoaded} productImages={productImages} accountDetails={accountDetails} />}
+        <TopProductCard data={topProductList.data} accountDetails={accountDetails} />}
     </AppLayout>
   );
 };

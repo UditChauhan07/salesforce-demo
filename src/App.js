@@ -98,7 +98,7 @@ function App() {
               <Route path="/linkdin" element={<Linkdin />}></Route>
               <Route path="/join-us" element={<JoinUs />}></Route>
               <Route path="logout" element={<Logout />}></Route>
-              <Route path="/lead" element={<SignUp />}></Route>
+              <Route path="/sign-up" element={<SignUp />}></Route>
               <Route path="/orderDetails" element={<MyBagOrder />}></Route>
               {/* <Route path="/customerService" element={<CustomerServiceForm />}></Route> */}
               <Route path="/customerService" element={<CustomerService />}></Route>
@@ -117,9 +117,9 @@ function App() {
               <Route path="/AuditReport" element={<AuditReport />} />
               <Route path="/account-contact-detailed-Report" element={<ContactDetailedReport />} />
               <Route path='/productPage/:id' element={<ProductPage />} />
-              <Route path='/public/product/order' element={<ProductOrder/>} />
-              <Route path="/learn-more" element={<LearnMore/>}/>
-              <Route path = '/paymentLink/:order_Id/:randomToken'  element = {<PaymentLink/>} />  
+              <Route path='/public/product/order' element={<ProductOrder />} />
+              <Route path="/learn-more" element={<LearnMore />} />
+              <Route path='/paymentLink/:order_Id/:randomToken' element={<PaymentLink />} />
               <Route path="*" element={<PageNotFound />}></Route>
 
               {/* 1234 */}

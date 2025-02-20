@@ -141,7 +141,7 @@ const BrandDetailCard = ({ brandId }) => {
                                                     Shop The Collection
                                                 </Link>
                                                 <div className="fitContent d-flex justify-content-center align-items-center" onClick={() => setProductId(item.Id)}>
-                                                    <ImageHandler image={{ src: item.ProductImage ?? productImages?.images?.[item.ProductCode]?.ContentDownloadUrl ?? productImages?.images?.[item.ProductCode] ?? "dummy.png" }} />
+                                                    <ImageHandler Id={item.Id} />
                                                 </div>
                                             </div>
                                         </div>

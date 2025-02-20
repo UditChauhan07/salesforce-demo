@@ -138,7 +138,7 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
           <table className="table table-hover ">
             <thead>
               <tr>
-                {/* <th>Image</th> */}
+                <th>Image</th>
                 <th style={{ width: "200px", paddingLeft: "22px" }}>Title</th>
                 <th>Product Code</th>
                 <th>UPC</th>
@@ -184,13 +184,13 @@ const Accordion = ({ salesRepId, data, formattedData, productImage = [], product
                           salesPrice = (+listPrice - (discount / 100) * +listPrice).toFixed(2);
                           return (
                             <tr className={`${styles.ControlTR} w-full `} key={indexed}>
-                              {/* <td className={styles.ControlStyle} style={{ cursor: "pointer" }}> */}
-                              {/* <ImageHandler
-                                  image={{ src: value?.ContentDownloadUrl || productImage.images[value?.ProductCode]?.ContentDownloadUrl || productImage.images[value?.ProductCode] || "dummy.png" }}
+                            <td className={styles.ControlStyle} style={{ cursor: "pointer" }}>
+                          <ImageHandler
+                                  Id={value.Id}
                                   width={50}
                                   onClick={() => sendProductIdHandler({ productId: value.Id, productName: value.Name })}
-                                /> */}
-                              {/* </td> */}
+                                />
+                          </td>
                               <td
                                 className="text-capitalize linkEffect"
                                 style={{ fontSize: "13px", cursor: "pointer", paddingLeft: "22px" }}

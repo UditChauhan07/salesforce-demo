@@ -462,7 +462,7 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                                 <div className={Styles.Mainbox}>
                                   <div className={Styles.Mainbox1M}>
                                      <div className={Styles.Mainbox2} style={{ cursor: 'pointer' }}>
-                                      <ImageHandler image={{ src: item.ProductImage ?? item?.ContentDownloadUrl ?? productImage.images[item.ProductCode]?.ContentDownloadUrl ?? productImage.images[item.ProductCode] ?? 'dummy.png' }} onClick={() => { setProductDetailId(item?.Product2Id) }} width={50} />
+                                      <ImageHandler Id={item?.Product2Id} onClick={() => { setProductDetailId(item?.Product2Id) }} width={50} />
                                      </div>
                                     <div className={Styles.Mainbox3}>
                                       <h2 onClick={() => { setProductDetailId(item?.Product2Id) }} className="linkEffect" style={{ cursor: 'pointer' }}>{item.Name.split(OrderData.Name)}</h2>

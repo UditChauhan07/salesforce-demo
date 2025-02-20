@@ -360,13 +360,9 @@ function NewArrivalsPage({ productList, brand, month, isLoaded, to = null, accou
                           {/* {isLoaded ? <img className={Styles.imgHolder} onClick={() => { setProductDetailId(product.Id) }} src={product?.[product.ProductCode]?.ContentDownloadUrl ?? product.image} /> : <LoaderV2 />} */}
                           <div className={` last:mb-0 mb-4 ${Styles.HoverArrow}`}>
                             <div className={` border-[#D0CFCF] flex flex-col gap-4 h-full  ${Styles.ImgHover1}`}>
-                              {imageLoading[product.Id] ? (
-                                <LoaderV2 width={100} height={100} />
-                              ) : (
-                                <ImageHandler image={{src:product.ProductImage ?? "\\assets\\images\\dummy.png",alt:product.Name}} height={212} width={212} onClick={() => {
+                                <ImageHandler Id={product.Id} height={212} width={212} onClick={() => {
                                   setProductDetailId(product.Id);
                                 }} onLoad={() => handleImageLoad(product.Id)} />
-                              )}
                             </div>
                           </div>
                           <p onClick={() => navigate("/Brand/" + product.ManufacturerId__c)} className={Styles.brandHolder}>{product?.ManufacturerName__c}</p>

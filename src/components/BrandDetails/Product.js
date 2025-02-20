@@ -316,7 +316,7 @@ function Product() {
 
   const generateOrderHandler = () => {
     let begValue = fetchBeg();
-    if (begValue.Account.id == localStorage.getItem("AccountId__c") && begValue.Manufacturer.id == localStorage.getItem("ManufacturerId__c")) {
+    if (begValue?.Account?.id == localStorage.getItem("AccountId__c") && begValue?.Manufacturer?.id == localStorage.getItem("ManufacturerId__c")) {
       if (begValue?.Account?.id && begValue?.Manufacturer?.id && begValue.items.length > 0) {
         let bagPrice = 0;
         let bagTesterPrice = 0;

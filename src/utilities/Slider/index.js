@@ -44,7 +44,7 @@ const Slider = ({ data }) => {
                   key={i}
                   className={Style.carouselWrapperElement}
                 >
-                  {e.ContentDownloadUrl ?<img src={e.ContentDownloadUrl} alt={e.ContentDownloadUrl} height={500} width={'auto'}/>:<img src={e.src} alt={e.src} height={500} width={'auto'}/>}
+                  {e?.ContentDownloadUrl ?<img src={e.ContentDownloadUrl} alt={e.ContentDownloadUrl} height={500} width={'auto'}/>:e?.path ?<img src={e?.path} alt={e?.name} height={500} width={'auto'}/>:<img src={e.src} alt={e.src} height={500} width={'auto'}/>}
                 </div>
               );
             })}

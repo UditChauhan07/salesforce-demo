@@ -118,7 +118,7 @@ function LaunchCalendar({ productList, brand, month }) {
                                     </div>
                                     <div className="d-flex mt-2">
                                       <div className="m-auto ProductImg">
-                                        <ImageHandler image={{src:product?.ProductImage,alt:product.Name}} onClick={() => {
+                                        <ImageHandler Id={product.Id} onClick={() => {
                                           setProductDetailId(product.Id);
                                         }}/>
                                       </div>

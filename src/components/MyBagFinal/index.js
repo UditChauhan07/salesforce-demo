@@ -993,16 +993,9 @@ function MyBagFinal({ showOrderFor }) {
                               return (
                                 <div className={Styles.Mainbox} style={errorProduct ? { border: '1px solid red', borderRadius: '5px' } : {}}>
                                   <div className={Styles.Mainbox1M}>
-                                    {/* <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
+                                    <div className={Styles.Mainbox2} style={{ cursor: "pointer" }}>
                                       <ImageHandler
-                                        image={{
-                                          src:
-                                            ele?.ContentDownloadUrl ??
-                                            ele?.ProductImage ??
-                                            productImage?.images?.[ele?.ProductCode]?.ContentDownloadUrl ??
-                                            productImage.images[ele?.ProductCode] ??
-                                            "dummy.png",
-                                        }}
+                                        Id={ele.Id}
                                         width={25}
                                         onClick={() => {
                                           if (!qunatityChange) {
@@ -1010,7 +1003,7 @@ function MyBagFinal({ showOrderFor }) {
                                           }
                                         }}
                                       />
-                                    </div> */}
+                                    </div>
                                     <div className={Styles.Mainbox3}>
                                       <h2
                                         onClick={() => {
