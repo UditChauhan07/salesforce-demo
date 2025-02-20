@@ -997,7 +997,7 @@ export async function fetchProductImageAll({ Id = "'all'" }) {
     Accept: "*/*",
     "Content-Type": "application/json",
   };
-  let url = originAPi + `EAZ7KKgTyBDsI4M/Vds0rHtc7XSWUlF/${Id}/WpCcbIpvCe7SqqT,IFSmK2b7XXOFIbH/kkCCtq4PqLYtJJn`
+  let url = originAPi + `/EAZ7KKgTyBDsI4M/Vds0rHtc7XSWUlF/${Id}/WpCcbIpvCe7SqqT,IFSmK2b7XXOFIbH/kkCCtq4PqLYtJJn`
 
   let response = await fetch(url, {
     headers: headersList,
