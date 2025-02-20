@@ -14,6 +14,7 @@ import Loading from "../../Loading";
 import "./style.css";
 import useBackgroundUpdater from "../../../utilities/Hooks/useBackgroundUpdater";
 import { useLocation } from 'react-router-dom';
+import ImageHandler from "../../loader/ImageHandler";
 const LogoHeader = () => {
   const navigate = useNavigate();
   const [permissions, setPermissions] = useState(null);
@@ -238,7 +239,7 @@ const LogoHeader = () => {
                           {suggestion.type === "account" && <FaStore />}
                           {suggestion.type === "order" && <OrderIcon height={50} width={50} />}
                           {suggestion.type === "Product2" && (
-                            <img className="search-logo" src={`${suggestion.imageUrl}?oauth_token=${key}`} onError={(e) => (e.target.src = "\\assets\\images\\dummy.png")} alt="" />
+                            <ImageHandler className="search-logo" Id={suggestion.Id} />
                           )}
                         </div>
                         <div className="suggested-content">
