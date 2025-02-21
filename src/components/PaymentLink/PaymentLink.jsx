@@ -12,43 +12,43 @@ function PaymentLink() {
     const [orderData , setOrderData] = useState()
      const [token , setToken ] = useState()
      const { order_Id, randomToken } = useParams()
-     const [isPageLoad ,  setIsPageLoad] = useState(false)
+     const [isPageLoad ,  setIsPageLoad] = useState(true)
      const [productData , setProductData] = useState()
         
      const fullUrl = window.location.href;
  
     
-    const checkUrl =  () => {
-        if(orderData){
-            if (fullUrl !== orderData?.PBL_Status__c?.trim()) {
-                Swal.fire({
-                    title: 'Error',
-                    text: `The URL you are trying to reach does not contains any payment details`,
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        confirmButton: 'swal2-confirm'
-                    }
-                }).then(() => {
+    // const checkUrl =  () => {
+    //     if(orderData){
+    //         if (fullUrl !== orderData?.PBL_Status__c?.trim()) {
+    //             Swal.fire({
+    //                 title: 'Error',
+    //                 text: `The URL you are trying to reach does not contains any payment details`,
+    //                 icon: 'warning',
+    //                 confirmButtonText: 'OK',
+    //                 customClass: {
+    //                     confirmButton: 'swal2-confirm'
+    //                 }
+    //             }).then(() => {
                     
-                    window.location.href = window.location.origin + "/";
-            });  
+    //                 window.location.href = window.location.origin + "/";
+    //         });  
               
-            } else {
+    //         } else {
              
-              setIsPageLoad(true)
-            }
-        }
-        else{
-            console.error("OrderData not retrieved")
-        }
+    //           setIsPageLoad(true)
+    //         }
+    //     }
+    //     else{
+    //         console.error("OrderData not retrieved")
+    //     }
       
-      };
+    //   };
       
-     useEffect(()=>{
-     checkUrl()
+    //  useEffect(()=>{
+    //  checkUrl()
 
-     }, [orderData])
+    //  }, [orderData])
      
   
     const fetchBrandDetails = async () => {

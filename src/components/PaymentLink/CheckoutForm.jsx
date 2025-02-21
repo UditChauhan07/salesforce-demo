@@ -53,7 +53,13 @@ const [isBtnLoading , setIsBtnLoading] = useState(false)
                     icon: 'info',
                     confirmButtonText: 'OK',
                 }).then(()=>{
-                    window.location.href = window.location.origin + "/"
+                    if(errorMessage==="This order has already been paid."){
+window.location.href = window.location.origin + "/"
+                    }
+                    else{
+                        
+                    }
+                    
                 })
     
             } else if (paymentIntent && paymentIntent.status === "succeeded") {
