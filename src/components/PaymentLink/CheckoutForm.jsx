@@ -19,15 +19,11 @@ const [isBtnLoading , setIsBtnLoading] = useState(false)
 
 
     const handleSubmit = async (event) => {
-        setIsBtnLoading(true)
+        setIsBtnLoading(true);
         event.preventDefault();
         if (!stripe || !elements) return;
     
         try {
-    
-  
-    
-           
             const cardNumberElement = elements.getElement(CardNumberElement);
     
             const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
@@ -40,36 +36,50 @@ const [isBtnLoading , setIsBtnLoading] = useState(false)
                 },
             });
     
+            console.log({ paymentIntent });
+    
             if (error) {
+                let errorMessage = error.message || "Payment failed. Please try again later.";
                 
-                if(error.message === "A processing error occurred."){
-                    Swal.fire({
-                        title: 'Payment Already Completed!',
-                        text: 'This order has already been paid.',
-                        icon: 'info',
-                        confirmButtonText: 'OK',
-                    }).then(() => {
-                        window.location.href = window.location.origin + "/";
-                    });
+                if (error.message.includes("processing error")) {
+                    errorMessage = "This order has already been paid.";
+                } else if (error.message.includes("error occurred while processing your card")) {
+                    errorMessage = "An error occurred while processing your card. Try again in a little bit.";
                 }
-            } else {
+    
+                Swal.fire({
+                    title: 'Payment Failed',
+                    text: errorMessage,
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                }).then(()=>{
+                    window.location.href = window.location.origin + "/"
+                })
+    
+            } else if (paymentIntent && paymentIntent.status === "succeeded") {
                 setReload(true);
                 Swal.fire({
                     title: 'Payment Successful!',
-                    text: 'Your payment is successful for this order',
+                    text: 'Your payment was successful for this order.',
                     icon: 'success',
                     confirmButtonText: 'OK',
                 }).then(() => {
                     window.location.href = "https://retailer.beautyfashionsales.com/thank-you";
                 });
-                
-                console.log({paymentIntent})
             }
         } catch (error) {
             console.error("Error checking payment status:", error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Something went wrong. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
+        } finally {
+            setIsBtnLoading(false);
         }
     };
-
+    
 
   
 
