@@ -46,12 +46,12 @@ function CreateAccountForm() {
   const redirecting = () => {
     setTimeout(() => {
       navigate("/");
-    }, 2000);
+    }, 6000);
   };
   const handleSubmit = async (values, action) => {
     setLoading(true);
-    const result = await api.newUserSignUp(values,files);
-    setLoading(false);
+    const result = await api.newUserSignUp(values, files);
+    setLoading(false);   
     if (!Array.isArray(result) && result === 200) {
       action.resetForm();
       setInitialValues({
@@ -68,11 +68,9 @@ function CreateAccountForm() {
       setRedirect(true);
     } else {
       setInitialValues(values);
-
       let message = "Something went wrong. Try Again!";
       if (result.length) {
         if (result[0]?.duplicateResult) {
-
           if (result[0].duplicateResult?.duplicateRule) {
             message = result[0].duplicateResult?.duplicateRule.replaceAll("_", " ")
           } else {
@@ -387,7 +385,7 @@ function CreateAccountForm() {
                             <p>
                               <input type="checkbox" id="termBox" />
                               <label htmlFor="termBox">
-                              By signing in or clicking "Apply for an Account", you agree to our Terms of Service. Please also read our Privacy Policy.
+                                By signing in or clicking "Apply for an Account", you agree to our Terms of Service. Please also read our Privacy Policy.
                               </label>
                             </p>
 
