@@ -35,13 +35,10 @@ export const useSignUp = () => {
         const response = await axios.post(originAPi + "/beauty/B0F9FC7237TC", bodydata);
         if (files.length && response?.data?.status == 200 && response?.data?.data?.id) {
           let leadId = response?.data?.data?.id;
-          uploadFileSupport({ key, supportId: leadId, files }).then((fileUploader) => {
-            if (fileUploader) {
-              return response.data.status == 200 ? response.data.status : response?.data?.err ? response?.data?.err : response?.data;
-            }
-          }).catch((fileErr) => {
-            console.log({ fileErr });
-          })
+          let fileUploader = await uploadFileSupport({ key, supportId: leadId, files })
+          if(fileUploader){
+            return response.data.status == 200 ? response.data.status : response?.data?.err ? response?.data?.err : response?.data;
+          }
         } else {
           return response.data.status == 200 ? response.data.status : response?.data?.err ? response?.data?.err : response?.data;
         }
