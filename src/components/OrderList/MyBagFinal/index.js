@@ -560,12 +560,13 @@ function MyBagFinal({ setOrderDetail, generateXLSX, generatePdfServerSide }) {
                         <div className={Styles.paymentCheck}>
                           {OrderData?.Payment_Status__c ? <p>Payment Status : {OrderData?.Payment_Status__c} </p> : null}
                           {OrderData?.Transaction_ID__c ? <p>Transaction ID : {OrderData?.Transaction_ID__c} </p> : null}
-                          {OrderData?.Status__c !== "Order Cancelled" && OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') && !OrderData?.Transaction_ID__c) ?
+                          {OrderData?.Status__c !== "Order Cancelled" && OrderData.PBL_Status__c && ((!OrderData?.Payment_Status__c || OrderData?.Payment_Status__c != 'succeeded') ) ?
                             <div className={Styles.ShipBut}>
                               {!buttonLoading ? <button role="link"
                                 onClick={() => {
                                   if (!buttonLoading) {
                                     openInNewTab(OrderData.PBL_Status__c)
+                                    // navigate(`/paymentLink/${OrderData?.Id}/1`)
                                  
                                   }
                                 }}>Payment Link</button> : null}
