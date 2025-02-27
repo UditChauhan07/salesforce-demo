@@ -21,6 +21,7 @@ export const useSignUp = () => {
             Phone: String(values.contact),
             Email: values.email,
             Description: values.descriptionOfStore,
+            Notes__c: values.descriptionOfStore,
             How_do_you__c: values.sellOption,
             Website: values?.website ?? null,
             Facebook_URL__c: values?.facebookUrl ?? null,
