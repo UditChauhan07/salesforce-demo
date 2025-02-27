@@ -10,7 +10,6 @@ import { uploadFileSupport } from "../../lib/store";
 import ModalPage from "../Modal UI";
 import Swal from "sweetalert2";
 const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, setSubmitForm,salesRepId }) => {
-    console.log("hello")
     const navigate = useNavigate();
     const [contactList, setContactList] = useState([]);
     const [brandList, setBrandList] = useState([]);
@@ -64,6 +63,8 @@ const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, se
         "0123b0000007z9pAAA": "Customer Service",
         "0123b000000GfOEAA0": "Brand Management Approval"
     }
+
+    
     const onSubmitHandler = (values) => {
         let subject = `${typeName[typeId]} for ${reason}`;
         setSubmitForm(true)
@@ -145,7 +146,6 @@ const AccountInfo = ({ reason, typeId, Accounts, postSupportAny, GetAuthData, se
         tempFile.splice(index, 1)
         setFile(tempFile);
     }
-console.log(files , "files")
     return (
         <>
         <ModalPage
