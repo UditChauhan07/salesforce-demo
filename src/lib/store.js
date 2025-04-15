@@ -4,7 +4,7 @@ import { getPermissions } from "./permission";
 import dataStore from "./dataStore";
 import { addImageToDB } from "./indexedDBUtils";
 // export const originAPi = process.env.REACT_APP_OA_URL || "https://live.beautyfashionsales.com/"
-export const originAPi =  "http://localhost:3001"
+export const originAPi =  "https://beauty.truet.net"
 export const defaultLoadTime = 1800000;
 let url2 = `${originAPi}/retailerv2/`;
 let url = `${originAPi}/beauty/`;
